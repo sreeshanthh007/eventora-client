@@ -16,7 +16,7 @@ interface IClientState {
 }
 
 const initialState : IClientState = {
-    client:JSON.parse(sessionStorage.getItem("clientSession") || "null")
+    client:JSON.parse(localStorage.getItem("clientSession") || "null")
 }
 
 const clientSlice = createSlice({
@@ -25,11 +25,11 @@ const clientSlice = createSlice({
     reducers:{
         clientLogin:(state,action:PayloadAction<Client>) =>{
             state.client = action.payload
-            sessionStorage.setItem("clientSession",JSON.stringify(action.payload))
+            localStorage.setItem("clientSession",JSON.stringify(action.payload))
         },
         clientLogout:(state)=>{
             state.client = null
-            sessionStorage.removeItem("clientSession")
+            localStorage.removeItem("clientSession")
         }
     }
 });

@@ -1,5 +1,5 @@
 import { clientAxiosInstance } from "@/api/client.axios";
-
+import { type IAxiosResponse } from "@/types/Response";
 
 
 export type Client ={
@@ -25,3 +25,12 @@ export const getClientDetails = async()=>{
     )
     return result.data
 }
+
+
+        export const clientForgotUpdatePassword = async(data: { email: string; password: string })=>{
+            const result = await clientAxiosInstance.put<IAxiosResponse>(
+                "/forgot-password",
+                data
+            )
+            return result.data
+        }

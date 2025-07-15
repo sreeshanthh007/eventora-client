@@ -43,6 +43,7 @@ export const ClientLogin = () => {
       redirectText="Don't have an Account ?" 
       redirectLinkText="Register now"
       onSubmit={handleLoginSubmit}
+      role="client"
       />
       </AuthLayout>
   )

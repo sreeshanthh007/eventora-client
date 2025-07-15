@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import type { ILoginData } from "@/services/auth/authServices"
 import { useLoginMutation } from "@/hooks/auth/userLogin";
 import { toast } from "sonner";
+import { vendorLogin } from "@/store/slices/vendorSlice";
 
 
 
@@ -16,16 +17,17 @@ export const VendorLoginPage = () => {
   const {mutate:loginUser} = useLoginMutation()
 
   const handleLoginSubmit = (data:Omit<ILoginData,"role">)=>{
-    
+    console.log("data in frond",data)
     loginUser(
-      {...data,role:"client"},
+      {...data,role:"vendor"},
       {
         onSuccess:(data)=>{
           toast.success(data.message)
-          dispatch(clientLogin(data.user))
+          dispatch(vendorLogin(data.user))
         },
         onError:(err)=>{
-          toast.error(err.message)
+          console.log(err)
+          toast.error(err.response?.data.message)
         }
       }
     )

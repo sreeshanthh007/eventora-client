@@ -1,25 +1,24 @@
-import { Navigate } from "react-router-dom";
-import {  useSelector } from "react-redux";
-import { type  RootState } from "@/store/store";
-import type { JSX } from "react";
+import { useSelector } from "react-redux";
+import { Navigate, Outlet } from "react-router-dom";
+import type { RootState } from "@/store/store";
 
-interface allowedProps {
-    element : JSX.Element
-    allowedRoutes : string[]
-}
-export const AuthRoute = ({element,allowedRoutes}:allowedProps)=>{
-    
-    const userRole = useSelector((state:RootState)=>state.client.client?.role)
+export const VendorProtectedRoute = () => {
+  const vendor = useSelector((state: RootState) => state.vendor.vendor);
 
-    console.log(userRole)
+  return vendor ? <Outlet /> : <Navigate to="/vendor/login" />;
+};
 
-    if(!userRole){
-        return <Navigate to="/login" replace/>
-    }
 
-   return allowedRoutes.includes("client")  ? (
-         element
-    ) : (
-        <Navigate to="/unauthorized"/>
-    )
+
+
+
+export const ClientProtectedRoute = () => {
+  const client = useSelector((state: RootState) => state.client.client);
+
+  return client ? <Outlet /> : <Navigate to="/login" />;
+};
+
+export const AdminProtectedRoute = () => {
+  const admin = useSelector((state: RootState) => state.admin.admin)
+  return admin ? <Outlet /> : <Navigate to="/admin/login" />
 }

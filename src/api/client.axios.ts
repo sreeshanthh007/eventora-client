@@ -13,13 +13,13 @@ clientAxiosInstance.interceptors.response.use(
     (response)=>response,
     async (error)=>{
         const originalRequest = error.config
-
+        
+    console.log("⚠️ Interceptor Triggered:", error?.response?.status);
         if(error.response?.status==401 && !originalRequest._retry){
             originalRequest._retry=true
 
             if(!isRefreshing){
                 isRefreshing = true
-
                 try {
                     await clientAxiosInstance.post("/refresh-token");
                     isRefreshing = false

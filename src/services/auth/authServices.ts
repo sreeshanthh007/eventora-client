@@ -46,6 +46,13 @@ export const sendOtp = async(email:string):Promise<IAxiosResponse> =>{
     return response.data
 }
 
+export const sendForgotPasswordOtp = async(email:string) : Promise<IAxiosResponse>=>{
+    const response = await AuthAxiosInstance.post("/forgot-password/sent-otp",{
+        email
+    });
+    return response.data
+}
+
 
 export const verifyOtp = async(data:{email:string,otp:string}) : Promise<IAxiosResponse>=>{
     const response = await AuthAxiosInstance.post<IAxiosResponse>(
