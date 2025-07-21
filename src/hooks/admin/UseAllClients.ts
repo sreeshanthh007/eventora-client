@@ -13,7 +13,6 @@
     return useQuery({
         queryKey: ["clients", page, limit, search],
         queryFn: () => getAllClients({ page, limit, search }),
-        keepPreviousData: true, 
         staleTime: 1000 * 60, 
     })
     }

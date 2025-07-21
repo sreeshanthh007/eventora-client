@@ -6,7 +6,6 @@ import * as Yup from "yup"
 const ClientSignupSchema = Yup.object().shape({
     name:Yup.string()
     .required("Name is required")
-
     .matches(
 			/^[a-zA-Z\s]+$/,
 			"Full name should only contain letters and spaces"

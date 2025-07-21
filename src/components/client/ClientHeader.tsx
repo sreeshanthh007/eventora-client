@@ -23,14 +23,16 @@ import { Separator } from "@/components/pages/ui/separator"
 import { Button } from "../pages/ui/button"    
 import { Instagram , Linkedin , Facebook } from "lucide-react"
 import { useDispatch, useSelector } from "react-redux";
-
+import { UseLogout } from "@/hooks/auth/Uselogout";
+import { logOutClient } from "@/services/auth/authServices";
+import { logout } from "@/store/userSlice";
+import { toast } from "sonner";
   
  export const ClientHeader : React.FC = () => {
   const client = useSelector((state:RootState)=>state.client.client)
-  const dispatch = useDispatch()
   const navigate = useNavigate()
   
-    const sidebarMenuItems = [
+  const sidebarMenuItems = [
     { icon: User, label: "My Profile", href: "#" },
     { icon: Ticket, label: "My Events", href: "#" },
     { icon: Heart, label: "Favorites", href: "#" },
@@ -40,9 +42,25 @@ import { useDispatch, useSelector } from "react-redux";
     { icon: Settings, label: "Settings", href: "#" },
     { icon: HelpCircle, label: "Help & Support", href: "#" },
   ]
-
-
+  
+  
     const [sidebarOpen, setSidebarOpen] = useState(false)
+    
+    const dispatch = useDispatch()
+    const {mutate:logoutReq} = UseLogout(logOutClient)
+
+    const handleLogout = ()=>{
+      logoutReq(undefined,{
+        onSuccess:(data)=>{
+          dispatch(clientLogout())
+          toast.success(data.message)
+        },
+
+        onError:(err:any)=>{
+          toast.error(err.response?.data.message)
+        }
+      })
+    }
      return (
     <header className="bg-gradient-to-r from-purple-900 via-blue-900 to-indigo-900 text-white shadow-2xl sticky top-0 z-50 border-b border-purple-500/30 backdrop-blur-md">
       <div className="container mx-auto px-4 py-4">
@@ -136,10 +154,7 @@ import { useDispatch, useSelector } from "react-redux";
                         {client ? (
                           <button
                             className="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-red-900/50 transition-all duration-300 w-full text-left text-red-400 group"
-                            onClick={() => {
-                              dispatch(clientLogout());
-                              navigate("/login");
-                            }}
+                            onClick={handleLogout}
                           >
                             <LogOut className="w-5 h-5 group-hover:text-red-300 group-hover:scale-110 transition-all" />
                             <span className="font-medium group-hover:text-red-300">Sign Out</span>

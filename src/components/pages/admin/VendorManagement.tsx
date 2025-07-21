@@ -13,6 +13,7 @@ import {
 import { Button } from "../ui/button"
 import { Card } from "../ui/card"
 import { getAllVendors, updateVendorStatus } from "@/services/admin/adminService"
+import { Pagination } from "@/components/common/paginations/Pagination"
 
 interface IVendor {
   _id: string
@@ -30,17 +31,20 @@ const VendorManagementPage = () => {
   const [vendors, setVendors] = useState<IVendor[]>([])
   const [loading, setLoading] = useState(false)
   const [updatingUsers, setUpdatingUsers] = useState<Set<string>>(new Set())
-
+  const [currentPage, setCurrentPage] = useState(1)
+      const [totalPages, setTotalPages] = useState(1)
+    const limit = 10
   const fetchVendors = async () => {
     setLoading(true)
     try {
       const response = await getAllVendors({
         page: 1,
-        limit: 100,
+        limit: limit,
         search: ""
       })
       console.log(response)
       setVendors(response.vendors) 
+      setTotalPages(response.totalPages)
     } catch (error) {
       console.error("Error fetching vendors:", error)
 
@@ -51,7 +55,7 @@ const VendorManagementPage = () => {
 
   useEffect(() => {
     fetchVendors()
-  }, [])
+  }, [currentPage])
 
   const handleBlockUser = async (vendor: IVendor) => {
 
@@ -161,6 +165,12 @@ const VendorManagementPage = () => {
               ) : (
                 <div className="overflow-x-auto">
                   {renderVendorTable()}
+                  <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={(page)=>setCurrentPage(page)}
+                  
+                  />
                 </div>
               )}
             </div>

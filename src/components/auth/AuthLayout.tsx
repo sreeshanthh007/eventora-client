@@ -1,14 +1,16 @@
-import React from 'react'
+"use client"
+
+import type React from "react"
 import { Calendar, Users, MapPin, Clock, Star, Ticket, Music, Camera } from "lucide-react"
 import { motion } from "framer-motion"
 interface AuthLayoutProps {
-    children:React.ReactNode;
-    imageSrc:string,
-    heading:string,
-    subHeading:string
+  children: React.ReactNode
+  imageSrc: string
+  heading: string
+  subHeading: string
 }
 export const AuthLayout = ({ children, imageSrc, heading, subHeading }: AuthLayoutProps) => {
-     const floatingIcons = [
+  const floatingIcons = [
     { Icon: Calendar, size: 28, position: "top-16 left-10", delay: 0 },
     { Icon: Users, size: 24, position: "top-32 right-16", delay: 0.1 },
     { Icon: MapPin, size: 26, position: "top-48 left-20", delay: 0.2 },
@@ -26,18 +28,14 @@ export const AuthLayout = ({ children, imageSrc, heading, subHeading }: AuthLayo
     { Icon: Users, size: 22, position: "bottom-40 left-32", delay: 1.4 },
     { Icon: Calendar, size: 20, position: "bottom-60 right-32", delay: 1.5 },
   ]
-
   return (
     <div className="min-h-screen flex flex-col lg:flex-row relative overflow-hidden bg-black">
-
       <motion.div
         className="absolute inset-0 bg-black z-50 pointer-events-none"
         initial={{ opacity: 1 }}
         animate={{ opacity: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
       />
-
-
       <motion.div
         className="absolute top-0 left-0 w-full h-full bg-black z-40 pointer-events-none"
         initial={{ x: 0 }}
@@ -50,8 +48,6 @@ export const AuthLayout = ({ children, imageSrc, heading, subHeading }: AuthLayo
         animate={{ x: "100%" }}
         transition={{ duration: 0.6, delay: 0.4, ease: "easeInOut" }}
       />
-
-    
       <motion.div
         className="lg:w-1/2 relative min-h-[50vh] lg:min-h-screen"
         initial={{ x: -100, opacity: 0 }}
@@ -67,8 +63,6 @@ export const AuthLayout = ({ children, imageSrc, heading, subHeading }: AuthLayo
           transition={{ duration: 1.2, ease: "easeOut" }}
         />
       </motion.div>
-
-     
       <motion.div
         className="hidden lg:block w-px bg-gradient-to-b from-transparent via-gray-400 to-transparent relative"
         initial={{ scaleY: 0 }}
@@ -88,7 +82,6 @@ export const AuthLayout = ({ children, imageSrc, heading, subHeading }: AuthLayo
           />
         </motion.div>
       </motion.div>
-
       <motion.div
         className="lg:w-1/2 min-h-[50vh] lg:min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 relative flex items-center justify-center"
         initial={{ x: 100, opacity: 0 }}
@@ -108,7 +101,7 @@ export const AuthLayout = ({ children, imageSrc, heading, subHeading }: AuthLayo
               }}
               transition={{
                 duration: 3,
-                delay: delay, 
+                delay: delay,
                 repeat: Number.POSITIVE_INFINITY,
                 ease: "easeInOut",
               }}
@@ -117,7 +110,6 @@ export const AuthLayout = ({ children, imageSrc, heading, subHeading }: AuthLayo
             </motion.div>
           ))}
         </div>
-
         <motion.div
           className="w-full max-w-md mx-8 space-y-8 relative z-20"
           initial={{ y: 50, opacity: 0 }}
@@ -140,7 +132,6 @@ export const AuthLayout = ({ children, imageSrc, heading, subHeading }: AuthLayo
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.4, delay: 1.0 }}
             />
-
             <motion.div
               className="text-center mb-8 relative z-10"
               initial={{ y: 20, opacity: 0 }}

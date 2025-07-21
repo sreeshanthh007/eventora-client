@@ -7,7 +7,6 @@ import { Button } from "../pages/ui/button"
 import { Input } from "../pages/ui/input"
 import { Label } from "../pages/ui/label"
 import { Mail, Shield, X, ArrowLeft } from 'lucide-react'
-import { useSendOtpMutation } from "@/hooks/auth/UseSendOtp"
 import { useVerifyOtpMutation } from "@/hooks/auth/UseVerifyOtp"
 import { toast } from "sonner"
 import { UseTimer } from "@/hooks/UseTimer"
@@ -124,6 +123,8 @@ const handleResendOTP = () => {
 }
 
   return (
+
+    <>
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md bg-gradient-to-br from-white to-purple-50 border-0 shadow-2xl">
         <DialogHeader className="relative">
@@ -272,5 +273,6 @@ const handleResendOTP = () => {
         </div>
       </DialogContent>
     </Dialog>
+    </>
   )
 }

@@ -7,7 +7,7 @@ import { Input } from "../pages/ui/input"
 import { Lock, Eye, EyeOff, X, CheckCircle } from "lucide-react"
 import { useClientForgotPasswordMutation } from "@/hooks/client/UseClientForgotPassword"
 import { UseVendorForgotPasswordMutation } from "@/hooks/vendor/UseVendorForgotPassword"
-import { UseVendorSentOTP } from "@/hooks/vendor/UseVendorSentOTP"
+import { usePasswordValidation } from "@/hooks/services/Usepasswordvalidation"
 interface ResetPasswordModalProps {
   isOpen: boolean
   onClose: () => void
@@ -15,15 +15,6 @@ interface ResetPasswordModalProps {
   email: string
   role:string
   
-}
-
-interface PasswordValidation {
-  minLength: boolean
-  hasUpper: boolean
-  hasLower: boolean
-  hasNumber: boolean
-  hasSpecial: boolean
-  isValid: boolean
 }
 export const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({ isOpen, onClose, onSuccess, email , role }) => {
 
@@ -39,24 +30,11 @@ const {mutate:forgotPasswordClient} = useClientForgotPasswordMutation()
 
 
 
-  const passwordValidation: PasswordValidation = useMemo(() => {
-    const minLength = password.length >= 8
-    const hasUpper = /[A-Z]/.test(password)
-    const hasLower = /[a-z]/.test(password)
-    const hasNumber = /\d/.test(password)
-    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password)
-    return {
-      minLength,
-      hasUpper,
-      hasLower,
-      hasNumber,
-      hasSpecial,
-      isValid: minLength && hasUpper && hasLower && hasNumber && hasSpecial
-    }
-  }, [password])
+  const passwordValidation = usePasswordValidation(password)
+  
 
   const validatePassword = (pwd: string): string | undefined => {
-    if (!pwd) return "Password is required"
+    if (!pwd) return "Password is required" 
     if (pwd.length < 8) return "Password must be at least 8 characters"
     if (!/[A-Z]/.test(pwd)) return "Password must contain at least one uppercase letter"
     if (!/[a-z]/.test(pwd)) return "Password must contain at least one lowercase letter"
@@ -88,19 +66,16 @@ const {mutate:forgotPasswordClient} = useClientForgotPasswordMutation()
 
     setErrors(newErrors)
 
-  
     if (Object.keys(newErrors).length > 0) return
 
     setIsLoading(true)
     
     try {
-
           const resetPasswordData = {
           email,
           password,
         }
 
- 
 const handler = role=="client" ? forgotPasswordClient : forgotPasswordVendor
 console.log("in handler",handler)
 await new Promise((resolve, reject) => {

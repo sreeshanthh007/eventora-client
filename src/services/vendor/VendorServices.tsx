@@ -19,3 +19,21 @@ export const VendorSentOTPForforgotPassword = async(email:string) : Promise<IAxi
     });
     return response.data    
 }
+
+export interface IVendorProfileUpdateData{
+    name:string,
+    phone:string,
+    bio:string,
+    place:string
+}
+
+
+export const GetVendorDetails = async()=>{
+    const response = await vendorAxiosInstance.get("/details")
+    return response.data    
+}
+
+export const updateVendorProfile =async(data:IVendorProfileUpdateData)=>{
+    const response = await vendorAxiosInstance.put("/update-profile",data)
+    return response.data
+}

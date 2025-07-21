@@ -12,15 +12,16 @@ export const VendorRoutes = () => {
   return (
     <Routes>
       {/* Public routes - only visible when NOT logged in */}
-      <Route element={<VendorPublicRoute />}>
+        <Route element={<VendorPublicRoute />}>
         <Route path="register" element={<VendorRegisterPage />} />
         <Route path="login" element={<VendorLoginPage />} />
       </Route>
 
+        <Route path="" element={<VendorLandingPage />} />
       {/* Protected route - only accessible when logged in */}
       <Route element={<VendorProtectedRoute />}>
-        <Route path="" element={<VendorLandingPage />} />
-        {/* 👆 this matches "/vendor" correctly */}
+      
+
       </Route>
     </Routes>
   );

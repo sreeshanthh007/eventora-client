@@ -1,12 +1,19 @@
 import { Avatar, AvatarFallback } from "@radix-ui/react-avatar"
 import type React from "react"
 import { useDispatch } from "react-redux"
+import { UseLogout } from "@/hooks/auth/Uselogout"
+import { VendorLogout } from "@/services/auth/authServices"
 import { vendorLogout } from "@/store/slices/vendorSlice"
-import { useNavigate } from "react-router-dom"
+import { useToast } from "@/hooks/ui/UseToaster"
+import { toast } from "sonner"
+
 
 export const VendorSidebar: React.FC = () => {
   const dispatch = useDispatch()
-  const navigate = useNavigate()
+  const {showToast} = useToast()
+
+  // const vendor = useState((state:RootState)=>state.vendor.vendor)
+  // const navigate = useNavigate()
 
   const sidebarItems = [
     { name: "Dashboard", active: false },
@@ -20,9 +27,22 @@ export const VendorSidebar: React.FC = () => {
     { name: "Logout", active: false },
   ]
 
-  const handleLogout = () => {
-    dispatch(vendorLogout())
-    navigate("/vendor/login") 
+
+    const {mutate:logoutReq} = UseLogout(VendorLogout)
+
+
+  const handleLogout = ()=>{
+    logoutReq(undefined,
+      {
+        onSuccess:(data)=>{
+          toast.success(data.message)
+            dispatch(vendorLogout());
+        },
+        onError:(err:any)=>{
+          toast.error(err.response?.data.message)
+        }
+      }
+    )
   }
 
   return (

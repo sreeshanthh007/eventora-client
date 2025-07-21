@@ -12,6 +12,9 @@ import { Link } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
 import { adminLogout } from "@/store/slices/adminSlice"
 import type { RootState } from "@/store/store"
+import { UseLogout } from "@/hooks/auth/Uselogout"
+import { AdminLogout } from "@/services/auth/authServices"
+import { toast } from "sonner"
 
 
 // Menu items
@@ -64,8 +67,20 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const dispatch = useDispatch()
     const admin = useSelector((state:RootState)=>state.admin.admin)
+    const {mutate:logoutReq} = UseLogout(AdminLogout)
+   
     const handleLogout = ()=>{
-      dispatch(adminLogout())
+      logoutReq(undefined,
+        {
+          onSuccess:(data)=>{
+            toast.success(data.message)
+            dispatch(adminLogout())
+          },
+          onError:(err:any)=>{
+            toast.error(err.response?.data.message)
+          }
+        }
+      )
     }
 
   return (

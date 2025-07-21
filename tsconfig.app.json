@@ -3,7 +3,7 @@
     /* By Schadcn*/
       "paths": {
       "@/*": [
-        "./src/*"
+        "src/*"
       ]
     },
 
