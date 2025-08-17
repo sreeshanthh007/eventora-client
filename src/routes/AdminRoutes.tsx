@@ -1,31 +1,89 @@
+import { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 import { NotFound } from "@/Custom404Page";
+import Spinner from "@/components/common/spinners/AdminSpinner";
 
 import AdminLoginPage from "@/components/pages/admin/AdminPage";
-import AdminDashboard from "@/components/admin/Admindashboard";
-import ClientManagementPage from "@/components/pages/admin/ClientManagement";
 import { AdminProtectedRoute } from "@/protected/ProtectedRoute";
 import { AdminPublicRoute } from "@/protected/PublicRoute";
-import VendorManagementPage from "@/components/pages/admin/VendorManagement";
+import CategoryManagementPage from "@/components/pages/admin/managementPages/CategoryManagementPage";
+import { AddCategoryPage } from "@/components/pages/admin/AddCategoryPage";
+import RequestedVendorsPage from "@/components/pages/admin/managementPages/VendorRequestManagementPage";
+// import EditCategoryPage from "@/components/pages/admin/EditCategoryPage";
+
+const AdminDashboard = lazy(() => import("@/components/admin/Admindashboard"));
+const ClientManagementPage = lazy(() => import("@/components/pages/admin/managementPages/ClientManagement"));
+const VendorManagementPage = lazy(() => import("@/components/pages/admin/managementPages/VendorManagement"));
 
 export const AdminRoutes = () => {
   return (
     <>
-    
-    <Routes>
+      <Routes>
+        <Route element={<AdminPublicRoute />}>
+          <Route path="/login" element={<AdminLoginPage />} />
+        </Route>
 
-      <Route element={<AdminPublicRoute />}>
-      <Route path="/login" element={<AdminLoginPage />} />
-    </Route>
+        <Route element={<AdminProtectedRoute />}>
+          <Route
+            path="/dashboard"
+            element={
+              <Suspense fallback={<Spinner />}>
+                <AdminDashboard />
+              </Suspense>
+            }
+          />
 
-     <Route element={<AdminProtectedRoute />}>
-        <Route path="/dashboard" element={<AdminDashboard />} />
-        <Route path="/clients" element={<ClientManagementPage />} />
-        <Route path="/vendors" element={<VendorManagementPage/>}/>
-      </Route>
-      <Route path="*" element={<NotFound />} />
-    </Routes>
-    
+          <Route
+            path="/clients"
+            element={
+              <Suspense fallback={<Spinner />}>
+                <ClientManagementPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/vendors"
+            element={
+              <Suspense fallback={<Spinner />}>
+                <VendorManagementPage />
+              </Suspense>
+            }
+          />
+
+          <Route
+          path="/addCategory"
+          element={
+            <Suspense fallback={<Spinner/>}>
+              <AddCategoryPage/>
+            </Suspense>
+          }
+          />
+
+          {/* <Route
+          path="/editCategory/:id"
+          element={
+            <Suspense fallback={<Spinner/>}>
+              <EditCategoryPage/>
+            </Suspense>
+          }
+          /> */}
+           <Route path="/category" element={
+      <Suspense fallback={<Spinner/>}>
+        <CategoryManagementPage/>
+      </Suspense>
+    } /> 
+
+    <Route path="/requestedVendors" element={
+      <Suspense fallback={<Spinner/>}>
+        <RequestedVendorsPage/>
+      </Suspense>
+    }
+
+
+    />
+        </Route>
+        <Route path="*" element={<NotFound />} />
+      </Routes>
     </>
-  )
-}
+  );
+};

@@ -8,11 +8,19 @@ import { useQuery } from "@tanstack/react-query"
     search: string
     }
 
+
+    interface VendorResponse {
+  success: boolean;
+  message: string;
+  vendors: [];
+  totalPages: number;
+}
+
     export const useGetAllVendors = ({ page, limit, search }: UseGetAllCVendorssParams) => {
-    return useQuery({
-        queryKey: ["clients", page, limit, search],
-        queryFn: () => getAllVendors({ page, limit, search }),
-        keepPreviousData: true, 
-        staleTime: 1000 * 60, 
-    })
-    }
+  return useQuery<VendorResponse, Error>({
+    queryKey: ["vendors", page, limit, search],
+    queryFn: () => getAllVendors({ page, limit, search }),
+    
+    
+  }); 
+};

@@ -1,12 +1,11 @@
 import type React from "react"
-import { useState, useMemo } from "react"
+import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../pages/ui/dialog"
 import { Button } from "../pages/ui/button"
 import { Label } from "../pages/ui/label"
 import { Input } from "../pages/ui/input"
 import { Lock, Eye, EyeOff, X, CheckCircle } from "lucide-react"
 import { useClientForgotPasswordMutation } from "@/hooks/client/UseClientForgotPassword"
-import { UseVendorForgotPasswordMutation } from "@/hooks/vendor/UseVendorForgotPassword"
 import { usePasswordValidation } from "@/hooks/services/Usepasswordvalidation"
 interface ResetPasswordModalProps {
   isOpen: boolean
@@ -26,7 +25,6 @@ export const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({ isOpen, 
   const [errors, setErrors] = useState<{ password?: string; confirmPassword?: string; api?: string }>({})
   
 const {mutate:forgotPasswordClient} = useClientForgotPasswordMutation()
- const { mutate: forgotPasswordVendor } = UseVendorForgotPasswordMutation()
 
 
 
@@ -74,9 +72,10 @@ const {mutate:forgotPasswordClient} = useClientForgotPasswordMutation()
           const resetPasswordData = {
           email,
           password,
+          role
         }
 
-const handler = role=="client" ? forgotPasswordClient : forgotPasswordVendor
+const handler = forgotPasswordClient
 console.log("in handler",handler)
 await new Promise((resolve, reject) => {
   handler(resetPasswordData, {

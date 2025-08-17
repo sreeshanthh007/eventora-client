@@ -3,18 +3,31 @@ import { AuthLayout } from "@/components/auth/AuthLayout";
 
 import vendorSignUpImage from "../../../assets/common/ProviderSignupImage.png"
 import { useRegisterMutation } from "@/hooks/auth/userRegister";
-import type { User } from '@/types/User'
+import type { IVendor, } from '@/types/User'
 import { toast } from "sonner";
+import { uploadImageToCloudinarySigned } from "@/services/cloudinary/cloudinary";
+
 
 export const VendorRegisterPage = () => {
    const {mutate:registerUser} = useRegisterMutation()
 
-  const handleSignupSubmit = (data:Omit<User,"role">)=>{
+  const handleSignupSubmit = async(data:Omit<IVendor,"role">)=>{
+    
+   let uploadedImageUrl: string | null = null;
+   
+   if(data.idProof instanceof File){  
+    uploadedImageUrl = await uploadImageToCloudinarySigned(data.idProof as File,"vendor-id-proofs")
+    console.log("image url",uploadedImageUrl)
+    if(!uploadedImageUrl){
+    toast.error("failed to upload")
+    return
+   }
+   }
     registerUser(
-      {...data,role:"vendor"},
+      {...data,role:"vendor",idProof:uploadedImageUrl || ""},
       {
         onSuccess:(data)=>{
-          toast.success(data.message)
+          toast.success(data.message) 
         },
 
         onError:((err)=>{

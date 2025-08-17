@@ -7,7 +7,8 @@ export interface User{
     email:string,
     phone:string,
     password:string,
-    role?:UserRole
+    role?:UserRole,
+    idProof:string
 }
 
 
@@ -27,9 +28,18 @@ export interface IVendor {
   name:string,
   email: string;
   phone: string;
-  password: string;
-  role: "vendor";
-  category?: string;
+  password?: string;
+  role?: "vendor";
+  profileImage?:string
+  idProof?:File | null | string,
+  vendorStatus:"approved" | "pending" | "rejected",
+  status?:string
+}
+
+export interface ICategory {
+    categoryId:string
+    title:string,
+    image:File
 }
 
 

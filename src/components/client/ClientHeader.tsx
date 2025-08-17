@@ -1,39 +1,23 @@
-    
-import {Sheet , SheetTrigger , SheetTitle , SheetContent,SheetHeader} from "@/components/pages/ui/sheet"
+import {Sheet , SheetTrigger  , SheetContent,SheetHeader} from "../pages/ui/sheet"
 import React, { useState } from "react"
+import { Users, Bell, Menu, Ticket, Heart, User, CreditCard, Settings, HelpCircle, LogOut } from 'lucide-react'
+import type { RootState } from "@/store/store"
+import { useNavigate } from "react-router-dom"
+import { clientLogout } from "@/store/slices/clientSlice"
+import { Avatar, AvatarFallback, AvatarImage } from "../pages/ui/avatar"
+import { Separator } from "../pages/ui/separator"
+import { Button } from "../pages/ui/button"
+import { useDispatch, useSelector } from "react-redux"
+import { UseLogout } from "@/hooks/auth/Uselogout"
+import { logOutClient } from "@/services/auth/authServices"
+import { toast } from "sonner"
 
-import { Users , Bell , Menu ,
-    Ticket,
-    Heart,
-    User,
-    CreditCard,
-    Settings,
-    HelpCircle,
-    LogOut
-
-} from "lucide-react"
-
-import type { RootState } from "@/store/store";
-import { useNavigate } from "react-router-dom";
-import { clientLogout } from "@/store/slices/clientSlice";
-
-
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/pages/ui/avatar"
-import { Separator } from "@/components/pages/ui/separator"
-import { Button } from "../pages/ui/button"    
-import { Instagram , Linkedin , Facebook } from "lucide-react"
-import { useDispatch, useSelector } from "react-redux";
-import { UseLogout } from "@/hooks/auth/Uselogout";
-import { logOutClient } from "@/services/auth/authServices";
-import { logout } from "@/store/userSlice";
-import { toast } from "sonner";
-  
- export const ClientHeader : React.FC = () => {
-  const client = useSelector((state:RootState)=>state.client.client)
+export const ClientHeader: React.FC = () => {
+  const client = useSelector((state: RootState) => state.client.client)
   const navigate = useNavigate()
   
   const sidebarMenuItems = [
-    { icon: User, label: "My Profile", href: "#" },
+    { icon: User, label: "My Profile", href: "/profile" },
     { icon: Ticket, label: "My Events", href: "#" },
     { icon: Heart, label: "Favorites", href: "#" },
     { icon: Bell, label: "Notifications", href: "#" },
@@ -43,139 +27,129 @@ import { toast } from "sonner";
     { icon: HelpCircle, label: "Help & Support", href: "#" },
   ]
   
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   
-    const [sidebarOpen, setSidebarOpen] = useState(false)
-    
-    const dispatch = useDispatch()
-    const {mutate:logoutReq} = UseLogout(logOutClient)
+  const dispatch = useDispatch()
+  const { mutate: logoutReq } = UseLogout(logOutClient)
+  
+  const handleLogout = () => {
+    logoutReq(undefined, {
+      onSuccess: (data) => {
+        dispatch(clientLogout())
+        toast.success(data.message)
+      },
+      onError: (err: any) => {
+        toast.error(err.response?.data.message)
+      }
+    })
+  }
 
-    const handleLogout = ()=>{
-      logoutReq(undefined,{
-        onSuccess:(data)=>{
-          dispatch(clientLogout())
-          toast.success(data.message)
-        },
-
-        onError:(err:any)=>{
-          toast.error(err.response?.data.message)
-        }
-      })
-    }
-     return (
-    <header className="bg-gradient-to-r from-purple-900 via-blue-900 to-indigo-900 text-white shadow-2xl sticky top-0 z-50 border-b border-purple-500/30 backdrop-blur-md">
+  return (
+    <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-    
-          <div className="flex items-center space-x-4">
-            <Instagram className="w-5 h-5 text-purple-300 hover:text-white cursor-pointer transition-all duration-300 hover:scale-110 hover:rotate-12" />
-            <Facebook className="w-5 h-5 text-purple-300 hover:text-white cursor-pointer transition-all duration-300 hover:scale-110 hover:rotate-12" />
-            <Linkedin className="w-5 h-5 text-purple-300 hover:text-white cursor-pointer transition-all duration-300 hover:scale-110 hover:rotate-12" />
-          </div>
-
-       
-          <div className="text-2xl md:text-3xl font-bold tracking-wider cursor-pointer group">
-            <span className="bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-500 bg-clip-text text-transparent animate-pulse">
-              EVENTORA
-            </span>
-            <div className="h-1 w-0 group-hover:w-full bg-gradient-to-r from-yellow-400 to-purple-500 transition-all duration-500 mx-auto"></div>
-          </div>
-
-        
-          <div className="flex items-center space-x-3"> 
-            <Button
-              variant="ghost"
-              size="icon"
-              className="hidden sm:flex text-purple-300 hover:text-white hover:bg-purple-800/50 transition-all duration-300 rounded-full relative"
-            >
-              <Bell className="w-5 h-5" />
-              <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping"></span>
-            </Button>
-
-           
-            <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-              <SheetTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-purple-300 hover:text-white hover:bg-purple-800/50 transition-all duration-300 p-2 rounded-full"
-                >
-                  <Menu className="w-6 h-6" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent
-                side="right"
-                className="w-80 bg-gradient-to-b from-purple-900 to-indigo-900 text-white border-l border-purple-500/30"
-              >
-                <SheetHeader className="border-b border-purple-500/30 pb-4">
-                  <SheetTitle className="text-white text-left font-bold text-lg">Menu</SheetTitle>
-                </SheetHeader>
-
-              
-                <div className="py-6 border-b border-purple-500/30">
-                 <div className="flex items-center space-x-3">
-                    <Avatar className="h-12 w-12 border-2 border-purple-400 ring-2 ring-purple-300/50">
-                      <AvatarImage src={"" || "/placeholder.svg?height=48&width=48&text=User"} />
-                      <AvatarFallback className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold">
-                        {client?.name ? client.name[0] : "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <h3 className="font-semibold text-white">
-                        {client?.name || "Guest User"}
-                      </h3>
-                      {client?.email && (
-                        <p className="text-sm text-purple-300">{client.email}</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
           
-                <nav className="py-4">
-                  <ul className="space-y-1">
-                    {sidebarMenuItems.map((item, index) => (
-                      <li key={index}>
-                        <a
-                          href={item.href}
-                          className="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-purple-800/50 transition-all duration-300 group"
-                          onClick={() => setSidebarOpen(false)}
-                        >
-                          <item.icon className="w-5 h-5 text-purple-300 group-hover:text-white transition-colors group-hover:scale-110" />
-                          <span className="font-medium">{item.label}</span>
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </nav>
-                <Separator className="bg-purple-500/30" />
-
-        
-               <div className="py-4">
-                        {client ? (
-                          <button
-                            className="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-red-900/50 transition-all duration-300 w-full text-left text-red-400 group"
-                            onClick={handleLogout}
-                          >
-                            <LogOut className="w-5 h-5 group-hover:text-red-300 group-hover:scale-110 transition-all" />
-                            <span className="font-medium group-hover:text-red-300">Sign Out</span>
-                          </button>
-                        ) : (
-                          <button
-                            className="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-blue-900/50 transition-all duration-300 w-full text-left text-blue-400 group"
-                            onClick={() => navigate("/login")}
-                          >
-                            <User className="w-5 h-5 group-hover:text-blue-300 group-hover:scale-110 transition-all" />
-                            <span className="font-medium group-hover:text-blue-300">Login</span>
-                          </button>
+          {/* Logo */}
+          <div className="text-2xl md:text-3xl  text-gray-900 cursor-pointer">
+            EVENTORA
+          </div>
+          
+          {/* Navigation Menu - Desktop */}
+          <nav className="hidden md:flex items-center space-x-8">
+            <a href="#" className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">
+              Home
+            </a>
+            <a href="#" className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">
+              Events
+            </a>
+            <a href="#" className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">
+              Services
+            </a>
+          </nav>
+          
+          {/* Right side actions */}
+          <div className="flex items-center space-x-3">
+            {!client ? (
+              <Button
+                onClick={() => navigate("/login")}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium"
+              >
+                Login
+              </Button>
+            ) : (
+              <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+                <SheetTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  >
+                    <Menu className="w-6 h-6" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent
+                  side="right"
+                  className="w-80 bg-white border-l border-gray-200"
+                >
+                  <SheetHeader className="border-b border-gray-200 pb-4">
+                    {/* <SheetTitle className="text-gray-900 text-left font-semibold text-lg">Menu</SheetTitle> */}
+                  </SheetHeader>
+                  
+                  {/* User Profile */}
+                  <div className="py-6 border-b border-gray-200">
+                    <div className="flex items-center space-x-3">
+                      <Avatar className="h-12 w-12 border border-gray-200">
+                        <AvatarImage src="/placeholder.svg" />
+                        <AvatarFallback className="bg-gray-100 text-gray-700 font-semibold">
+                          {client?.name ? client.name[0] : "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">
+                          {client?.name}
+                        </h3>
+                        {client?.email && (
+                          <p className="text-sm text-gray-600">{client.email}</p>
                         )}
                       </div>
-              </SheetContent>
-            </Sheet>
+                    </div>
+                  </div>
+                  
+                  {/* Navigation Menu */}
+                  <nav className="py-4">
+                    <ul className="space-y-1">
+                      {sidebarMenuItems.map((item, index) => (
+                        <li key={index}>
+                          <a
+                            href={item.href}
+                            className="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 group"
+                            onClick={() => setSidebarOpen(false)}
+                          >
+                            <item.icon className="w-5 h-5 text-gray-600 group-hover:text-gray-900" />
+                            <span className="font-medium text-gray-700 group-hover:text-gray-900">{item.label}</span>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </nav>
+                  
+                  <Separator className="bg-gray-200" />
+                  
+                  <div className="py-4">
+                    <button
+                      className="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-red-50 transition-colors duration-200 w-full text-left text-red-600 group"
+                      onClick={handleLogout}
+                    >
+                      <LogOut className="w-5 h-5 group-hover:text-red-700" />
+                      <span className="font-medium group-hover:text-red-700">Sign Out</span>
+                    </button>
+                  </div>
+                </SheetContent>
+              </Sheet>
+            )}
           </div>
         </div>
       </div>
     </header>
   )
-    }
-    
-   
+}

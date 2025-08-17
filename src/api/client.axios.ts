@@ -1,5 +1,7 @@
 import axios from "axios";
-import { toast } from "sonner";
+import { createTokenRefreshInterceptor } from "./interceptor";
+import { store } from "@/store/store";
+import { clientLogout } from "@/store/slices/clientSlice";
 
 
 export const clientAxiosInstance = axios.create({
@@ -7,46 +9,6 @@ export const clientAxiosInstance = axios.create({
     withCredentials:true
 })
 
-
-let isRefreshing = false
-clientAxiosInstance.interceptors.response.use(
-    (response)=>response,
-    async (error)=>{
-        const originalRequest = error.config
-    console.log("⚠️ Interceptor Triggered:", error?.response?.status);
-        if(error.response?.status==401 && !originalRequest._retry){
-            originalRequest._retry=true
-
-            if(!isRefreshing){
-                isRefreshing = true
-                try {
-                    await clientAxiosInstance.post("/refresh-token");
-                    isRefreshing = false
-
-                    return clientAxiosInstance(originalRequest)
-                } catch (error) {
-                    isRefreshing=false
-                    localStorage.removeItem("clientSession")
-                    window.location.href="/"
-                    toast.info("please try again")
-                }
-            }
-        }
-        if(
-            error.response?.status === 403 && 
-            error.response?.data?.message == 'Access denied. You do not have permission to access this resource.' || 
-            (error.response?.status == 403 && 
-                error.response?.data?.message == "Token is blacklisted" ||
-                (error.response?.status === 403 && 
-                    error.response?.data?.message === 'Your account has been blocked.' &&
-                    !originalRequest._retry)
-            )
-        ){
-            localStorage.removeItem("clientSession")
-            window.location.href='/login'
-            toast.info("Please login again")
-        }
-        return Promise.reject(error)
-    }
-)
-
+createTokenRefreshInterceptor(clientAxiosInstance,()=>{
+    store.dispatch(clientLogout())
+})

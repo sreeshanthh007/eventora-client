@@ -7,8 +7,8 @@ export const googleAuth = async({
     client_id,
     role
 }:{
-    credential:any,
-    client_id:any,
+    credential:string,
+    client_id:string,
     role:string
 }):Promise<IAuthResponse>=>{
     const response = await AuthAxiosInstance.post("/google-auth",{

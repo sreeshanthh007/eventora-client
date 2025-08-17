@@ -5,3 +5,9 @@ export interface IAxiosResponse{
 }
 
 
+
+
+export interface ICategory {
+    image:string,
+    name:string,
+}

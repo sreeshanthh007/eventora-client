@@ -1,8 +1,5 @@
 
 import * as Yup from "yup"
-// .matches(/^\d{10}$/, "Invalid phone number"),
-// .matches(/^\+?[1-9]\d{1,14}$/, "Invalid phone number")
-
 const ClientSignupSchema = Yup.object().shape({
     name:Yup.string()
     .required("Name is required")

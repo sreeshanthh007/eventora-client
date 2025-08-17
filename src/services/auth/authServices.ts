@@ -9,7 +9,7 @@ import { adminAxiosInstance } from "@/api/admin.axios";
 export interface ILoginData{
     name:string,
     email:string,
-    role:UserRole
+    role:UserRole,
 }
 
 export interface IAuthResponse{
@@ -19,7 +19,9 @@ export interface IAuthResponse{
         id:string,
         name:string,
         email:string,
-        role: "client" | "admin" | "vendor"
+        role: "client" | "admin" | "vendor",
+        idProof?:string
+        status?: "active" | "pending" | "blocked" | "verifying"; 
     }
 }
 
@@ -55,6 +57,18 @@ export const sendForgotPasswordOtp = async(email:string) : Promise<IAxiosRespons
     });
     return response.data
 }
+
+export const clientForgotUpdatePassword = async (data: {
+  email: string;
+  password: string;
+  role:string;
+}) => {
+  const result = await AuthAxiosInstance.put<IAxiosResponse>(
+    "/forgot-password",
+    data
+  );
+  return result.data;
+};
 
 
 export const verifyOtp = async(data:{email:string,otp:string}) : Promise<IAxiosResponse>=>{

@@ -1,12 +1,9 @@
-   import { Calendar , MapPin } from "lucide-react"
-import { CardContent , Card } from "../pages/ui/card"
-import { ChevronLeft , ChevronRight, Star , Users } from "lucide-react"
-import { Button } from "../pages/ui/button"
+import { Calendar, MapPin } from 'lucide-react'
 
-
-
+import { ChevronLeft, ChevronRight, Star, Users } from 'lucide-react'
 import React, { useState } from 'react'
-
+import { Card,CardContent } from '../pages/ui/card'
+import { Button } from '../pages/ui/button'
 
 const upcomingEvents = [
   {
@@ -38,9 +35,8 @@ const upcomingEvents = [
   },
 ]
 
-
-export const UpcomingEvents : React.FC = () => {
- const [currentEvent, setCurrentEvent] = useState(0)
+export const UpcomingEvents: React.FC = () => {
+  const [currentEvent, setCurrentEvent] = useState(0)
 
   const nextEvent = () => {
     setCurrentEvent((prev) => (prev + 1) % upcomingEvents.length)
@@ -53,39 +49,37 @@ export const UpcomingEvents : React.FC = () => {
   const event = upcomingEvents[currentEvent]
 
   return (
-    <section className="py-20 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+    <section className="py-20 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            <span className="bg-gradient-to-r from-yellow-400 to-pink-500 bg-clip-text text-transparent">
-              Upcoming Events
-            </span>
+          <h2 className="text-4xl md:text-5xl mb-6 text-gray-900">
+            Upcoming Events
           </h2>
-          <div className="w-32 h-1 bg-gradient-to-r from-yellow-400 to-pink-500 mx-auto rounded-full"></div>
-          <p className="text-gray-300 mt-4 text-lg">Don't miss out on these amazing events</p>
+          <div className="w-24 h-1 bg-blue-600 mx-auto rounded-full"></div>
+          <p className="text-gray-600 mt-4 text-lg">Don't miss out on these amazing events</p>
         </div>
-
+        
         <div className="relative max-w-5xl mx-auto">
-          <div className="overflow-hidden rounded-3xl">
-            <Card className="border-0 shadow-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-lg">
+          <div className="overflow-hidden rounded-2xl">
+            <Card className="border border-gray-200 shadow-lg bg-white">
               <CardContent className="p-0">
                 <div className="relative h-96 md:h-[500px] overflow-hidden">
                   <img
                     src={event.image || "/placeholder.svg"}
                     alt={event.title}
-                    className="w-full h-full object-cover transition-transform duration-700"
+                    className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-
-                  {/* Floating Elements */}
-                  <div className="absolute top-6 right-6 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 flex items-center space-x-2">
-                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                    <span className="text-white font-semibold">{event.rating}</span>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  
+                  {/* Rating Badge */}
+                  <div className="absolute top-6 right-6 bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 flex items-center space-x-2">
+                    <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                    <span className="text-gray-900 font-semibold">{event.rating}</span>
                   </div>
-
+                  
                   <div className="absolute bottom-8 left-8 right-8 text-white">
                     <div className="flex items-center space-x-4 mb-4">
-                      <div className="bg-purple-500/80 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-semibold">
+                      <div className="bg-blue-600 rounded-full px-3 py-1 text-sm font-semibold">
                         FEATURED
                       </div>
                       <div className="flex items-center space-x-1 text-sm">
@@ -93,24 +87,24 @@ export const UpcomingEvents : React.FC = () => {
                         <span>{event.attendees} attending</span>
                       </div>
                     </div>
-
-                    <h3 className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                    
+                    <h3 className="text-3xl md:text-4xl font-bold mb-6">
                       {event.title}
                     </h3>
-
+                    
                     <div className="flex flex-wrap items-center gap-6 mb-6 text-sm md:text-base">
                       <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2">
-                        <Calendar className="w-5 h-5 text-yellow-400" />
+                        <Calendar className="w-5 h-5 text-blue-400" />
                         <span>{event.date}</span>
                       </div>
                       <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2">
-                        <MapPin className="w-5 h-5 text-pink-400" />
+                        <MapPin className="w-5 h-5 text-blue-400" />
                         <span>{event.location}</span>
                       </div>
                       <div className="text-2xl font-bold text-green-400">{event.price}</div>
                     </div>
-
-                    <Button className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                    
+                    <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-lg shadow-lg transition-all duration-300">
                       BOOK TICKET
                     </Button>
                   </div>
@@ -118,21 +112,21 @@ export const UpcomingEvents : React.FC = () => {
               </CardContent>
             </Card>
           </div>
-
+          
           {/* Navigation */}
           <button
             onClick={prevEvent}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-full p-3 shadow-lg transition-all duration-300 hover:scale-110"
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white border border-gray-300 rounded-full p-3 shadow-md transition-all duration-300"
           >
-            <ChevronLeft className="w-6 h-6 text-white" />
+            <ChevronLeft className="w-6 h-6 text-gray-600" />
           </button>
           <button
             onClick={nextEvent}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-full p-3 shadow-lg transition-all duration-300 hover:scale-110"
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white border border-gray-300 rounded-full p-3 shadow-md transition-all duration-300"
           >
-            <ChevronRight className="w-6 h-6 text-white" />
+            <ChevronRight className="w-6 h-6 text-gray-600" />
           </button>
-
+          
           {/* Dots Indicator */}
           <div className="flex justify-center mt-8 space-x-3">
             {upcomingEvents.map((_, index) => (
@@ -140,7 +134,7 @@ export const UpcomingEvents : React.FC = () => {
                 key={index}
                 onClick={() => setCurrentEvent(index)}
                 className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  index === currentEvent ? "bg-white scale-125" : "bg-white/50 hover:bg-white/75"
+                  index === currentEvent ? "bg-blue-600" : "bg-gray-300 hover:bg-gray-400"
                 }`}
               />
             ))}

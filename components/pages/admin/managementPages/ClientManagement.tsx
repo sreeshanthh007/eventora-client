@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { AppSidebar } from "@/components/mainComponents/AdminSidebar"
-import { SidebarProvider } from "../ui/sidebar"
 import { useToast } from "@/hooks/ui/UseToaster"
+import { SidebarProvider } from "../../ui/sidebar"
 
 import {
   Table,
@@ -10,22 +10,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "../ui/table"
-import { Button } from "../ui/button"
-import { Card } from "../ui/card"
-
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "../ui/alert-dialog"
+} from "../../ui/table"
+import { Card } from "../../ui/card"
+import { Button } from "../../ui/button"
 import { getAllClients, updateUserStatus } from "@/services/admin/adminService"
 import { Pagination } from "@/components/common/paginations/Pagination"
+import { ConfirmDialog } from "@/components/common/popups/ConfirmationPopup"
 
 interface IClient {
   _id: string
@@ -45,6 +35,8 @@ const ClientManagementPage = () => {
   const [updatingUsers, setUpdatingUsers] = useState<Set<string>>(new Set())
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+  const [searchTerm, setSearchTerm] = useState("") // Add search state
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("") // Add debounced search
   const limit = 10
 
   const {showToast} = useToast()
@@ -60,27 +52,44 @@ const ClientManagementPage = () => {
     action: 'block'
   })
 
+  // Debounce search term to avoid too many API calls
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm)
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [searchTerm])
+
+  // Reset to page 1 when search term changes
+  useEffect(() => {
+    if (debouncedSearchTerm !== searchTerm) return // Only reset when debounced term changes
+    setCurrentPage(1)
+  }, [debouncedSearchTerm])
+
   const fetchClients = async () => {
     setLoading(true)
     try {
       const response = await getAllClients({
         page: currentPage,
         limit,
-        search: ""
+        search: debouncedSearchTerm // Use debounced search term
       })
       console.log(response)
       setClients(response.clients) 
       setTotalPages(response.totalPages)
     } catch (error) {
       console.error("Error fetching clients:", error)
+      showToast("Error fetching clients", "error")
     } finally {
       setLoading(false)
     }
   }
 
+  // Refetch when currentPage or debouncedSearchTerm changes
   useEffect(() => {
     fetchClients()
-  }, [currentPage])
+  }, [currentPage, debouncedSearchTerm])
 
   const handleBlockUserClick = (client: IClient) => {
     if (updatingUsers.has(client._id)) {
@@ -116,14 +125,15 @@ const ClientManagementPage = () => {
             c._id === client._id ? { ...c, status: newStatus } : c
           )
         )
-       confirmDialog.action==="block" ? showToast(`user ${client.name} blocked successfully`,"success") : showToast(`user ${client.name} unblocked successfully`,"success")
-        
+        confirmDialog.action === "block" 
+          ? showToast(`User ${client.name} blocked successfully`, "success") 
+          : showToast(`User ${client.name} unblocked successfully`, "success")
       } else {
         throw new Error(response.message)
       }
     } catch (error) {
       console.error("Error updating user status:", error)
-
+      showToast("Error updating user status", "error")
     } finally {
       setUpdatingUsers(prev => {
         const newSet = new Set(prev)
@@ -144,6 +154,23 @@ const ClientManagementPage = () => {
       client: null,
       action: 'block'
     })
+  }
+
+  const handleSearch = () => {
+    // Force immediate search without waiting for debounce
+    setDebouncedSearchTerm(searchTerm)
+    setCurrentPage(1)
+  }
+
+  const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value)
+  }
+
+  // Handle Enter key press in search input
+  const handleSearchKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch()
+    }
   }
 
   const renderClientTable = () => (
@@ -208,16 +235,20 @@ const ClientManagementPage = () => {
                   type="text"
                   placeholder="Search by name or email"
                   className="px-4 py-2 border rounded w-full max-w-sm"
+                  value={searchTerm}
+                  onChange={handleSearchInputChange}
+                  onKeyPress={handleSearchKeyPress}
                 />
-                <Button
-                >
+                <Button onClick={handleSearch}>
                   Search
                 </Button>
               </div>
               {loading ? (
                 <div className="text-center py-8">Loading clients...</div>
               ) : clients.length === 0 ? (
-                <div className="text-center py-8">No clients found</div>
+                <div className="text-center py-8">
+                  {debouncedSearchTerm ? "No clients found matching your search" : "No clients found"}
+                </div>
               ) : (
                 <div className="overflow-x-auto">
                   {renderClientTable()}
@@ -232,34 +263,20 @@ const ClientManagementPage = () => {
           </Card>
         </div>
       </div>
-
-      {/* Confirmation Dialog */}
-      <AlertDialog open={confirmDialog.isOpen} onOpenChange={handleCancelAction}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {confirmDialog.action === 'block' ? 'Block User' : 'Unblock User'}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to {confirmDialog.action} user "{confirmDialog.client?.name}"?
-              {confirmDialog.action === 'block' 
-                ? ' This will prevent them from accessing their account.' 
-                : ' This will restore their access to the account.'}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleCancelAction}>
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleConfirmAction}
-              className={confirmDialog.action === 'block' ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'}
-            >
-              {confirmDialog.action === 'block' ? 'Block User' : 'Unblock User'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      
+      <ConfirmDialog
+        open={confirmDialog.isOpen}
+        onCancel={handleCancelAction}
+        onConfirm={handleConfirmAction}
+        title={confirmDialog.action === "block" ? "Block User" : "Unblock User"}
+        description={`Are you sure you want to ${confirmDialog.action} user "${confirmDialog.client?.name}"? ${
+          confirmDialog.action === "block"
+            ? "This will prevent them from accessing their account."
+            : "This will restore their access to the account."
+        }`}
+        confirmLabel={confirmDialog.action === "block" ? "Block User" : "Unblock User"}
+        confirmColor={confirmDialog.action === "block" ? "red" : "green"}
+      />
     </SidebarProvider>
   )
 }
