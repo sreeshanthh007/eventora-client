@@ -14,6 +14,7 @@ import { VendorDetailsModal } from "@/components/modals/RequestedVendorModal" //
 import { useApproveVendorMutation } from "@/hooks/admin/UseApproveVendor"
 import { useDispatch, useSelector } from "react-redux"
 import type { RootState } from "@/store/store"
+import { useRejectVendorMutation } from "@/hooks/admin/UseRejectVendor"
 
 interface RequestedVendor {
   _id: string
@@ -35,6 +36,7 @@ const RequestedVendorsPage = () => {
   const vendor = useSelector((state:RootState)=>state.vendor.vendor)
 
   const { mutateAsync: approveVendor } = useApproveVendorMutation()
+  const {mutateAsync:rejectVendor} = useRejectVendorMutation()
 
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean
@@ -85,18 +87,25 @@ const RequestedVendorsPage = () => {
   }
 
   const handleApproveVendor = async (vendorId: string) => {
-    const res = await approveVendor({
+    const res = await approveVendor(
       vendorId,
-    })
+    )
     if (res.success) {
       setVendors((prev) => prev.map((v) => (v._id === vendorId ? { ...v, vendorStatus: "approved" } : v)))
     }
   }
 
-  const handleRejectVendor = (vendorId: string) => {
-    // TODO: Implement reject vendor API call
-    console.log("Rejecting vendor:", vendorId)
-    showToast("Vendor rejected successfully", "success")
+  const handleRejectVendor = async(vendorId: string,rejectReason:string) => {
+    console.log("rejecteed reason",rejectReason)
+   const res = await rejectVendor(
+   {
+    vendorId,
+    rejectReason
+   },
+   )
+   if(res.success){
+    setVendors((prev)=>prev.map((v)=>(v._id === vendorId ? {...v,vendorStatus:"rejected"} : v)))
+   }
 
   }
 
@@ -116,10 +125,11 @@ const RequestedVendorsPage = () => {
               name: item.name,
               email: item.email,
               idProof: item.idProof,
+              _id:item._id
             }}
-            vendorStatus={item.vendorStatus} // Pass vendor status to modal
+            vendorStatus={item.vendorStatus}
             onApprove={() => handleApproveVendor(item._id)}
-            onReject={() => handleRejectVendor(item._id)}
+              onReject={handleRejectVendor}
           >
             <Button
               variant="outline"

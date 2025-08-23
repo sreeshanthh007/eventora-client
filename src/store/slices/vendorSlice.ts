@@ -1,77 +1,64 @@
-import { createAsyncThunk, createSlice ,  } from "@reduxjs/toolkit";
-import {type  PayloadAction } from "@reduxjs/toolkit";
-// import { IVendor } from "@/types/User";
-// import { refreshVendorSession } from "@/services/vendor/VendorServices";
-
-interface Vendor {
-    id:string,
-    name:string,
-    email:string,
-    phone?:string
-    role?:string,
-    vendorStatus?:boolean
-}
-
+import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit";
+import {type  IVendor } from "@/types/User";
+import { vendorAxiosInstance } from "@/api/provider.axios";
 
 interface IVendorState {
-    vendor:Vendor | null
+  vendor: IVendor | null;
+  loading: boolean;
+  error: string | null;
 }
 
+const initialState: IVendorState = {
+  vendor: JSON.parse(localStorage.getItem("vendorSession") || "null"),
+  loading: false,
+  error: null,
+};
 
 
-
-
-const initialState : IVendorState =  {
-    vendor:JSON.parse(localStorage.getItem("vendorSession") || 'null')
-}
-
-
-// export const refreshVendorSessionThunk = createAsyncThunk<
-//     {vendor:IVendor},
-//     void,
-//     {rejectValue:string}
-// >("vendor/refreshSession",async (_,{rejectWithValue})=>{
-//     try {
-//         const user = await refreshVendorSession()
-//         const mappedVendor : IVendor ={
-//             name:user.name,
-//             email:user.email,
-//             phone:user.phone,
-//             vendorStatus:user.vendorStatus,
-//             profileImage:user.profileImage,
-//         };
-//         return {vendor:mappedVendor}
-
-//     } catch (error) {
-//         return rejectWithValue("Failed to refresh session");
-//     }
-// });
-
-const vendorSlice = createSlice({
-    name:"vendor",
-    initialState,
-    reducers:{
-        vendorLogin:(state,action:PayloadAction<Vendor>)=>{
-            state.vendor = action.payload
-            localStorage.setItem("vendorSession",JSON.stringify(action.payload))
-        },
-
-        vendorLogout:(state)=>{
-            state.vendor=null
-            localStorage.removeItem("vendorSession")
-        },
-        // extraReducers : (builder)=>{
-        //     builder
-        //     .addCase(refreshVendorSessionThunk.fulfilled,(state,action)=>{
-        //         state.vendor = action.payload.vendor
-        //     })
-
-        //     .addCase()
-        // }
-    }
+export const refreshVendorSessionThunk = createAsyncThunk<
+  IVendor,
+  void,
+  { rejectValue: string }
+>("vendor/refreshSession", async (_, { rejectWithValue }) => {
+  try {
+    const {data} = await vendorAxiosInstance.get<IVendor>("/refresh_session");
+    return data.user;
+  } catch (err: any) {
+    return rejectWithValue(err.message || "Failed to refresh session");
+  }
 });
 
+const vendorSlice = createSlice({
+  name: "vendor",
+  initialState,
+  reducers: {
+    vendorLogin: (state, action: PayloadAction<IVendor>) => {
+      state.vendor = action.payload;
+      localStorage.setItem("vendorSession", JSON.stringify(action.payload));
+    },
+    vendorLogout: (state) => {
+      state.vendor = null;
+      localStorage.removeItem("vendorSession");
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(refreshVendorSessionThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(refreshVendorSessionThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.vendor = action.payload;
+      
+      })
+      .addCase(refreshVendorSessionThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to refresh session";
+        state.vendor = null;
+      });
+  },
+});
 
-export const {vendorLogin,vendorLogout} = vendorSlice.actions
-export default vendorSlice.reducer
-
+export const { vendorLogin, vendorLogout} = vendorSlice.actions;
+export default vendorSlice.reducer;

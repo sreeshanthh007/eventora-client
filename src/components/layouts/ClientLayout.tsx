@@ -1,38 +1,24 @@
-import { Outlet } from "react-router-dom";
-import { ClientHeader } from "../client/ClientHeader";
-import { useState, useEffect } from "react";
-import { Spinner } from "../pages/ui/spinner";
-import { UseClientProfileQuery } from "@/hooks/client/UseClientProfile";
-import type { Client } from "@/services/client/ClientServices";
-import { Footer } from "../mainComponents/Footer";
+import type React from "react"
+import { ClientHeader } from "../client/ClientHeader"
+import { Footer } from "../mainComponents/Footer"
+import { useEffect } from "react"
+import { useAppDispatch } from "@/store/store"
+import { refreshClientSessionThunk } from "@/store/slices/clientSlice"
 
-export const ClientLayout = () => {
+interface ClientLayoutProps {
+  children: React.ReactNode
+}
 
-    const {data,isLoading} = UseClientProfileQuery()
-    const [clientData,setClientData] = useState<Client | null>(null)
-
+export const ClientLayout: React.FC<ClientLayoutProps> = ({ children }) => {
+    const dispatch = useAppDispatch()
     useEffect(()=>{
-        if(data){
-            setClientData(data.client)
-        }
-    },[data])
-
-    if(isLoading){
-        return <Spinner />
-    }
-
-    if(!clientData){
-        return null
-    }
-
-
+        dispatch(refreshClientSessionThunk())
+    },[dispatch])
   return (
-    <>
-    
-    <ClientHeader/>
-    <Outlet/>
-    <Footer/>
-
-    </>
+    <div className="min-h-screen flex flex-col">
+      <ClientHeader />
+      <main className="flex-1">{children}</main>
+      <Footer />
+    </div>
   )
 }

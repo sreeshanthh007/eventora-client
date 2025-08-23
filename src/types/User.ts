@@ -8,7 +8,8 @@ export interface User{
     phone:string,
     password:string,
     role?:UserRole,
-    idProof:string
+    idProof?:string,
+    profileImage?:string
 }
 
 
@@ -25,6 +26,8 @@ export interface IClient extends User{
 
 
 export interface IVendor {
+_id?:string
+ vendorId?:string
   name:string,
   email: string;
   phone: string;
@@ -32,8 +35,11 @@ export interface IVendor {
   role?: "vendor";
   profileImage?:string
   idProof?:File | null | string,
+  rejectionReason?:string
   vendorStatus:"approved" | "pending" | "rejected",
-  status?:string
+  status?:string,
+  place?:string,
+  bio?:string
 }
 
 export interface ICategory {
@@ -41,6 +47,21 @@ export interface ICategory {
     title:string,
     image:File
 }
+
+
+export interface IMappedVendor {
+    _id?:string
+    vendorId:string
+    name:string
+    email:string
+    role:string
+    phone:string
+    status:string
+    vendorStatus:string
+    submissionDate:string
+    rejectionReason:string
+}
+
 
 
 

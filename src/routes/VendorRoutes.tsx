@@ -1,15 +1,15 @@
-// ✅ src/routes/VendorRoutes.tsx
 
 import { Routes, Route } from "react-router-dom";
 import { VendorRegisterPage } from "@/components/pages/vendor/VendorRegisterPage";
 import { VendorLoginPage } from "@/components/pages/vendor/VendorLoginPage";
-// import { VendorLandingPage } from "@/components/vendor/VendorLandingPage";
 import VendorEntryPage from "@/components/vendor/VendorEntryPage";
 
 import { VendorProtectedRoute } from "@/protected/ProtectedRoute";
 import {VendorPublicRoute} from "@/protected/PublicRoute";
-// import EditProfilePage from "@/components/pages/vendor/EditProfilePage";
-// import { HostEventPage } from "@/components/pages/HostEventPage";/
+import VendorProfilePage from "@/components/vendor/VendorProfilePage";
+import ListedEventsPage from "@/components/pages/vendor/ListedEventsPage";
+import HostEventPage from "@/components/vendor/HostEventPage";
+
 
 export const VendorRoutes = () => {
   return (
@@ -24,8 +24,9 @@ export const VendorRoutes = () => {
      
       <Route element={<VendorProtectedRoute />}>
        <Route path="" element={<VendorEntryPage />} />
-       {/* <Route path="editProfile" element={<EditProfilePage/>}/> */}
-        {/* <Route path="host-event" element={<HostEventPage/>}/> */}
+      <Route path="/profile" element={<VendorProfilePage/>}/>
+      <Route path="events" element={<ListedEventsPage/>}/>
+      <Route path="hostEvent" element={<HostEventPage/>}/>
       </Route>
     </Routes>
   );

@@ -1,5 +1,5 @@
 
-import { VendorLayout } from "../pages/vendor/VendorLayout"
+import { VendorLayout } from "../layouts/VendorLayout"
 
 export default function VendorEntryPage() {
   return (

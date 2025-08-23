@@ -16,12 +16,14 @@ export interface IAuthResponse{
     success:boolean,
     message:string,
     user:{
-        id:string,
+        _id:string,
         name:string,
         email:string,
         role: "client" | "admin" | "vendor",
         idProof?:string
-        status?: "active" | "pending" | "blocked" | "verifying"; 
+        status?: "active" | "pending" | "blocked";
+        rejectionReason?:string
+        submissionDate?:Date 
     }
 }
 
@@ -78,6 +80,11 @@ export const verifyOtp = async(data:{email:string,otp:string}) : Promise<IAxiosR
     )
     return response.data
     
+}
+
+export const saveFcmToken = async({userId,fcmToken}:{userId:string,fcmToken:string}) =>{
+    const response = await AuthAxiosInstance.post("/save-fcm",{userId,fcmToken:fcmToken})
+    return response.data
 }
 export const logOutClient = async() : Promise<IAxiosResponse> =>{
     const response = await clientAxiosInstance.post("/logout")

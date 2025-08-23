@@ -64,7 +64,7 @@ export const createTokenRefreshInterceptor = (
         (error.response?.status === StatusCodes.FORBIDDEN &&
           error.response.data?.message?.includes("Your account has been blocked"))
       ) {
-        toast.info("Please login again");
+        toast.info(error.response?.data?.message);
         logoutCallback();
         return Promise.reject(error);
       }

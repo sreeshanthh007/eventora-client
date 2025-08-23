@@ -1,24 +1,27 @@
-
-
-import { Calendar, Home, Settings, User, LogOut } from "lucide-react"
-import { useDispatch } from "react-redux"
+import { Calendar, Home, Settings, User, LogOut, UserCheck } from "lucide-react"
+import {useSelector } from "react-redux"
 import { UseLogout } from "@/hooks/auth/Uselogout"
 import { VendorLogout } from "@/services/auth/authServices"
-import { vendorLogout } from "@/store/slices/vendorSlice"
+import { refreshVendorSessionThunk, vendorLogout } from "@/store/slices/vendorSlice"
 import { useToast } from "@/hooks/ui/UseToaster"
 import { toast } from "sonner"
+import { CheckVerifiedModal } from "../modals/CheckVerifiedModal"
+
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/pages/ui/sidebar"
 import { Button } from "@/components/pages/ui/button"
+import { Link } from "react-router-dom"
+import { useAppDispatch, type RootState } from "@/store/store"
+import { useState } from "react"
+import { useResendVerificationMutation } from "@/hooks/vendor/UseResendVerification"
 
 const items = [
   {
@@ -28,26 +31,33 @@ const items = [
   },
   {
     title: "My Profile",
-    url: "/profile",
+    url: "/vendor/profile",
     icon: User,
   },
   {
+    title: "Check status",
+    icon: UserCheck, 
+  },
+  {
     title: "Events",
-    url: "/events",
+    url: "/vendor/events",
     icon: Calendar,
   },
   {
     title: "Services",
-    url: "/services",
+    url: "/vendor/services",
     icon: Settings,
   },
 ]
 
 export function VendorSidebar() {
-  const dispatch = useDispatch()
+  const dispatch =useAppDispatch()
+  const [isOpen, setIsOpen] = useState(false)
   const { showToast } = useToast()
+  const vendor = useSelector((state:RootState)=>state.vendor.vendor) 
   const { mutate: logoutReq } = UseLogout(VendorLogout)
-
+  const {mutate:resendVerification} = useResendVerificationMutation()
+  
   const handleLogout = () =>
     logoutReq(undefined, {
       onSuccess: (data) => {
@@ -59,45 +69,77 @@ export function VendorSidebar() {
       },
     })
 
-  return (
-    <Sidebar>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-      <SidebarFooter>
-        <div className="p-4 space-y-4">
-          <Button
-            variant="outline"
-            className="w-full justify-start gap-2 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 hover:border-red-300 bg-transparent"
-            onClick={handleLogout}
-          >
-            <LogOut className="h-4 w-4" />
-            Logout
-          </Button>
+  const checkIsVerified = () => {
+    setIsOpen(true)
+  }
 
-          <div className="text-center text-sm text-muted-foreground">
-            <p className="font-semibold text-foreground mb-1">Vendor</p>
-            <p>© 2024 All rights reserved</p>
-            <p className="mt-2">Making events memorable</p>
+  const handleReverify = ()=>{
+    if(!vendor?._id) return
+     resendVerification(
+      vendor._id
+    );
+    dispatch(refreshVendorSessionThunk())
+  }
+  return (
+    <>
+      <Sidebar>
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {items.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      {item.url ? (
+                        <Link to={item.url} className="flex items-center gap-2">
+                          <item.icon className="h-4 w-4" />
+                          <span>{item.title}</span>
+                        </Link>
+                      ) : (
+                        <button
+                          onClick={item.title === "Check status" ? checkIsVerified : undefined}
+                          className="flex items-center gap-2 w-full text-left"
+                        >
+                          <item.icon className="h-4 w-4" />
+                          <span>{item.title}</span>
+                        </button>
+                      )}
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+        <SidebarFooter>
+          <div className="p-4 space-y-4">
+            <Button
+              variant="outline"
+              className="w-full justify-start gap-2 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 hover:border-red-300 bg-transparent"
+              onClick={handleLogout}
+            >
+              <LogOut className="h-4 w-4" />
+              Logout
+            </Button>
+
+            <div className="text-center text-sm text-muted-foreground">
+              <p className="font-semibold text-foreground mb-1">Vendor</p>
+              <p>© 2024 All rights reserved</p>
+              <p className="mt-2">Making events memorable</p>
+            </div>
           </div>
-        </div>
-      </SidebarFooter>
-    </Sidebar>
+        </SidebarFooter>
+      </Sidebar>
+
+      <CheckVerifiedModal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        userName={vendor?.name || "Vendor"}
+        submissionDate={vendor?.submissionDate}
+        status={vendor?.vendorStatus}
+        rejectReason={vendor?.rejectionReason}
+        onReVerify={handleReverify}
+      />
+    </>
   )
 }

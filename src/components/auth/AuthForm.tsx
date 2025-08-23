@@ -16,6 +16,7 @@ import { useFormik } from "formik"
 import { signInschema } from "@/utils/validations/signIn.validator"
 import { Link, useNavigate } from "react-router-dom"
 import type { CredentialResponse } from "@react-oauth/google"
+import { UseSaveFcmTokenMutation } from "@/hooks/auth/UseSaveFcmToken"
 
 interface AuthFormProps {
   type: "login" | "register"
@@ -52,7 +53,7 @@ export const AuthForm = ({
   const [isSending, setIsSending] = useState(false)
   const [userdata, setUserData] = useState<User>({} as User)
   
-  // Image upload state
+
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [croppedImage, setCroppedImage] = useState<string | null>(null)
   const [showCropper, setShowCropper] = useState(false)
@@ -60,8 +61,9 @@ export const AuthForm = ({
   
   const { mutate: sendVerificationOtp } = useSendOtpMutation()
   const { mutate: verifyOtp } = useVerifyOtpMutation()
+  const {mutate:saveFcmToken} = UseSaveFcmTokenMutation()
 
-  // Existing handlers
+
   const handleOpenOtpModal = () => {
     setOtpModalOpen(true)
   }
@@ -89,7 +91,7 @@ export const AuthForm = ({
     toast.success("Password reset successfully! You can now login with your new password.")
   }
 
-  // Image upload handlers
+
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
@@ -155,7 +157,7 @@ export const AuthForm = ({
     onSubmit(finalUserData)
   }
 
-  const submitLogin = (email: string, pass: string) => {
+  const submitLogin = async(email: string, pass: string) => {
     const userLoginData: any = {}
     ;(userLoginData.email = email), (userLoginData.password = pass)
     onSubmit(userLoginData)

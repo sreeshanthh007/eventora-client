@@ -1,6 +1,5 @@
-import { AuthAxiosInstance } from "@/api/auth.axios";
+
 import { clientAxiosInstance } from "@/api/client.axios";
-import { type IAxiosResponse } from "@/types/Response";
 import type { ICategory } from "@/types/User";
 
 export type Client = {
@@ -31,7 +30,13 @@ export const getClientDetails = async () => {
 };
 
 
-
+export const updateProfileImage = async(image:string) =>{
+  const result = await clientAxiosInstance.post(
+    "/update-profileImage",
+    {image}
+  );
+  return result.data
+}
 
 export const getAllCategories = async() : Promise<ICategory[]>=>{
     const result = await clientAxiosInstance.get<ICategory[]>(
@@ -39,3 +44,11 @@ export const getAllCategories = async() : Promise<ICategory[]>=>{
     )
     return result.data
 };
+
+
+export const clientRefreshSession = async() : Promise<ClientResponse> =>{
+  const response = await clientAxiosInstance.get<ClientResponse>(
+    "/refresh-session"
+  );
+  return response.data
+}

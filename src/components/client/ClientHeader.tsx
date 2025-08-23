@@ -11,9 +11,11 @@ import { useDispatch, useSelector } from "react-redux"
 import { UseLogout } from "@/hooks/auth/Uselogout"
 import { logOutClient } from "@/services/auth/authServices"
 import { toast } from "sonner"
+import { getCloudinaryImageUrl } from "@/utils/helpers/GetCloudinaryImage"
 
 export const ClientHeader: React.FC = () => {
-  const client = useSelector((state: RootState) => state.client.client)
+  const client = useSelector((state: RootState) => state.client.client);
+  console.log("client from header",client)
   const navigate = useNavigate()
   
   const sidebarMenuItems = [
@@ -99,7 +101,7 @@ export const ClientHeader: React.FC = () => {
                   <div className="py-6 border-b border-gray-200">
                     <div className="flex items-center space-x-3">
                       <Avatar className="h-12 w-12 border border-gray-200">
-                        <AvatarImage src="/placeholder.svg" />
+                        <AvatarImage src={client.profileImage ? getCloudinaryImageUrl(client.profileImage) : "/placeholder"} />
                         <AvatarFallback className="bg-gray-100 text-gray-700 font-semibold">
                           {client?.name ? client.name[0] : "U"}
                         </AvatarFallback>

@@ -1,7 +1,8 @@
 import { vendorAxiosInstance } from "@/api/provider.axios";
 import type { IAxiosResponse } from "@/types/Response";
 import { type Client } from "../client/ClientServices";
-
+import type { IVendor } from "@/types/User";
+import { type IEventFormData } from "@/components/forms/AddEventForm";
 
 
 export interface IVendorProfileUpdateData{
@@ -11,12 +12,15 @@ export interface IVendorProfileUpdateData{
     place:string
 }
 
-// export const refreshVendorSession = async ():Promise<UserDTO> =>{
-//     const response = await vendorAxiosInstance.get<UserDTO>(
-//         "/refresh_session"
-//     );
-//     return response.data
-// }
+
+
+
+export const refreshVendorSession = async ():Promise<IVendor> =>{
+    const response = await vendorAxiosInstance.get<IVendor>(
+        "/refresh_session"
+    );
+    return response.data
+}
 
 
 
@@ -35,6 +39,12 @@ export const GetVendorDetails = async()=>{
 }
 
 
+
+export const resendVerification = async(vendorId:string)=>{
+  const response = await  vendorAxiosInstance.patch(`${vendorId}/resend-verification`)
+  return response.data
+}
+
 export interface IUpdateClientData
   extends Pick<
     Client,
@@ -43,5 +53,11 @@ export interface IUpdateClientData
 
 export const updateVendorProfile =async(data:IUpdateClientData)=>{
     const response = await vendorAxiosInstance.put("/update-profile",data)
+    return response.data
+}
+
+
+export const addEvent = async(data:IEventFormData) : Promise<IAxiosResponse>=>{
+    const response = await vendorAxiosInstance.post("/add-event",data)
     return response.data
 }

@@ -1,7 +1,4 @@
-import { adminAxiosInstance } from "@/api/admin.axios";
-import { keepPreviousData } from "@tanstack/react-query";
-
-
+import { adminAxiosInstance } from "@/api/admin.axios"
 
 export const getAllClients = async ({
   page = 1,
@@ -84,7 +81,7 @@ export const getRequestedVendors = async({
 
 
 export const updateUserStatus = async (data: {
-    userId: any;
+    userId: string;
     status: string;
 }) => {
   const response = await adminAxiosInstance.patch(
@@ -151,9 +148,13 @@ export const addCategory = async(data :{
 
 
 
-export const approveVendor = async(data:{
-  vendorId:string
-})=>{
-  const response= await adminAxiosInstance.patch("/approve-vendors",data)
-  return response.data
-}
+export const approveVendor = async(vendorId: string) => {
+  const response = await adminAxiosInstance.patch(`${vendorId}/approve-vendors`);
+  return response.data;
+};
+
+export const rejectVendor = async ({ vendorId, rejectReason }:{vendorId:string,rejectReason:string}) => {
+  const response = await adminAxiosInstance.patch(`${vendorId}/reject-vendors`, { rejectReason });
+  return response.data;
+};
+

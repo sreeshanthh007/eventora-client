@@ -9,7 +9,7 @@ import { Button } from "@/components/pages/ui/button";
 import { Input } from "@/components/pages/ui/input";
 import { useSelector } from "react-redux";
 import { type RootState } from "@/store/store";
-import { Link, Navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export const VendorContentSection: React.FC = () => {
   const vendor = useSelector((state: RootState) => state.vendor.vendor);
