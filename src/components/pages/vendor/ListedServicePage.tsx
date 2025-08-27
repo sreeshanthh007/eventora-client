@@ -56,7 +56,7 @@ export default function ListedServicePage() {
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const limit = 6;
+  const limit = 2;
 
   // Use the custom hook for fetching services
   const { data, isLoading, isError, error } = UseGeAllService({

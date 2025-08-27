@@ -46,7 +46,7 @@ export default function ListedEventsPage() {
     search: debouncedSearchTerm,
   });
 
-  const toggleEventMutation = useToggleEventMutation(); // Initialize the mutation hook
+  const toggleEventMutation = useToggleEventMutation(); 
 
   const events = data?.events || [];
 
