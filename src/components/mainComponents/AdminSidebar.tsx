@@ -1,30 +1,37 @@
+"use client"
 
 import type * as React from "react"
-import { BarChart3, Building2, Home, Package, Settings, ShoppingCart, Users, Wallet , LogOut } from "lucide-react"
-
-import { Sidebar , SidebarContent , SidebarGroup, SidebarFooter, SidebarHeader , SidebarMenu ,
-    SidebarMenuItem ,SidebarMenuButton , SidebarGroupLabel, SidebarGroupContent,SidebarRail
-  }
- from "../pages/ui/sidebar"
-import { Avatar , AvatarFallback, AvatarImage } from "@radix-ui/react-avatar"
-import { DropdownMenu,  DropdownMenuContent , DropdownMenuTrigger , DropdownMenuItem } from "@radix-ui/react-dropdown-menu"
-import { Link } from "react-router-dom"
+import { BarChart3, Building2, Home, Calendar, Settings, Tag, Users, Wallet } from "lucide-react"
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarGroupLabel,
+  SidebarGroupContent,
+  SidebarRail,
+} from "@/components/pages/ui/sidebar" // Adjusted import path
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/pages/ui/avatar" // Adjusted import path
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from "@/components/pages/ui/dropdown-menu" 
+import { Link, useLocation } from "react-router-dom" 
 import { useDispatch, useSelector } from "react-redux"
-import { adminLogout } from "@/store/slices/adminSlice"
 import type { RootState } from "@/store/store"
-import { UseLogout } from "@/hooks/auth/Uselogout"
 import { AdminLogout } from "@/services/auth/authServices"
-import { toast } from "sonner"
-
+import { UseLogout } from "@/hooks/auth/Uselogout"
+import { useToast } from "@/hooks/ui/UseToaster"
+import { adminLogout } from "@/store/slices/adminSlice"
 
 // Menu items
-const data = {
+const navData = {
   navMain: [
     {
       title: "Dashboard",
       url: "/admin/dashboard",
       icon: Home,
-      isActive: true,
     },
     {
       title: "Clients",
@@ -37,51 +44,60 @@ const data = {
       icon: Building2,
     },
     {
-      title: "Products",
-      url: "#",
-      icon: Package,
+      title: "Category",
+      url: "/admin/category", // Updated URL to match the new page
+      icon: Tag,
     },
-    {
-      title: "Orders",
-      url: "#",
-      icon: ShoppingCart,
-    },
-    {
-      title: "Analytics",
-      url: "#",
-      icon: BarChart3,
-    },
-    {
-      title: "Payments",
-      url: "#",
-      icon: Wallet,
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings,
-    },  
+    // {
+    //   title: "Events",
+    //   url: "/admin/events",
+    //   icon: Calendar,
+    // },
+    // {
+    //   title: "Analytics",
+    //   url: "#",
+    //   icon: BarChart3,
+    // },
+    // {
+    //   title: "Payments",
+    //   url: "#",
+    //   icon: Wallet,
+    // },
+    // {
+    //   title: "Settings",
+    //   url: "#",
+    //   icon: Settings,
+    // },
   ],
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-    const dispatch = useDispatch()
-    const admin = useSelector((state:RootState)=>state.admin.admin)
-    const {mutate:logoutReq} = UseLogout(AdminLogout)
-   
-    const handleLogout = ()=>{
-      logoutReq(undefined,
-        {
-          onSuccess:(data)=>{
-            toast.success(data.message)
-            dispatch(adminLogout())
-          },
-          onError:(err:any)=>{
-            toast.error(err.response?.data.message)
-          }
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  // currentPath is now derived internally from useLocation
+}
+
+export function AppSidebar({ ...props }: AppSidebarProps) {
+  const location = useLocation() 
+  const currentPath = location.pathname
+const {showToast} =  useToast()
+
+
+  const dispatch = useDispatch()
+  const admin = useSelector((state:RootState)=>state.admin.admin)
+  const {mutate:logoutReq} = UseLogout(AdminLogout)
+
+  const handleLogout = ()=>{
+    logoutReq(undefined,
+      {
+        onSuccess:(data)=>{
+          showToast(data.message,"success")
+          dispatch(adminLogout())
+        },
+        onError:(err:any)=>{
+          showToast(err.message,"error")
         }
-      )
-    }
+      }
+    )
+  }
 
   return (
     <Sidebar {...props}>
@@ -89,7 +105,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href="#" className="flex items-center gap-2">
+              <Link to="#" className="flex items-center gap-2">
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                   <BarChart3 className="size-4" />
                 </div>
@@ -97,7 +113,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <span className="font-semibold">Admin Panel</span>
                   <span className="text-xs text-muted-foreground">v2.1.0</span>
                 </div>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -107,9 +123,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {data.navMain.map((item) => (
+              {navData.navMain.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={item.isActive}>
+                  <SidebarMenuButton asChild isActive={currentPath === item.url}>
                     <Link to={item.url} className="flex items-center gap-2">
                       <item.icon className="size-4" />
                       <span>{item.title}</span>
@@ -135,15 +151,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     <AvatarFallback className="rounded-lg">AD</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                 
-                  {admin?.email && 
+                    {admin?.email &&
                     <span className="truncate text-xs text-muted-foreground">{admin.email}</span>
-                  }
+                    }
                   </div>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
                 side="bottom"
                 align="end"
                 sideOffset={4}

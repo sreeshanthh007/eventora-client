@@ -1,5 +1,5 @@
-import { Star, Award, MapPin, ChevronLeft, ChevronRight } from "lucide-react"
-import { CardContent , Card } from "../pages/ui/card"
+import { Star, Award, MapPin, ChevronLeft, ChevronRight } from 'lucide-react'
+import { CardContent, Card } from "../pages/ui/card"
 import { useState } from "react"
 
 const providers = [
@@ -68,8 +68,9 @@ const providers = [
     events: 95,
   },
 ]
-export const EventProvidersSection : React.FC = () => {
-   const [currentIndex, setCurrentIndex] = useState(0)
+
+export const EventProvidersSection: React.FC = () => {
+  const [currentIndex, setCurrentIndex] = useState(0)
   const itemsPerView = 5
 
   const nextSlide = () => {
@@ -81,18 +82,16 @@ export const EventProvidersSection : React.FC = () => {
   }
 
   return (
-    <section className="py-20 bg-gradient-to-br from-gray-50 via-purple-50 to-pink-50">
+    <section className="py-20 bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Our Event Providers
-            </span>
+          <h2 className="text-4xl md:text-5xl mb-6 text-gray-900">
+            Our Event Providers
           </h2>
-          <div className="w-32 h-1 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto rounded-full"></div>
+          <div className="w-24 h-1 bg-blue-600 mx-auto rounded-full"></div>
           <p className="text-gray-600 mt-4 text-lg">Meet our talented team of event professionals</p>
         </div>
-
+        
         <div className="relative max-w-7xl mx-auto">
           <div className="overflow-hidden">
             <div
@@ -101,55 +100,50 @@ export const EventProvidersSection : React.FC = () => {
             >
               {providers.map((provider, index) => (
                 <div key={index} className="w-1/5 flex-shrink-0 px-3">
-                  <Card className="text-center hover:shadow-2xl transition-all duration-500 border-0 bg-white/80 backdrop-blur-sm hover:scale-105 group overflow-hidden">
+                  <Card className="text-center hover:shadow-lg transition-all duration-300 border border-gray-200 bg-white hover:border-blue-300 group">
                     <CardContent className="p-6">
                       <div className="relative w-28 h-28 mx-auto mb-6">
                         <img
                           src={provider.image || "/placeholder.svg"}
                           alt={provider.name}
-                          className="w-full h-full object-cover rounded-full border-4 border-purple-200 group-hover:border-purple-400 transition-all duration-300"
+                          className="w-full h-full object-cover rounded-full border-2 border-gray-200 group-hover:border-blue-400 transition-all duration-300"
                         />
-                        <div className="absolute -top-2 -right-2 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full p-2">
+                        <div className="absolute -top-2 -right-2 bg-blue-600 rounded-full p-2">
                           <Award className="w-4 h-4 text-white" />
                         </div>
                       </div>
-
-                      <h3 className="font-bold text-gray-800 mb-2 group-hover:text-purple-600 transition-colors duration-300">
+                      <h3 className="font-semibold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors duration-300">
                         {provider.name}
                       </h3>
-                      <p className="text-sm text-purple-600 font-semibold mb-3">{provider.specialty}</p>
-
+                      <p className="text-sm text-blue-600 font-medium mb-3">{provider.specialty}</p>
                       <div className="flex items-center justify-center gap-2 mb-3">
                         <MapPin className="w-4 h-4 text-gray-500" />
                         <span className="text-sm text-gray-600">{provider.location}</span>
                       </div>
-
                       <div className="flex items-center justify-center gap-1 mb-3">
                         <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                         <span className="text-sm font-semibold text-gray-800">{provider.rating}</span>
                         <span className="text-xs text-gray-500">({provider.events} events)</span>
                       </div>
-
-                      <div className="w-0 group-hover:w-full h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto transition-all duration-300"></div>
                     </CardContent>
                   </Card>
                 </div>
               ))}
             </div>
           </div>
-
+          
           {/* Navigation Arrows */}
           <button
             onClick={prevSlide}
-            className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 bg-white hover:bg-gray-50 border-2 border-purple-200 hover:border-purple-400 rounded-full p-3 shadow-lg transition-all duration-300 hover:scale-110"
+            className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 bg-white hover:bg-gray-50 border border-gray-300 hover:border-blue-400 rounded-full p-3 shadow-md transition-all duration-300"
           >
-            <ChevronLeft className="w-6 h-6 text-purple-600" />
+            <ChevronLeft className="w-6 h-6 text-gray-600" />
           </button>
           <button
             onClick={nextSlide}
-            className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 bg-white hover:bg-gray-50 border-2 border-purple-200 hover:border-purple-400 rounded-full p-3 shadow-lg transition-all duration-300 hover:scale-110"
+            className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 bg-white hover:bg-gray-50 border border-gray-300 hover:border-blue-400 rounded-full p-3 shadow-md transition-all duration-300"
           >
-            <ChevronRight className="w-6 h-6 text-purple-600" />
+            <ChevronRight className="w-6 h-6 text-gray-600" />
           </button>
         </div>
       </div>

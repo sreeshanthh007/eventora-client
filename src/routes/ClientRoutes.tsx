@@ -6,6 +6,7 @@ import { NotFound } from "@/Custom404Page";
 
 import { ClientProtectedRoute } from "@/protected/ProtectedRoute";
 import { ClientPublicRoute } from "@/protected/PublicRoute";
+import ProfilePage from "@/components/pages/client/ProfileSidebarPage"; 
 
 
 const ClientRoutes = () => {
@@ -21,7 +22,8 @@ const ClientRoutes = () => {
     
          <Route path="/" element={<ClientLandingPage />} />
       <Route element={<ClientProtectedRoute />}>
-       
+       <Route path="/profile" element={<ProfilePage/>}>
+       </Route>
       </Route>
 
       <Route path="*" element={<NotFound />} />

@@ -2,24 +2,29 @@ import { AuthAxiosInstance } from "@/api/auth.axios";
 import type {  IAxiosResponse } from "@/types/Response";
 import type  { UserRole } from "@/types/UserRoles";
 import type { UserDTO } from "@/types/User";
-import { clientAxiosInstance } from "@/api/client.axios";
-import { vendorAxiosInstance } from "@/api/provider.axios";
-import { adminAxiosInstance } from "@/api/admin.axios";
+import { axiosInstance } from "@/api/interceptor";
+// import { clientAxiosInstance } from "@/api/client.axios";
+// import { vendorAxiosInstance } from "@/api/provider.axios";
+// import { adminAxiosInstance } from "@/api/admin.axios";
 
 export interface ILoginData{
     name:string,
     email:string,
-    role:UserRole
+    role:UserRole,
 }
 
 export interface IAuthResponse{
     success:boolean,
     message:string,
     user:{
-        id:string,
+        _id:string,
         name:string,
         email:string,
-        role: "client" | "admin" | "vendor"
+        role: "client" | "admin" | "vendor",
+        idProof?:string
+        status?: "active" | "pending" | "blocked";
+        rejectionReason?:string
+        submissionDate?:Date 
     }
 }
 
@@ -56,6 +61,18 @@ export const sendForgotPasswordOtp = async(email:string) : Promise<IAxiosRespons
     return response.data
 }
 
+export const clientForgotUpdatePassword = async (data: {
+  email: string;
+  password: string;
+  role:string;
+}) => {
+  const result = await AuthAxiosInstance.put<IAxiosResponse>(
+    "/forgot-password",
+    data
+  );
+  return result.data;
+};
+
 
 export const verifyOtp = async(data:{email:string,otp:string}) : Promise<IAxiosResponse>=>{
     const response = await AuthAxiosInstance.post<IAxiosResponse>(
@@ -65,18 +82,23 @@ export const verifyOtp = async(data:{email:string,otp:string}) : Promise<IAxiosR
     return response.data
     
 }
+
+export const saveFcmToken = async({userId,fcmToken}:{userId:string,fcmToken:string}) =>{
+    const response = await AuthAxiosInstance.post("/save-fcm",{userId,fcmToken:fcmToken})
+    return response.data
+}
 export const logOutClient = async() : Promise<IAxiosResponse> =>{
-    const response = await clientAxiosInstance.post("/logout")
+    const response = await axiosInstance.post("/api_v1/_cl/logout")
     return response.data    
 }
 
 export const VendorLogout = async() : Promise<IAxiosResponse> =>{
-    const response = await vendorAxiosInstance.post("/logout")
+    const response = await axiosInstance.post("/api_v1/_ve/logout")
     return response.data
 }
 
 
 export const AdminLogout = async() : Promise<IAxiosResponse> =>{
-    const reponse = await adminAxiosInstance.post("/logout")
+    const reponse = await axiosInstance.post("/api_v1/_ad/logout")
     return reponse.data
 }

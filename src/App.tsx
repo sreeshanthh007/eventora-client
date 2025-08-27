@@ -5,9 +5,13 @@ import { Toaster } from 'sonner'
 import ClientRoutes from './routes/ClientRoutes'
 import { VendorRoutes } from './routes/VendorRoutes'
 import { AdminRoutes } from './routes/AdminRoutes'
+import { useEffect } from 'react'
+import { listenToForegroundMessages } from './services/firebase/notification'
 
 function App() {
-
+  useEffect(()=>{
+    listenToForegroundMessages()
+  },[])
   return (
     <>
     <AppLayout/>

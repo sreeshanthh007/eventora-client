@@ -5,7 +5,7 @@ import { useMutation} from "@tanstack/react-query";
 
 
 export const UseGoogleAuth = ()=>{
-    return useMutation<IAuthResponse,Error,{credential:any;client_id:any;role:string}>({
+    return useMutation<IAuthResponse,Error,{credential:string;client_id:string;role:string}>({
         mutationFn:googleAuth
     });
 }

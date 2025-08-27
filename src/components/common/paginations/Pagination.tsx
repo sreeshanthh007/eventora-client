@@ -1,4 +1,10 @@
-import { Button } from "@/components/pages/ui/button"
+import {
+  Pagination as ShadcnPagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationPrevious,
+  PaginationNext,
+} from "@/components/pages/ui/pagination"
 
 interface PaginationProps {
   currentPage: number
@@ -10,26 +16,30 @@ export const Pagination = ({
   currentPage,
   totalPages,
   onPageChange,
-}: PaginationProps) => {
+}: PaginationProps) => {  
   return (
-    <div className="flex justify-center mt-4 gap-2">
-      <Button
-        onClick={() => onPageChange(currentPage - 1)}
-        disabled={currentPage === 1}
-      >
-        Previous
-      </Button>
-
-      <span className="px-3 py-1 rounded bg-gray-200">
-        Page {currentPage} of {totalPages}
-      </span>
-
-      <Button
-        onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
-      >
-        Next
-      </Button>
-    </div>
+    <ShadcnPagination className="mt-4">
+      <PaginationContent>
+        <PaginationItem>
+          <PaginationPrevious
+            onClick={() => onPageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className={currentPage === 1 ? "pointer-events-none opacity-50" : undefined}
+          />
+        </PaginationItem>
+        <PaginationItem>
+          <span className="px-3 py-1 rounded bg-muted text-muted-foreground">
+            Page {currentPage} of {totalPages}
+          </span>
+        </PaginationItem>
+        <PaginationItem>
+          <PaginationNext
+            onClick={() => onPageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className={currentPage === totalPages ? "pointer-events-none opacity-50" : undefined}
+          />
+        </PaginationItem>
+      </PaginationContent>
+    </ShadcnPagination>
   )
 }

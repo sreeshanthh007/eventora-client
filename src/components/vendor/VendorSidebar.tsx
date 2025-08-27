@@ -1,71 +1,145 @@
-import { Avatar, AvatarFallback } from "@radix-ui/react-avatar"
-import type React from "react"
-import { useDispatch } from "react-redux"
+import { Calendar, Home, Settings, User, LogOut, UserCheck } from "lucide-react"
+import {useSelector } from "react-redux"
 import { UseLogout } from "@/hooks/auth/Uselogout"
 import { VendorLogout } from "@/services/auth/authServices"
-import { vendorLogout } from "@/store/slices/vendorSlice"
+import { refreshVendorSessionThunk, vendorLogout } from "@/store/slices/vendorSlice"
 import { useToast } from "@/hooks/ui/UseToaster"
 import { toast } from "sonner"
+import { CheckVerifiedModal } from "../modals/CheckVerifiedModal"
 
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/components/pages/ui/sidebar"
+import { Button } from "@/components/pages/ui/button"
+import { Link } from "react-router-dom"
+import { useAppDispatch, type RootState } from "@/store/store"
+import { useState } from "react"
+import { useResendVerificationMutation } from "@/hooks/vendor/UseResendVerification"
 
-export const VendorSidebar: React.FC = () => {
-  const dispatch = useDispatch()
-  const {showToast} = useToast()
+const items = [
+  {
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: Home,
+  },
+  {
+    title: "My Profile",
+    url: "/vendor/profile",
+    icon: User,
+  },
+  {
+    title: "Check status",
+    icon: UserCheck, 
+  },
+  {
+    title: "Events",
+    url: "/vendor/events",
+    icon: Calendar,
+  },
+  {
+    title: "Services",
+    url: "/vendor/services",
+    icon: Settings,
+  },
+]
 
-  // const vendor = useState((state:RootState)=>state.vendor.vendor)
-  // const navigate = useNavigate()
+export function VendorSidebar() {
+  const dispatch =useAppDispatch()
+  const [isOpen, setIsOpen] = useState(false)
+  const { showToast } = useToast()
+  const vendor = useSelector((state:RootState)=>state.vendor.vendor) 
+  const { mutate: logoutReq } = UseLogout(VendorLogout)
+  const {mutate:resendVerification} = useResendVerificationMutation()
+  
+  const handleLogout = () =>
+    logoutReq(undefined, {
+      onSuccess: (data) => {
+        showToast(data.message, "success")
+        dispatch(vendorLogout())
+      },
+      onError: (err: any) => {
+        toast.error(err.response?.data.message)
+      },
+    })
 
-  const sidebarItems = [
-    { name: "Dashboard", active: false },
-    { name: "My Profile", active: true },
-    { name: "Check Status", active: false },
-    { name: "Services", active: false },
-    { name: "Work Samples", active: false },
-    { name: "Bookings", active: false },
-    { name: "Events", active: false },
-    { name: "Wallet", active: false },
-    { name: "Logout", active: false },
-  ]
-
-
-    const {mutate:logoutReq} = UseLogout(VendorLogout)
-
-
-  const handleLogout = ()=>{
-    logoutReq(undefined,
-      {
-        onSuccess:(data)=>{
-          toast.success(data.message)
-            dispatch(vendorLogout());
-        },
-        onError:(err:any)=>{
-          toast.error(err.response?.data.message)
-        }
-      }
-    )
+  const checkIsVerified = () => {
+    setIsOpen(true)
   }
 
+  const handleReverify = ()=>{
+    if(!vendor?._id) return
+     resendVerification(
+      vendor._id
+    );
+    dispatch(refreshVendorSessionThunk())
+  }
   return (
-    <div className="w-64 bg-white rounded-lg shadow-sm p-6 h-fit">
-      <div className="flex flex-col items-center mb-6">
-        <Avatar className="w-20 h-20 bg-green-600 mb-3">
-          <AvatarFallback className="bg-green-600 text-white text-2xl font-semibold">V</AvatarFallback>
-        </Avatar>
-        <h3 className="font-semibold text-gray-900">Vendor Name</h3>
-      </div>
-      <nav className="space-y-2">
-        {sidebarItems.map((item) => (
-          <button
-            key={item.name}
-            onClick={item.name === "Logout" ? handleLogout : undefined}
-            className={`w-full text-left px-4 py-2 rounded-md transition-colors ${
-              item.active ? "bg-black text-white" : "text-gray-700 hover:bg-gray-100"
-            }`}
-          >
-            {item.name}
-          </button>
-        ))}
-      </nav>
-    </div>
+    <>
+      <Sidebar>
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {items.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      {item.url ? (
+                        <Link to={item.url} className="flex items-center gap-2">
+                          <item.icon className="h-4 w-4" />
+                          <span>{item.title}</span>
+                        </Link>
+                      ) : (
+                        <button
+                          onClick={item.title === "Check status" ? checkIsVerified : undefined}
+                          className="flex items-center gap-2 w-full text-left"
+                        >
+                          <item.icon className="h-4 w-4" />
+                          <span>{item.title}</span>
+                        </button>
+                      )}
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+        <SidebarFooter>
+          <div className="p-4 space-y-4">
+            <Button
+              variant="outline"
+              className="w-full justify-start gap-2 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 hover:border-red-300 bg-transparent"
+              onClick={handleLogout}
+            >
+              <LogOut className="h-4 w-4" />
+              Logout
+            </Button>
+
+            <div className="text-center text-sm text-muted-foreground">
+              <p className="font-semibold text-foreground mb-1">Vendor</p>
+              <p>© 2024 All rights reserved</p>
+              <p className="mt-2">Making events memorable</p>
+            </div>
+          </div>
+        </SidebarFooter>
+      </Sidebar>
+
+      <CheckVerifiedModal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        userName={vendor?.name || "Vendor"}
+        submissionDate={vendor?.submissionDate}
+        status={vendor?.vendorStatus}
+        rejectReason={vendor?.rejectionReason}
+        onReVerify={handleReverify}
+      />
+    </>
   )
 }
