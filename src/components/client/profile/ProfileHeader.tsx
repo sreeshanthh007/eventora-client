@@ -1,7 +1,8 @@
-
 import { Edit, Camera } from "lucide-react"
 import type React from "react"
 import { useState, useRef } from "react"
+import { useSelector } from "react-redux"
+import type { RootState } from "@/store/store"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/pages/ui/avatar"
 import { Button } from "@/components/pages/ui/button"
@@ -12,26 +13,20 @@ import { useToast } from "@/hooks/ui/UseToaster"
 import { useUpdateProfileImageMutation } from "@/hooks/client/UseUpdateProfileImage"
 import { getCloudinaryImageUrl } from "@/utils/helpers/GetCloudinaryImage"
 
-interface ProfileHeaderProps {
-  client: {
-    name: string
-    email: string
-    phone: string
-    profileImage: string
-  }
-}
-
-export const ProfileHeader: React.FC<ProfileHeaderProps> = ({ client }) => {
+export const ProfileHeader: React.FC = () => {
+ 
+  const client = useSelector((state: RootState) => state.client.client)
+  
   const [showCropper, setShowCropper] = useState(false)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const {showToast} = useToast()
-  console.log("profike",client.profileImage)
+  console.log("profile", client)
   const {mutate : updateProfileImage} = useUpdateProfileImageMutation()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleCameraClick = () => {
     fileInputRef.current?.click()
-  }
+  }   
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -71,6 +66,10 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({ client }) => {
     } catch (error) {
       console.error("Error uploading profile image:", error)
     }
+  }
+
+  if (!client) {
+    return null // or some loading state
   }
 
   return (

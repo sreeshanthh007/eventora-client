@@ -9,7 +9,7 @@
     BreadcrumbSeparator,
   } from "@/components/pages/ui/breadcrumb";
   import { SidebarProvider } from "@/components/pages/ui/sidebar";
-  import { AddCategoryForm } from "@/components/admin/CategoryPages";
+  import { AddCategoryForm } from "@/components/admin/AddCategoryPages";
   import { UseAddCategoryMutation } from "@/hooks/admin/UseAddCagegory";
   import type { ICategory } from "@/types/User";
   import { uploadImageToCloudinarySigned } from "@/services/cloudinary/cloudinary";

@@ -7,6 +7,7 @@ import "leaflet-control-geocoder"; // ✅ important
 
 interface LocationPickerProps {
   onLocationSelect: (lat: number, lng: number) => void;
+   initialLocation?: [number, number] 
 }
 
 function LocationMarker({ position, setPosition, onLocationSelect }: any) {

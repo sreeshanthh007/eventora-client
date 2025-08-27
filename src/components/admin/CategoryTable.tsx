@@ -1,3 +1,4 @@
+"use client"
 
 import type * as React from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/pages/ui/table"

@@ -53,7 +53,7 @@ export const ClientLogin = () => {
         },
         onError:(err:any)=>{
           console.log(err)
-          showToast(err.message)
+          showToast(err.response?.data?.message,"error")
         }
       }
     )

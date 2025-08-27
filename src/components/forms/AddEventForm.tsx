@@ -18,9 +18,9 @@ export interface IEventFormData {
   endTime: string;
   pricePerTicket: string;
   totalTicket: string;
-  ticketLimit: string;
+  // ticketLimit: string;
   eventLocation: string;
-  coordinates: [number, number] | null;
+  location: [number, number] | null;
   Images: string[];
 }
 
@@ -37,9 +37,9 @@ export function AddEventForm({ onSubmit }: { onSubmit: (data: IEventFormData) =>
       endTime: "",
       pricePerTicket: "",
       totalTicket: "",
-      ticketLimit: "",
+      // ticketLimit: "",
       eventLocation: "",
-      coordinates: null,
+      location: null,
       Images: [],
     },
     validationSchema: eventSchema,
@@ -245,7 +245,7 @@ export function AddEventForm({ onSubmit }: { onSubmit: (data: IEventFormData) =>
                 )}
               </div>
             </div>
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <Label htmlFor="ticketLimit">Ticket Limit per Person</Label>
               <div className="relative">
                 <Users className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -260,12 +260,12 @@ export function AddEventForm({ onSubmit }: { onSubmit: (data: IEventFormData) =>
                   <p className="text-sm text-red-500">{formik.errors.ticketLimit}</p>
                 )}
               </div>
-            </div>
+            </div> */}
           </div>
         </CardContent>
       </Card>
 
-      {/* Location */}
+   
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -298,16 +298,16 @@ export function AddEventForm({ onSubmit }: { onSubmit: (data: IEventFormData) =>
                 </div>
               </div>
             </div>
-            {formik.values.coordinates && (
+            {formik.values.location && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <MapPin className="h-4 w-4" />
                 <span>
-                  Selected Coordinates: [{formik.values.coordinates[0].toFixed(6)}, {formik.values.coordinates[1].toFixed(6)}]
+                  Selected Coordinates: [{formik.values.location[0].toFixed(6)}, {formik.values.location[1].toFixed(6)}]
                 </span>
               </div>
             )}
-            {formik.touched.coordinates && formik.errors.coordinates && (
-              <p className="text-sm text-red-500">{String(formik.errors.coordinates)}</p>
+            {formik.touched.location && formik.errors.location && (
+              <p className="text-sm text-red-500">{String(formik.errors.location)}</p>
             )}
           </div>
         </CardContent>

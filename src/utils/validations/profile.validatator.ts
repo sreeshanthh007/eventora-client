@@ -1,10 +1,9 @@
 
 
 import * as Yup from "yup"
-import { emailSchema } from "./email.validator"
+
 
 export const profileValidateSchema = Yup.object().shape({
-    email:emailSchema,
     name:Yup.string()
     .required("Name is required")
     .max(20,"maximum 20 charaters are allowed")

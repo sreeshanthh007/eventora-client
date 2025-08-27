@@ -1,11 +1,17 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit";
 import {type  IVendor } from "@/types/User";
-import { vendorAxiosInstance } from "@/api/provider.axios";
+import { axiosInstance } from "@/api/interceptor";
+// import { vendorAxiosInstance } from "@/api/provider.axios";
 
 interface IVendorState {
   vendor: IVendor | null;
   loading: boolean;
   error: string | null;
+}
+
+interface IVendorResponse {
+  success: boolean;
+  user: IVendor;
 }
 
 const initialState: IVendorState = {
@@ -21,10 +27,11 @@ export const refreshVendorSessionThunk = createAsyncThunk<
   { rejectValue: string }
 >("vendor/refreshSession", async (_, { rejectWithValue }) => {
   try {
-    const {data} = await vendorAxiosInstance.get<IVendor>("/refresh_session");
+    const {data} = await axiosInstance.get<IVendorResponse>("/api_v1/_ve/refresh_session");
+    console.log("data from slice",data)
     return data.user;
   } catch (err: any) {
-    return rejectWithValue(err.message || "Failed to refresh session");
+    return rejectWithValue(err.response?.data?.message || err.message || "Failed to refresh session");
   }
 });
 

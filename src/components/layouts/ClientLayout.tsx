@@ -2,15 +2,18 @@ import type React from "react"
 import { ClientHeader } from "../client/ClientHeader"
 import { Footer } from "../mainComponents/Footer"
 import { useEffect } from "react"
-import { useAppDispatch } from "@/store/store"
+import { useAppDispatch, type RootState } from "@/store/store"
 import { refreshClientSessionThunk } from "@/store/slices/clientSlice"
+import { useSelector } from "react-redux"
 
 interface ClientLayoutProps {
   children: React.ReactNode
 }
 
 export const ClientLayout: React.FC<ClientLayoutProps> = ({ children }) => {
-    const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch()
+  const vendor = useSelector((state:RootState)=>state.client.client)
+
     useEffect(()=>{
         dispatch(refreshClientSessionThunk())
     },[dispatch])

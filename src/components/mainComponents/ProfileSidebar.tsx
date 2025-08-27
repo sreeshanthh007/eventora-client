@@ -1,7 +1,12 @@
 
-import { User, Ticket, Heart, Bell, CreditCard, Settings, HelpCircle, Shield, Calendar, MapPin } from "lucide-react"
+import { User, Ticket, Heart, Bell, CreditCard, HelpCircle, Calendar, LogOut } from "lucide-react"
 import { Card } from "@/components/pages/ui/card"
 import { Button } from "@/components/pages/ui/button"
+import { UseLogout } from "@/hooks/auth/Uselogout"
+import { logOutClient } from "@/services/auth/authServices"
+import { clientLogout } from "@/store/slices/clientSlice"
+import { useToast } from "@/hooks/ui/UseToaster"
+import { useAppDispatch } from "@/store/store"
 
 const menuItems = [
   {
@@ -46,30 +51,33 @@ const menuItems = [
     active: false,
     description: "Cards and billing",
   },
+
+  {
+    icon:LogOut,
+    label:"Log out",
+    active:false,
+    description:"click to log out"
+  }
 ]
 
-const settingsItems = [
-  {
-    icon: Settings,
-    label: "Account Settings",
-    href: "/settings",
-    active: false,
-  },
-  {
-    icon: Shield,
-    label: "Privacy & Security",
-    href: "/privacy",
-    active: false,
-  },
-  {
-    icon: HelpCircle,
-    label: "Help & Support",
-    href: "/help",
-    active: false,
-  },
-]
 
 export function ProfileSidebar() {
+
+
+   const dispatch = useAppDispatch()
+  const { mutate: logoutReq } = UseLogout(logOutClient)
+  const {showToast} =  useToast()
+  const handleLogout = () => {
+    logoutReq(undefined, {
+      onSuccess: (data) => {
+        dispatch(clientLogout())
+        showToast(data.message,"success")
+      },
+      onError: (err: any) => {
+       showToast(err.response?.data?.message,"error")
+      }
+    })
+  }
   return (
     <div className="space-y-4">
       {/* Main Navigation */}
@@ -105,7 +113,12 @@ export function ProfileSidebar() {
                   ${item.active ? "text-blue-900" : "text-gray-900"}
                 `}
                 >
-                  {item.label}
+                  {item.label === "Log out" ? (
+                  <button onClick={handleLogout}>{item.label}</button>
+                ) : (
+              item.label
+                 )}
+
                 </p>
                 <p
                   className={`

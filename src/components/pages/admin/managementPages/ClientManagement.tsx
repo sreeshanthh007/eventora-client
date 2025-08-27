@@ -1,5 +1,4 @@
 
-
 import { useEffect, useState } from "react"
 import { AppSidebar } from "@/components/mainComponents/AdminSidebar"
 import { useToast } from "@/hooks/ui/UseToaster"
@@ -21,20 +20,22 @@ const ClientManagementPage = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const debouncedSearchTerm = useDebounce(searchTerm, 300)
   const [currentPage, setCurrentPage] = useState(1)
+  const [clients, setClients] = useState<IClient[]>([])
+
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean
     item: IClient | null
-    action: "blocked" | "unblock"
+    action: "block" | "unblock" // Fixed: changed "blocked" to "block"
   }>({
     isOpen: false,
     item: null,
-    action: "blocked"
+    action: "block" // Fixed: changed "blocked" to "block"
   })
 
   const limit = 10
   const { showToast } = useToast()
 
-  const { mutate: updateUserStatus } = useUpdateUserMutation()
+  const { mutateAsync: updateUserStatus } = useUpdateUserMutation()
 
   const { data, isLoading, isError, error } = useGetAllClients({
     page: currentPage,
@@ -42,9 +43,13 @@ const ClientManagementPage = () => {
     search: debouncedSearchTerm,
   })
 
-  const clients = data?.clients || []
   const totalPages = data?.totalPages || 1
 
+  useEffect(() => {
+    if (data?.clients) {
+      setClients(data.clients)
+    }
+  }, [data])
 
   useEffect(() => {
     if (isError) {
@@ -57,7 +62,11 @@ const ClientManagementPage = () => {
   }, [debouncedSearchTerm])
 
   const handleBlockUserClick = (client: IClient) => {
-    const action = client.status === "active" ? "blocked" : "unblock"
+    // Fixed: More explicit action determination
+    const action = client.status === "active" ? "block" : "unblock"
+    
+    console.log(`Client status: ${client.status}, Action: ${action}`) // Debug log
+    
     setConfirmDialog({
       isOpen: true,
       item: client,
@@ -69,17 +78,38 @@ const ClientManagementPage = () => {
     const { item, action } = confirmDialog
     if (!item) return
 
-    updateUserStatus({
-      userId: item._id,
-      status: action === "blocked" ? "blocked" : "active",
-    })
+    try {
+      const newStatus = action === "block" ? "blocked" : "active"
+      
+      const response = await updateUserStatus({
+        userId: item._id,
+        status: newStatus
+      });
+
+      if (response.success) {
+        setClients(prevClients =>
+          prevClients.map(c =>
+            c._id === item._id ? { ...c, status: newStatus } : c
+          )
+        )
+        
+        setConfirmDialog({
+          isOpen: false,
+          item: null,
+          action: "block"
+        })
+      }
+    } catch (error) {
+      showToast("Failed to update client status", "error")
+      console.error("Error updating client status:", error)
+    }
   }
 
   const handleCancelAction = () => {
     setConfirmDialog({
       isOpen: false,
       item: null,
-      action: "blocked"
+      action: "block"
     })
   }
 

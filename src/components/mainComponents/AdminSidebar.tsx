@@ -48,26 +48,26 @@ const navData = {
       url: "/admin/category", // Updated URL to match the new page
       icon: Tag,
     },
-    {
-      title: "Events",
-      url: "/admin/events",
-      icon: Calendar,
-    },
-    {
-      title: "Analytics",
-      url: "#",
-      icon: BarChart3,
-    },
-    {
-      title: "Payments",
-      url: "#",
-      icon: Wallet,
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings,
-    },
+    // {
+    //   title: "Events",
+    //   url: "/admin/events",
+    //   icon: Calendar,
+    // },
+    // {
+    //   title: "Analytics",
+    //   url: "#",
+    //   icon: BarChart3,
+    // },
+    // {
+    //   title: "Payments",
+    //   url: "#",
+    //   icon: Wallet,
+    // },
+    // {
+    //   title: "Settings",
+    //   url: "#",
+    //   icon: Settings,
+    // },
   ],
 }
 
@@ -76,7 +76,7 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 }
 
 export function AppSidebar({ ...props }: AppSidebarProps) {
-  const location = useLocation() // Get current location from react-router-dom
+  const location = useLocation() 
   const currentPath = location.pathname
 const {showToast} =  useToast()
 
@@ -151,9 +151,9 @@ const {showToast} =  useToast()
                     <AvatarFallback className="rounded-lg">AD</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    {/* {admin?.email && */}
-                    <span className="truncate text-xs text-muted-foreground">admin@example.com</span>
-                    {/* } */}
+                    {admin?.email &&
+                    <span className="truncate text-xs text-muted-foreground">{admin.email}</span>
+                    }
                   </div>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>

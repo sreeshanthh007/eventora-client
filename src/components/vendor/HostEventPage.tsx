@@ -11,29 +11,32 @@ export default function HostEventPage() {
   const {mutate:addEvent} = useAddEventMutation()
 
   const handleCreateEvent = async(data)=>{
-
+    console.log("data after creating evet",data)
     let uploadImageUrl : string [] = []
 
 
-      if(data.Images.length>0){
-        for(let file of data.Images){
-          const url = await uploadImageToCloudinarySigned(file,"event-images");
-          if(!url){
-            showToast("failed to upload","error")
-          }
-          uploadImageUrl.push(url)
-        }
+      if (data.Images?.length > 0) {
+  for (let file of data.Images) {
+    const url = await uploadImageToCloudinarySigned(file, "event-images");
+    console.log("tje uslr after ",url)
+    if (url) {            // 👈 only push if valid
+      uploadImageUrl.push(url);
+    } else {
+      showToast("Failed to upload image", "error");
+    }
+  }
+}
 
         const processedData = {
           ...data,
           Images:uploadImageUrl,
-            coordinates: {
+            location: {
             type: "Point", 
           coordinates: [data.coordinates[0], data.coordinates[1]],
           },
         }
         addEvent(processedData)
-      }
+      
    
   }
   return (

@@ -1,6 +1,7 @@
 
-import { clientAxiosInstance } from "@/api/client.axios";
-import type { ICategory } from "@/types/User";
+// import { clientAxiosInstance } from "@/api/client.axios";
+import { axiosInstance } from "@/api/interceptor";
+import type { ICategory, IEvent } from "@/types/User";
 
 export type Client = {
   _id: string;
@@ -22,33 +23,54 @@ export interface ClientResponse {
   client: Client;
 }
 
+export interface ClientPersonalInformation{
+  name:string
+  phone:string
+}
+
 export const getClientDetails = async () => {
-  const result = await clientAxiosInstance.get<ClientResponse>(
-    "/client/details"
+  const result = await axiosInstance.get<ClientResponse>(
+    "/api_v1/_cl/details"
   );
   return result.data;
 };
 
 
 export const updateProfileImage = async(image:string) =>{
-  const result = await clientAxiosInstance.post(
-    "/update-profileImage",
+  const result = await axiosInstance.post(
+    "/api_v1/_cl/update-profileImage",
     {image}
   );
   return result.data
-}
+};
+
+
+  export const updatePersonalInformation = async(data:Partial<Pick<ClientPersonalInformation,"name" | "phone">>)=>{
+    const response =await axiosInstance.patch(
+      "/api_v1/_cl/update-profile",
+      data
+    );
+    return response.data
+  }
 
 export const getAllCategories = async() : Promise<ICategory[]>=>{
-    const result = await clientAxiosInstance.get<ICategory[]>(
-        "/all-categories"
+    const result = await axiosInstance.get<ICategory[]>(
+        "/api_v1/_cl/all-categories"
     )
     return result.data
 };
 
 
+export const getAllEvents = async() : Promise<IEvent[]>=>{
+  const response = await axiosInstance.get<IEvent[]>(
+    "/api_v1/_cl/all-events"
+  );
+  return response.data
+}
+
 export const clientRefreshSession = async() : Promise<ClientResponse> =>{
-  const response = await clientAxiosInstance.get<ClientResponse>(
-    "/refresh-session"
+  const response = await axiosInstance.get<ClientResponse>(
+    "/api_v1/_cl/refresh-session"
   );
   return response.data
 }

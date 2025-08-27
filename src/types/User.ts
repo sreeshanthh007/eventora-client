@@ -8,6 +8,7 @@ export interface User{
     phone:string,
     password:string,
     role?:UserRole,
+    status?:string,
     idProof?:string,
     profileImage?:string
 }
@@ -33,13 +34,13 @@ _id?:string
   phone: string;
   password?: string;
   role?: "vendor";
-  profileImage?:string
+  profilePicture?:string
   idProof?:File | null | string,
   rejectionReason?:string
   vendorStatus:"approved" | "pending" | "rejected",
   status?:string,
   place?:string,
-  bio?:string
+  about?:string
 }
 
 export interface ICategory {
@@ -48,6 +49,13 @@ export interface ICategory {
     image:File
 }
 
+export interface IEvent{
+    title:string
+    pricePerTicket:number;
+    date:Date;
+    eventLocation:string;
+    
+}
 
 export interface IMappedVendor {
     _id?:string

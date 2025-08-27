@@ -1,43 +1,52 @@
-
-import { User, Mail, Phone, Edit } from "lucide-react"
-import type React from "react"
-import { useState } from "react"
-
-import { Button } from "@/components/pages/ui/button"
-import { Card } from "@/components/pages/ui/card"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/pages/ui/dialog"
-import { Input } from "@/components/pages/ui/input"
-import { Label } from "@/components/pages/ui/label"
+import { User, Mail, Phone, Edit } from "lucide-react";
+import type React from "react";
+import { useState } from "react";
+import { useSelector } from "react-redux";
+import { useFormik } from "formik";
+import type { RootState } from "@/store/store";
+import { Button } from "@/components/pages/ui/button";
+import { Card } from "@/components/pages/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/pages/ui/dialog";
+import { Input } from "@/components/pages/ui/input";
+import { Label } from "@/components/pages/ui/label";
+import { profileValidateSchema } from "@/utils/validations/profile.validatator";
 
 interface ContactInfoCardProps {
-  client: {
-    name: string
-    email: string
-    phone: string
-  }
+  onUpdateClient?: (updatedClient: { name: string; phone: string }) => void;
 }
 
-export const ContactInfoCard: React.FC<ContactInfoCardProps> = ({ client }) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [formData, setFormData] = useState({
-    name: client.name,
-    email: client.email,
-    phoneNumber: client.phone,
+export const ContactInfoCard: React.FC<ContactInfoCardProps> = ({ onUpdateClient }) => {
+  // Get client data directly from Redux store
+  const client = useSelector((state: RootState) => state.client.client);
+  
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleEditDetails = (values: { name: string; phone: string }) => {
+    const updatedClient = {
+      name: values.name,
+      phone: values.phone,
+    };
+    
+    if (onUpdateClient) {
+      onUpdateClient(updatedClient);
+    }
+    
+    console.log("After submitting", updatedClient);
+    setIsOpen(false);
+  };
+
+  const formik = useFormik({
+    initialValues: {
+      name: client?.name || "",
+      phone: client?.phone || "",
+    },
+    validationSchema: profileValidateSchema,
+    onSubmit: handleEditDetails,
+    enableReinitialize: true, // This ensures formik updates when client data changes
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
- 
-    console.log("[v0] Submitting contact info:", formData)
-    setIsOpen(false)
-  
-  }
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }))
+  if (!client) {
+    return null; // or some loading state
   }
 
   return (
@@ -55,40 +64,50 @@ export const ContactInfoCard: React.FC<ContactInfoCardProps> = ({ client }) => {
             <DialogHeader>
               <DialogTitle>Edit Contact Information</DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={formik.handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Full Name</Label>
                 <Input
                   id="name"
-                  value={formData.name}
-                  onChange={(e) => handleInputChange("name", e.target.value)}
+                  {...formik.getFieldProps("name")}
                   placeholder="Enter full name"
+                  className="h-12 bg-gray-50/80 border-gray-300 focus:border-gray-600 focus:ring-gray-600/20 rounded-xl"
                 />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange("email", e.target.value)}
-                  placeholder="Enter email address"
-                />
+                {formik.touched.name && formik.errors.name && (
+                  <p className="text-sm text-red-500">{formik.errors.name}</p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="phone">Phone Number</Label>
                 <Input
                   id="phone"
-                  value={formData.phoneNumber}
-                  onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
+                  {...formik.getFieldProps("phone")}
                   placeholder="Enter phone number"
+                  className="h-12 bg-gray-50/80 border-gray-300 focus:border-gray-600 focus:ring-gray-600/20 rounded-xl"
                 />
+                {formik.touched.phone && formik.errors.phone && (
+                  <p className="text-sm text-red-500">{formik.errors.phone}</p>
+                )}
               </div>
               <div className="flex justify-end space-x-2 pt-4">
-                <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    formik.resetForm();
+                    setIsOpen(false);
+                  }}
+                  className="px-5 py-2.5 hover:bg-gray-50"
+                >
                   Cancel
                 </Button>
-                <Button type="submit">Save Changes</Button>
+                <Button
+                  type="submit"
+                  disabled={!formik.isValid || !formik.dirty}
+                  className="px-5 py-2.5 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white"
+                >
+                  Save Changes
+                </Button>
               </div>
             </form>
           </DialogContent>
@@ -127,5 +146,5 @@ export const ContactInfoCard: React.FC<ContactInfoCardProps> = ({ client }) => {
         </div>
       </div>
     </Card>
-  )
-}
+  );
+};

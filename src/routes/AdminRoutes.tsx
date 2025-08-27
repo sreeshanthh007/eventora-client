@@ -9,7 +9,7 @@ import { AdminPublicRoute } from "@/protected/PublicRoute";
 import CategoryManagementPage from "@/components/pages/admin/managementPages/CategoryManagementPage";
 import { AddCategoryPage } from "@/components/pages/admin/AddCategoryPage";
 import RequestedVendorsPage from "@/components/pages/admin/managementPages/VendorRequestManagementPage";
-// import EditCategoryPage from "@/components/pages/admin/EditCategoryPage";
+
 
 const AdminDashboard = lazy(() => import("@/components/admin/Admindashboard"));
 const ClientManagementPage = lazy(() => import("@/components/pages/admin/managementPages/ClientManagement"));
@@ -59,14 +59,6 @@ export const AdminRoutes = () => {
           }
           />
 
-          {/* <Route
-          path="/editCategory/:id"
-          element={
-            <Suspense fallback={<Spinner/>}>
-              <EditCategoryPage/>
-            </Suspense>
-          }
-          /> */}
            <Route path="/category" element={
       <Suspense fallback={<Spinner/>}>
         <CategoryManagementPage/>

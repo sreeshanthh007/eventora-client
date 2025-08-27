@@ -1,12 +1,10 @@
 
 import * as Yup from "yup"
 const ClientSignupSchema = Yup.object().shape({
-    name:Yup.string()
+    name: Yup.string()
+    .trim()
     .required("Name is required")
-    .matches(
-			/^[a-zA-Z\s]+$/,
-			"Full name should only contain letters and spaces"
-	)
+    .matches(/^(?!\s*$)[a-zA-Z\s]+$/, "Full name should only contain letters and spaces")
     .min(2,"Name should be atleast 2 charaters")
     .max(50,"Name must not exceed 50 charaters"),
 

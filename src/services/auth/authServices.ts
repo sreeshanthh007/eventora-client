@@ -2,9 +2,10 @@ import { AuthAxiosInstance } from "@/api/auth.axios";
 import type {  IAxiosResponse } from "@/types/Response";
 import type  { UserRole } from "@/types/UserRoles";
 import type { UserDTO } from "@/types/User";
-import { clientAxiosInstance } from "@/api/client.axios";
-import { vendorAxiosInstance } from "@/api/provider.axios";
-import { adminAxiosInstance } from "@/api/admin.axios";
+import { axiosInstance } from "@/api/interceptor";
+// import { clientAxiosInstance } from "@/api/client.axios";
+// import { vendorAxiosInstance } from "@/api/provider.axios";
+// import { adminAxiosInstance } from "@/api/admin.axios";
 
 export interface ILoginData{
     name:string,
@@ -87,17 +88,17 @@ export const saveFcmToken = async({userId,fcmToken}:{userId:string,fcmToken:stri
     return response.data
 }
 export const logOutClient = async() : Promise<IAxiosResponse> =>{
-    const response = await clientAxiosInstance.post("/logout")
+    const response = await axiosInstance.post("/api_v1/_cl/logout")
     return response.data    
 }
 
 export const VendorLogout = async() : Promise<IAxiosResponse> =>{
-    const response = await vendorAxiosInstance.post("/logout")
+    const response = await axiosInstance.post("/api_v1/_ve/logout")
     return response.data
 }
 
 
 export const AdminLogout = async() : Promise<IAxiosResponse> =>{
-    const reponse = await adminAxiosInstance.post("/logout")
+    const reponse = await axiosInstance.post("/api_v1/_ad/logout")
     return reponse.data
 }

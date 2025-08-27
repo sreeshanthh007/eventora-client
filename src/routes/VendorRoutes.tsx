@@ -9,6 +9,11 @@ import {VendorPublicRoute} from "@/protected/PublicRoute";
 import VendorProfilePage from "@/components/vendor/VendorProfilePage";
 import ListedEventsPage from "@/components/pages/vendor/ListedEventsPage";
 import HostEventPage from "@/components/vendor/HostEventPage";
+import AddServicePage from "@/components/pages/vendor/AddServicePage";
+import ListedServicePage from "@/components/pages/vendor/ListedServicePage";
+import EditServicePage from "@/components/pages/vendor/EditServicePage";
+import EditEventPage from "@/components/vendor/EditEventPage";
+
 
 
 export const VendorRoutes = () => {
@@ -27,6 +32,10 @@ export const VendorRoutes = () => {
       <Route path="/profile" element={<VendorProfilePage/>}/>
       <Route path="events" element={<ListedEventsPage/>}/>
       <Route path="hostEvent" element={<HostEventPage/>}/>
+      <Route path="/addService" element={<AddServicePage/>}/>
+      <Route path="services" element={<ListedServicePage/>}/>
+      <Route path="/edit-service/:serviceId" element={<EditServicePage/>} />
+      <Route path="/edit-event/:eventId" element={<EditEventPage/>}/>
       </Route>
     </Routes>
   );
