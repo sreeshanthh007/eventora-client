@@ -5,6 +5,7 @@ import { adminLogout } from "@/store/slices/adminSlice";
 import { clientLogout } from "@/store/slices/clientSlice";
 import { vendorLogout } from "@/store/slices/vendorSlice";
 import { StatusCodes } from "@/utils/constants/statusCodes";
+import { URL_PART } from "@/utils/constants/route";
 
 export const axiosInstance: AxiosInstance = axios.create({
   withCredentials: true,
@@ -60,11 +61,11 @@ axiosInstance.interceptors.response.use(
         isRefreshing = true;
 
         const refreshEndpoint =
-          role === "_ad"
+          role === URL_PART.admin
             ? "/api_v1/_ad/refresh-token"
-            : role === "_cl"
+            : role === URL_PART.client
             ? "/api_v1/_cl/refresh-token"
-            : role === "_ve"
+            : role === URL_PART.vendor
             ? "/api_v1/_ve/refresh-token"
             : "";
 

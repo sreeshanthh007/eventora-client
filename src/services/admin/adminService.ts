@@ -1,5 +1,6 @@
 // import { adminAxiosInstance } from "@/api/admin.axios"
 import { axiosInstance } from "@/api/interceptor";
+import { ADMIN_ROUTES } from "@/utils/constants/api.routes";
 
 export const getAllClients = async ({
   page = 1,
@@ -10,7 +11,7 @@ export const getAllClients = async ({
   limit: number;
   search: string;
 }) => {
-  const response = await axiosInstance.get("/api_v1/_ad/users", {
+  const response = await axiosInstance.get(ADMIN_ROUTES.GET_ALL_CLIENTS, {
     params: {
       page,
       limit,
@@ -29,7 +30,7 @@ export const getAllVendors = async ({
   limit: number;
   search: string;
 }) => {
-  const response = await axiosInstance.get("/api_v1/_ad/vendors", {
+  const response = await axiosInstance.get(ADMIN_ROUTES.GET_ALL_VENDORS, {
     params: {
       page,
       limit,
@@ -49,7 +50,7 @@ export const getAllCategory = async ({
   limit:number,
   search:string
 }) =>{
-  const response = await axiosInstance.get("/api_v1/_ad/categories",{
+  const response = await axiosInstance.get(ADMIN_ROUTES.GET_ALL_CATEGORIES,{
     params:{
       page,
       limit,
@@ -73,7 +74,7 @@ export const editCategory = async (
 ) => {
   const { categoryId, data } = variables;
   const response = await axiosInstance.patch(
-    `/api_v1/_ad/edit-category/${categoryId}`,
+    ADMIN_ROUTES.EDIT_CATEGORY(categoryId),
     data
   );
   return response.data;
@@ -89,7 +90,7 @@ export const getRequestedVendors = async({
   limit:number,
   search:string
 })=>{
-  const response = await axiosInstance.get("/api_v1/_ad/requested-vendors",{
+  const response = await axiosInstance.get(ADMIN_ROUTES.GET_REQUESTED_VENDORS,{
     params:{
       page,
       limit,
@@ -105,7 +106,7 @@ export const updateUserStatus = async (data: {
     status: string;
 }) => {
   const response = await axiosInstance.patch(
-    "/api_v1/_ad/user-status",
+    ADMIN_ROUTES.UPDATE_USER_STATUS,
     {
       userId: data.userId,
       status: data.status,
@@ -121,7 +122,7 @@ export const updateVendorStatus = async (data: {
     status: string;
 }) => {
   const response = await axiosInstance.patch(
-    "/api_v1/_ad/vendor-status",
+      ADMIN_ROUTES.UPDATE_VENDOR_STATUS,
     {
       vendorId: data.vendorId,
       status: data.status,
@@ -137,7 +138,7 @@ export const updateCategoryStatus = async(data:{
   status:string
 }) =>{
   const response = await axiosInstance.patch(
-    "/api_v1/_ad/category-status",
+    ADMIN_ROUTES.UPDATE_CATEGORY_STATUS,
     {categoryId:data.categoryId,status:data.status}
   )
 
@@ -151,7 +152,7 @@ export const addCategory = async(data :{
   image:string
 }) =>{
   const resonse = await axiosInstance.post(
-    "/api_v1/_ad/add-category",
+    ADMIN_ROUTES.ADD_CATEGORY,
     {
       title:data.title,
       image:data.image
@@ -161,20 +162,17 @@ export const addCategory = async(data :{
 }
 
 
-// export const editCategory = async(data:{
-//   categoryId:string,
 
-// })
 
 
 
 export const approveVendor = async(vendorId: string) => {
-  const response = await axiosInstance.patch(`/api_v1/_ad/${vendorId}/approve-vendors`);
+  const response = await axiosInstance.patch(ADMIN_ROUTES.APPROVE_VENDOR(vendorId));
   return response.data;
 };
 
 export const rejectVendor = async ({ vendorId, rejectReason }:{vendorId:string,rejectReason:string}) => {
-  const response = await axiosInstance.patch(`/api_v1/_ad/${vendorId}/reject-vendors`, { rejectReason });
+  const response = await axiosInstance.patch(ADMIN_ROUTES.REJECT_VENDOR(vendorId), { rejectReason });
   return response.data;
 };
 
