@@ -54,7 +54,7 @@ export default function LocationPicker({ onLocationSelect }: LocationPickerProps
   return (
     <MapContainer
       center={position}
-      zoom={5}
+      zoom={5}  
       style={{ height: "400px", width: "100%" }}
       whenReady={(e) => {
         mapRef.current = e.target;

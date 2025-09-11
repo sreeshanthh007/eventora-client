@@ -7,6 +7,8 @@ import { NotFound } from "@/Custom404Page";
 import { ClientProtectedRoute } from "@/protected/ProtectedRoute";
 import { ClientPublicRoute } from "@/protected/PublicRoute";
 import ProfilePage from "@/components/pages/client/ProfileSidebarPage"; 
+import EventsPage from "@/components/pages/client/EventPage";
+import EventDetailsPage from "@/components/pages/client/EventDetailsPage";
 
 
 const ClientRoutes = () => {
@@ -24,6 +26,8 @@ const ClientRoutes = () => {
       <Route element={<ClientProtectedRoute />}>
        <Route path="/profile" element={<ProfilePage/>}>
        </Route>
+       <Route path="/events" element={<EventsPage/>}/>
+      <Route path="/event-details/:eventId" element={<EventDetailsPage/>}/>
       </Route>
 
       <Route path="*" element={<NotFound />} />

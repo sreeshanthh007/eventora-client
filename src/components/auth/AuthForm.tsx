@@ -16,7 +16,6 @@ import { useFormik } from "formik"
 import { signInschema } from "@/utils/validations/signIn.validator"
 import { Link, useNavigate } from "react-router-dom"
 import type { CredentialResponse } from "@react-oauth/google"
-import { UseSaveFcmTokenMutation } from "@/hooks/auth/UseSaveFcmToken"
 
 interface AuthFormProps {
   type: "login" | "register"
@@ -61,7 +60,6 @@ export const AuthForm = ({
   
   const { mutate: sendVerificationOtp } = useSendOtpMutation()
   const { mutate: verifyOtp } = useVerifyOtpMutation()
-  const {mutate:saveFcmToken} = UseSaveFcmTokenMutation()
 
 
   const handleOpenOtpModal = () => {
@@ -398,7 +396,6 @@ export const AuthForm = ({
             {buttonLabel}
           </Button>
 
-          {/* Google Auth for Client Login */}
           {type === "login" && role === "client" && (
             <>
               <div className="relative flex items-center justify-center">
@@ -421,7 +418,7 @@ export const AuthForm = ({
           </Link>
         </div>
 
-        {/* Modals */}
+   
         <OTPModal
           isOpen={isOtpModalOpen}
           onClose={handleCloseOtpModal}
@@ -433,22 +430,21 @@ export const AuthForm = ({
           isOpen={isForgotPasswordModalOpen}
           onClose={handleCLoseForgotPasswordModal}
           onSuccess={handleForgotPasswordSuccess}
-          role={role}
+          role={role!}
         />
         <ResetPasswordModal
           isOpen={isResetPasswordModalOpen}
           onClose={() => setIsResetPasswordModalOpen(false)}
           onSuccess={handleResetPasswordSuccess}
           email={emailForReset}
-          role={role}
+          role={role!}
         />
 
-        {/* Image Cropper Modal */}
         {showCropper && selectedImage && (
           <ImageCropper
             image={selectedImage}
             onCropComplete={handleCropComplete}
-            aspect={1} // Square aspect ratio for profile images
+            aspect={1} 
             showCropper={setShowCropper}
           />
         )}

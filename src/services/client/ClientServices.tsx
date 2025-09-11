@@ -69,6 +69,48 @@ export const getAllEvents = async() : Promise<IEvent[]>=>{
   return response.data
 }
 
+
+export const getAllEventForEventPage = async({
+  page= 1,
+  limit = 6,
+  search = "",
+  location = "all",
+  sort = "date-asc",
+   lat,
+  lng,
+}:{
+  page:number,
+  limit:number,
+  search:string,
+  location:string,
+  sort:string,
+    lat?: number;
+  lng?: number;
+}) =>{
+
+  const response = await axiosInstance.get(CLIENT_ROUTES.GET_ALL_EVENTS_FOR_CLIENT,{
+    params:{
+      page,
+      limit,
+      search,
+      location,
+      sort,
+      lat,
+      lng, // send coordinates here
+    },
+  })
+  return response.data
+}
+
+
+export const getEventDetails = async(eventId:string) =>{
+
+  const response = await axiosInstance.get(CLIENT_ROUTES.GET_EVENT_DETAILS(eventId))
+
+  return response.data
+}
+
+
 export const clientRefreshSession = async() : Promise<ClientResponse> =>{
   const response = await axiosInstance.get<ClientResponse>(
     CLIENT_ROUTES.REFRESH_SESSION

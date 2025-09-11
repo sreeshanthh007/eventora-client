@@ -1,6 +1,7 @@
+
 import type React from "react";
 import { useFormik } from "formik";
-import { Calendar, Clock, MapPin, Upload, DollarSign, Users, FileText, ImageIcon, Loader2 } from "lucide-react";
+import { Calendar, Clock, MapPin, Upload, DollarSign, Users, FileText, ImageIcon, Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/pages/ui/button";
 import { Input } from "@/components/pages/ui/input";
 import { Label } from "@/components/pages/ui/label";
@@ -14,14 +15,24 @@ import LocationPicker from "../map/MapPicker";
 export interface IEventFormData {
   title: string;
   description: string;
-  date: Date;
-  startTime: string;
-  endTime: string;
+  eventSchedule: Array<{
+    date: string;
+    startTime: string;
+    endTime: string;
+  }>;
   pricePerTicket: number;
   totalTicket: number;
+  maxTicketPerUser: number;
+  tickets: Array<{
+    ticketType: string;
+    price: number;
+    totalTickets: number;
+    maxTicketsPerUser: number;
+  }>;
   eventLocation: string;
   location: [number, number] | null;
-  Images: string[] | File[];
+  Images: File[] | string[];
+  eventType?: "row" | "normal";
 }
 
 interface EditEventFormProps {
@@ -40,24 +51,23 @@ export function EditEventForm({ initialData, onSubmit, onCancel, isSubmitting }:
     initialValues: {
       title: initialData?.title || "",
       description: initialData?.description || "",
-      date: initialData?.date,
-      startTime: initialData?.startTime || "",
-      endTime: initialData?.endTime || "",
-      pricePerTicket: initialData?.pricePerTicket,
-      totalTicket: initialData?.totalTicket,
+      eventSchedule: initialData?.eventSchedule!,
+      pricePerTicket: initialData?.pricePerTicket || 0,
+      totalTicket: initialData?.totalTicket || 0,
+      maxTicketPerUser: initialData?.maxTicketPerUser || 0,
+      tickets: initialData?.tickets || [],
       eventLocation: initialData?.eventLocation || "",
       location: initialData?.location || null,
       Images: initialData?.Images || [],
+      eventType: initialData?.eventType || "normal",
     },
     validationSchema: eventSchema,
     onSubmit: (values) => {
-      handleSubmit(values);
+      onSubmit(values);
     },
   });
 
   useEffect(() => {
-    console.log("formik.values", formik.values);
-    console.log("formik.errors", formik.errors);
     if (initialData?.Images) {
       setPreviewImages(
         initialData.Images.map((img) => (typeof img === "string" ? getCloudinaryImageUrl(img) : URL.createObjectURL(img))),
@@ -118,12 +128,37 @@ export function EditEventForm({ initialData, onSubmit, onCancel, isSubmitting }:
     );
   };
 
-  const handleSubmit = (data: IEventFormData) => {
-    onSubmit(data);
+  const addSchedule = () => {
+    formik.setFieldValue("eventSchedule", [
+      ...formik.values.eventSchedule,
+      { date: "", startTime: "", endTime: "" },
+    ]);
+  };
+
+  const removeSchedule = (index: number) => {
+    formik.setFieldValue(
+      "eventSchedule",
+      formik.values.eventSchedule.filter((_, i) => i !== index),
+    );
+  };
+
+  const addTicket = () => {
+    formik.setFieldValue("tickets", [
+      ...formik.values.tickets,
+      { ticketType: "", price: 0, totalTickets: 0, maxTicketsPerUser: 0 },
+    ]);
+  };
+
+  const removeTicket = (index: number) => {
+    formik.setFieldValue(
+      "tickets",
+      formik.values.tickets.filter((_, i) => i !== index),
+    );
   };
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-6">
+      {/* Basic Information */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -134,9 +169,9 @@ export function EditEventForm({ initialData, onSubmit, onCancel, isSubmitting }:
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="eventName">Event Name *</Label>
+              <Label htmlFor="title">Event Name *</Label>
               <Input
-                id="eventName"
+                id="title"
                 placeholder="Enter event name"
                 {...formik.getFieldProps("title")}
                 disabled={isSubmitting}
@@ -145,24 +180,7 @@ export function EditEventForm({ initialData, onSubmit, onCancel, isSubmitting }:
                 <p className="text-sm text-red-500">{formik.errors.title}</p>
               )}
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="eventDate">Event Date *</Label>
-              <div className="relative">
-                <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="eventDate"
-                  type="date"
-                  className="pl-10"
-                  {...formik.getFieldProps("date")}
-                  disabled={isSubmitting}
-                />
-                {formik.touched.date && formik.errors.date && (
-                  <p className="text-sm text-red-500">{formik.errors.date}</p>
-                )}
-              </div>
-            </div>
           </div>
-
           <div className="space-y-2">
             <Label htmlFor="description">Description *</Label>
             <Textarea
@@ -179,49 +197,91 @@ export function EditEventForm({ initialData, onSubmit, onCancel, isSubmitting }:
         </CardContent>
       </Card>
 
-      {/* Time & Schedule */}
+      {/* Event Schedule */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Clock className="h-5 w-5 text-primary" />
-            Time & Schedule
+            Event Schedule
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="startTime">Start Time *</Label>
-              <div className="relative">
-                <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="startTime"
-                  type="time"
-                  className="pl-10"
-                  {...formik.getFieldProps("startTime")}
-                  disabled={isSubmitting}
-                />
-                {formik.touched.startTime && formik.errors.startTime && (
-                  <p className="text-sm text-red-500">{formik.errors.startTime}</p>
+        <CardContent className="space-y-4">
+          {formik.values.eventSchedule.map((schedule, index) => (
+            <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor={`eventSchedule[${index}].date`}>Event Date *</Label>
+                <div className="relative">
+                  <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id={`eventSchedule[${index}].date`}
+                    type="date"
+                    className="pl-10"
+                    {...formik.getFieldProps(`eventSchedule[${index}].date`)}
+                    disabled={isSubmitting}
+                  />
+                  {formik.touched.eventSchedule?.[index]?.date && formik.errors.eventSchedule?.[index]?.date && (
+                    <p className="text-sm text-red-500">{formik.errors.eventSchedule[index].date}</p>
+                  )}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor={`eventSchedule[${index}].startTime`}>Start Time *</Label>
+                <div className="relative">
+                  <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id={`eventSchedule[${index}].startTime`}
+                    type="time"
+                    className="pl-10"
+                    {...formik.getFieldProps(`eventSchedule[${index}].startTime`)}
+                    disabled={isSubmitting}
+                  />
+                  {formik.touched.eventSchedule?.[index]?.startTime && formik.errors.eventSchedule?.[index]?.startTime && (
+                    <p className="text-sm text-red-500">{formik.errors.eventSchedule[index].startTime}</p>
+                  )}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor={`eventSchedule[${index}].endTime`}>End Time *</Label>
+                <div className="relative flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id={`eventSchedule[${index}].endTime`}
+                      type="time"
+                      className="pl-10"
+                      {...formik.getFieldProps(`eventSchedule[${index}].endTime`)}
+                      disabled={isSubmitting}
+                    />
+                  </div>
+                  {formik.values.eventSchedule.length > 1 && (
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => removeSchedule(index)}
+                      disabled={isSubmitting}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+                {formik.touched.eventSchedule?.[index]?.endTime && formik.errors.eventSchedule?.[index]?.endTime && (
+                  <p className="text-sm text-red-500">{formik.errors.eventSchedule[index].endTime}</p>
                 )}
               </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="endTime">End Time *</Label>
-              <div className="relative">
-                <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="endTime"
-                  type="time"
-                  className="pl-10"
-                  {...formik.getFieldProps("endTime")}
-                  disabled={isSubmitting}
-                />
-                {formik.touched.endTime && formik.errors.endTime && (
-                  <p className="text-sm text-red-500">{formik.errors.endTime}</p>
-                )}
-              </div>
-            </div>
-          </div>
+          ))}
+          {formik.values.eventType === "row" && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={addSchedule}
+              disabled={isSubmitting}
+              className="mt-4"
+            >
+              Add Another Schedule
+            </Button>
+          )}
         </CardContent>
       </Card>
 
@@ -233,43 +293,154 @@ export function EditEventForm({ initialData, onSubmit, onCancel, isSubmitting }:
             Pricing & Tickets
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="pricePerTicket">Price per Ticket *</Label>
-              <div className="relative">
-                <DollarSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="pricePerTicket"
-                  type="number"
-                  placeholder="0.00"
-                  className="pl-10"
-                  {...formik.getFieldProps("pricePerTicket")}
-                  disabled={isSubmitting}
-                />
-                {formik.touched.pricePerTicket && formik.errors.pricePerTicket && (
-                  <p className="text-sm text-red-500">{formik.errors.pricePerTicket}</p>
-                )}
+        <CardContent className="space-y-4">
+          {formik.values.eventType === "row" ? (
+            <>
+              {formik.values.tickets.map((ticket, index) => (
+                <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor={`tickets[${index}].ticketType`}>Ticket Type *</Label>
+                    <Input
+                      id={`tickets[${index}].ticketType`}
+                      placeholder="e.g., General Admission"
+                      {...formik.getFieldProps(`tickets[${index}].ticketType`)}
+                      disabled={isSubmitting}
+                    />
+                    {formik.touched.tickets?.[index]?.ticketType && formik.errors.tickets?.[index]?.ticketType && (
+                      <p className="text-sm text-red-500">{formik.errors.tickets[index].ticketType}</p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor={`tickets[${index}].price`}>Price *</Label>
+                    <div className="relative">
+                      <DollarSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id={`tickets[${index}].price`}
+                        type="number"
+                        placeholder="0.00"
+                        className="pl-10"
+                        {...formik.getFieldProps(`tickets[${index}].pricePerTicket`)}
+                        disabled={isSubmitting}
+                      />
+                      {formik.touched.tickets?.[index]?.pricePerTicket && formik.errors.tickets?.[index]?.pricePerTicket && (
+                        <p className="text-sm text-red-500">{formik.errors.tickets[index].pricePerTicket}</p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor={`tickets[${index}].totalTickets`}>Total Tickets *</Label>
+                    <div className="relative">
+                      <Users className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id={`tickets[${index}].totalTickets`}
+                        type="number"
+                        placeholder="100"
+                        className="pl-10"
+                        {...formik.getFieldProps(`tickets[${index}].totalTickets`)}
+                        disabled={isSubmitting}
+                      />
+                      {formik.touched.tickets?.[index]?.totalTickets && formik.errors.tickets?.[index]?.totalTickets && (
+                        <p className="text-sm text-red-500">{formik.errors.tickets[index].totalTickets}</p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor={`tickets[${index}].maxTicketsPerUser`}>Max Tickets Per User *</Label>
+                    <div className="relative flex items-center gap-2">
+                      <div className="relative flex-1">
+                        <Users className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id={`tickets[${index}].maxTicketsPerUser`}
+                          type="number"
+                          placeholder="10"
+                          className="pl-10"
+                          {...formik.getFieldProps(`tickets[${index}].maxTicketsPerUser`)}
+                          disabled={isSubmitting}
+                        />
+                      </div>
+                      {formik.values.tickets.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => removeTicket(index)}
+                          disabled={isSubmitting}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                    {formik.touched.tickets?.[index]?.maxTicketsPerUser && formik.errors.tickets?.[index]?.maxTicketsPerUser && (
+                      <p className="text-sm text-red-500">{formik.errors.tickets[index].maxTicketsPerUser}</p>
+                    )}
+                  </div>
+                </div>
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={addTicket}
+                disabled={isSubmitting}
+                className="mt-4"
+              >
+                Add Ticket Type
+              </Button>
+            </>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="pricePerTicket">Price per Ticket *</Label>
+                <div className="relative">
+                  <DollarSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="pricePerTicket"
+                    type="number"
+                    placeholder="0.00"
+                    className="pl-10"
+                    {...formik.getFieldProps("pricePerTicket")}
+                    disabled={isSubmitting}
+                  />
+                  {formik.touched.pricePerTicket && formik.errors.pricePerTicket && (
+                    <p className="text-sm text-red-500">{formik.errors.pricePerTicket}</p>
+                  )}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="totalTicket">Total Tickets *</Label>
+                <div className="relative">
+                  <Users className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="totalTicket"
+                    type="number"
+                    placeholder="100"
+                    className="pl-10"
+                    {...formik.getFieldProps("totalTicket")}
+                    disabled={isSubmitting}
+                  />
+                  {formik.touched.totalTicket && formik.errors.totalTicket && (
+                    <p className="text-sm text-red-500">{formik.errors.totalTicket}</p>
+                  )}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="maxTicketPerUser">Max Tickets Per User *</Label>
+                <div className="relative">
+                  <Users className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="maxTicketPerUser"
+                    type="number"
+                    placeholder="10"
+                    className="pl-10"
+                    {...formik.getFieldProps("maxTicketPerUser")}
+                    disabled={isSubmitting}
+                  />
+                  {formik.touched.maxTicketPerUser && formik.errors.maxTicketPerUser && (
+                    <p className="text-sm text-red-500">{formik.errors.maxTicketPerUser}</p>
+                  )}
+                </div>
               </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="totalTicket">Total Tickets *</Label>
-              <div className="relative">
-                <Users className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="totalTickets"
-                  type="number"
-                  placeholder="100"
-                  className="pl-10"
-                  {...formik.getFieldProps("totalTicket")}
-                  disabled={isSubmitting}
-                />
-                {formik.touched.totalTicket && formik.errors.totalTicket && (
-                  <p className="text-sm text-red-500">{formik.errors.totalTicket}</p>
-                )}
-              </div>
-            </div>
-          </div>
+          )}
         </CardContent>
       </Card>
 
@@ -368,7 +539,6 @@ export function EditEventForm({ initialData, onSubmit, onCancel, isSubmitting }:
                 Choose Files
               </Button>
             </div>
-
             {previewImages.length > 0 && (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {previewImages.map((preview, index) => (

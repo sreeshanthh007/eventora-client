@@ -11,6 +11,8 @@ export const CLIENT_ROUTES = {
     UPDATE_PERSONAL_INFORMATION:`${BASE_URL.CLIENT}/update-profile`,
     GET_ALL_CATEGORIES:`${BASE_URL.CLIENT}/all-categories`,
     GET_ALL_EVENTS:`${BASE_URL.CLIENT}/all-events`,
+    GET_ALL_EVENTS_FOR_CLIENT:`${BASE_URL.CLIENT}/eventPage`,
+    GET_EVENT_DETAILS:(eventId:string)=>`${BASE_URL.CLIENT}/event-details/${eventId}`
 }
 
 
@@ -40,7 +42,7 @@ export const VENDOR_ROUTES = {
     RESEND_VERIFICATION:(vendorId:string)=>`${BASE_URL.VENDOR}/${vendorId}/resend-verification`,
     UPDATE_PROFILE_IMAGE:`${BASE_URL.VENDOR}/update-profileImage`,
     UPDATE_VENDOR_PERSONAL_INFORMATION:`${BASE_URL.VENDOR}/update-profile`,
-    ADD_EVENT:`${BASE_URL.VENDOR}/add-event,`,
+    ADD_EVENT:`${BASE_URL.VENDOR}/add-event`,
     GET_EVENTS_FOR_VENDOR:`${BASE_URL.VENDOR}/get-all-events`,
     EDIT_EVENTS:(eventId:string)=>`${BASE_URL.VENDOR}/edit-events/${eventId}`,
     GET_EVENTS_BY_ID:(eventId:string)=>`${BASE_URL.VENDOR}/get-events-by-id/${eventId}`,
@@ -50,5 +52,6 @@ export const VENDOR_ROUTES = {
     GET_SERVICES_BY_ID:(serviceId:string)=>`${BASE_URL.VENDOR}/service-by-id/${serviceId}`,
     EDIT_SERVICE:(serviceId:string)=>`${BASE_URL.VENDOR}/edit-service/${serviceId}`,
     TOGGLE_SERVICE:(serviceId:string)=>`${BASE_URL.VENDOR}/toggle-service/${serviceId}`,
-    TOGGLE_EVENT:(eventId:string)=>`${BASE_URL.VENDOR}/toggle-status/${eventId}`
+    TOGGLE_EVENT:(eventId:string)=>`${BASE_URL.VENDOR}/toggle-status/${eventId}`,
+    UPDATE_EVENT_STATUS:(eventId:string)=>`${BASE_URL.VENDOR}/update-event-status/${eventId}`
 }

@@ -16,7 +16,6 @@ export const axiosInstance: AxiosInstance = axios.create({
 let isRefreshing = false;
 let refreshSubscribers: ((token?: string) => void)[] = [];
 
-// Notify queued requests when refresh succeeds
 function onRefreshed(token?: string) {
   refreshSubscribers.forEach((callback) => callback(token));
   refreshSubscribers = [];
@@ -29,34 +28,37 @@ const handleLogout = (role: string) => {
       break;
     case URL_PART.admin:
       store.dispatch(adminLogout());
-   
       break;
     case URL_PART.vendor:
       store.dispatch(vendorLogout());
-    
       break;
     default:
       window.location.href = "/";
   }
- 
 };
 
 function getRoleFromUrl(url?: string) {
-  const part = url?.split("/")[2] || ""; 
-  if (["_cl", "_ad", "_ve"].includes(part)) return part;
-  return "";
+  const part = url?.split("/")[2] || "";
+  return ["_cl", "_ad", "_ve"].includes(part) ? part : "";
 }
 
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error: AxiosError<any>) => {
-    console.log("error message", error.response?.data?.message);
     const originalRequest: any = error.config;
     const role = getRoleFromUrl(originalRequest.url);
+    const message = error.response?.data?.message || "";
 
-   
     if (error.response?.status === StatusCodes.UNAUTHORIZED && !originalRequest._retry) {
       originalRequest._retry = true;
+
+      
+      const isRefreshTokenRequest = originalRequest.url?.includes('refresh-token');
+      if (isRefreshTokenRequest) {
+        toast.info("Session expired, please log in again");
+        handleLogout(role);
+        return Promise.reject(error);
+      }
 
       if (!isRefreshing) {
         isRefreshing = true;
@@ -84,7 +86,6 @@ axiosInstance.interceptors.response.use(
         }
       }
 
-     
       return new Promise((resolve) => {
         refreshSubscribers.push(() => {
           resolve(axiosInstance(originalRequest));
@@ -92,18 +93,25 @@ axiosInstance.interceptors.response.use(
       });
     }
 
+    // Handle forbidden scenarios
     if (
-      (error.response?.status === StatusCodes.UNAUTHORIZED &&
-        error.response.data?.message === "Unauthorized access") ||
-      (error.response?.status === StatusCodes.FORBIDDEN &&
-        error.response.data?.message ===
-          "Access denied. You do not have permission to access this resource.") ||
-      (error.response?.status === StatusCodes.FORBIDDEN &&
-        error.response.data?.message === "Token is blacklisted") ||
-      (error.response?.status === StatusCodes.FORBIDDEN &&
-        error.response.data?.message?.includes("Your account has been blocked"))
+      error.response?.status === StatusCodes.FORBIDDEN &&
+      (message.includes("Access denied") ||
+       message.includes("Token is blacklisted") ||
+       message.includes("Your account has been blocked"))
     ) {
-      toast.info(error.response?.data?.message || "Session expired, please log in again");
+      toast.info(message || "Access denied");
+      handleLogout(role);
+      return Promise.reject(error);
+    }
+
+    // Handle explicit login required scenarios
+    if (
+      error.response?.status === StatusCodes.UNAUTHORIZED &&
+      message.includes("Unauthorized access") && 
+      message.includes("please login")
+    ) {
+      toast.info(message || "Please log in again");
       handleLogout(role);
       return Promise.reject(error);
     }

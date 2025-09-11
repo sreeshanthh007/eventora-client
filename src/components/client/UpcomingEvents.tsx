@@ -133,10 +133,10 @@ export const UpcomingEvents: React.FC = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
                   {/* Rating Badge */}
-                  <div className="absolute top-6 right-6 bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 flex items-center space-x-2">
+                  {/* <div className="absolute top-6 right-6 bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 flex items-center space-x-2">
                     <Star className="w-4 h-4 text-yellow-500 fill-current" />
                     <span className="text-gray-900 font-semibold">{event.rating}</span>
-                  </div>
+                  </div> */}
 
                   <div className="absolute bottom-8 left-8 right-8 text-white">
                     <div className="flex items-center space-x-4 mb-4">
@@ -145,7 +145,7 @@ export const UpcomingEvents: React.FC = () => {
                       </div>
                       <div className="flex items-center space-x-1 text-sm">
                         <Users className="w-4 h-4" />
-                        <span>{event.attendees} attending</span>
+                        <span>{event.attendiesCount} attending</span>
                       </div>
                     </div>
 
@@ -162,12 +162,12 @@ export const UpcomingEvents: React.FC = () => {
                         <MapPin className="w-5 h-5 text-blue-400" />
                         <span>{event.eventLocation}</span>
                       </div>
-                      <div className="text-2xl font-bold text-green-400">{event.price}</div>
+                      <div className="text-2xl font-bold text-green-400">{event.pricePerTicket}</div>
                     </div>
 
                     <Button
                       className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-lg shadow-lg transition-all duration-300"
-                      onClick={() => navigate(`/events/${event._id}`)}
+                      onClick={() => navigate(`/event-details/${event.eventId}`)}
                     >
                       BOOK TICKET
                     </Button>

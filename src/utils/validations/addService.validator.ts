@@ -22,10 +22,15 @@ import * as Yup from "yup"
       .min(0, "Additional hour price cannot be negative")
       .typeError("Additional hour price must be a number")
       .nullable(),
-  cancellationPolicies: Yup.string()
-    .required("Cancellation policy is required")
-    .min(20, "Cancellation policy must be at least 20 characters")
-    .max(2000, "Cancellation policy must not exceed 2000 characters"),
+cancellationPolicies: Yup.array()
+  .of(
+    Yup.string()
+      .min(20, "Each cancellation policy must be at least 20 characters")
+      .max(2000, "Each cancellation policy must not exceed 2000 characters")
+  )
+  .min(1, "At least one cancellation policy is required")
+  .required("Cancellation policy is required"),
+
      termsAndConditions: Yup.string()
     .required("Terms & conditions are required")
     .min(20, "Terms & conditions must be at least 20 characters")

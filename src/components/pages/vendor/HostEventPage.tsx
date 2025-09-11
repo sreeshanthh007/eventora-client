@@ -1,5 +1,5 @@
-import { VendorLayout } from "../layouts/VendorLayout"
-import { AddEventForm } from "../forms/AddEventForm"
+import { VendorLayout } from "@/components/layouts/VendorLayout"
+import { AddEventForm } from "@/components/forms/AddEventForm"
 import { uploadImageToCloudinarySigned } from "@/services/cloudinary/cloudinary"
 import { useToast } from "@/hooks/ui/UseToaster"
 import { useAddEventMutation } from "@/hooks/vendor/UseAddEvent"
@@ -19,7 +19,7 @@ export default function HostEventPage() {
   for (let file of data.Images) {
     const url = await uploadImageToCloudinarySigned(file, "event-images");
     console.log("tje uslr after ",url)
-    if (url) {            // 👈 only push if valid
+    if (url) { 
       uploadImageUrl.push(url);
     } else {
       showToast("Failed to upload image", "error");
@@ -35,6 +35,7 @@ export default function HostEventPage() {
           coordinates: [data.coordinates[0], data.coordinates[1]],
           },
         }
+        console.log("procressed data",processedData)
         addEvent(processedData)
       
    

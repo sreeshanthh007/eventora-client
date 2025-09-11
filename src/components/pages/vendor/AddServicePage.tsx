@@ -12,10 +12,14 @@ export default function AddServicePage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const navigate = useNavigate()
   const {mutateAsync:addService} = useAddServiceMutation()
+
+
+  
   const handleSubmit = async (data: ServiceFormData) => {
     setIsSubmitting(true)
     try {
       if(data){
+        console.log("data for submit",data)
       await addService(data)
       navigate("/vendor/services")
     }

@@ -99,24 +99,40 @@ export const getEvents = async({
 export interface IEditEventInformation {
   title: string;
   description: string;
-  date: Date;
-  startTime: string;
-  endTime: string;
+  eventSchedule: Array<{
+    date: string;
+    startTime: string;
+    endTime: string;
+  }>;
   pricePerTicket: number;
   totalTicket: number;
+  maxTicketPerUser: number;
+  tickets: Array<{
+    ticketType: string;
+    price: number;
+    totalTickets: number;
+    maxTicketsPerUser: number;
+  }>;
   eventLocation: string;
-  location: {
-    type: "Point";
-    coordinates: [number, number]; 
-  };
-  Images:string[];
+  location: [number, number] | null;  // Simplified to match your usage
+  Images: File[] | string[];          // Support both File objects and string URLs
 
 }
 
 export type TEditableEventFields = Partial<
   Pick<
     IEditEventInformation,
-    "title" | "description" | "date" | "startTime" | "endTime" | "pricePerTicket" | "totalTicket" | "eventLocation" | "location" | "Images"
+    | "title" 
+    | "description" 
+    | "eventSchedule"
+    | "pricePerTicket" 
+    | "totalTicket" 
+    | "maxTicketPerUser"
+    | "tickets"
+    | "eventLocation" 
+    | "location" 
+    | "Images"
+       
   >
 >;
 
@@ -222,7 +238,8 @@ export const toggleService = async ({
   serviceId: string;
   status: string;
 }): Promise<IAxiosResponse> => {
-  return axiosInstance.patch(VENDOR_ROUTES.TOGGLE_SERVICE(serviceId), { status });
+  const response = await axiosInstance.patch(VENDOR_ROUTES.TOGGLE_SERVICE(serviceId), { status });
+  return response.data
 };
 
 export const toggleEvent = async({
@@ -232,5 +249,19 @@ export const toggleEvent = async({
   eventId:string,
   isActive:boolean
 }) : Promise<IAxiosResponse>=>{
-  return axiosInstance.patch(VENDOR_ROUTES.TOGGLE_EVENT(eventId),{isActive})
+  const response = await axiosInstance.patch(VENDOR_ROUTES.TOGGLE_EVENT(eventId),{isActive})
+  return response.data
+}
+
+
+export const updateEventStatus = async({
+  eventId,
+  eventStatus
+}:{
+  eventId:string,
+  eventStatus:string
+}) : Promise<IAxiosResponse>=>{
+  const response =  await axiosInstance.patch(VENDOR_ROUTES.UPDATE_EVENT_STATUS(eventId),{eventStatus})
+
+  return response.data
 }

@@ -16,7 +16,7 @@ export const useUpdateVendorProfileImageMutation = ()=>{
             showToast(data.message,"success");
             dispatch(refreshVendorSessionThunk())
         },
-        onError:(err)=>{
+        onError:(err:any)=>{
             showToast(err.response?.data?.message,'error')
         }
     })
