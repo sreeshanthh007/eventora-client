@@ -9,6 +9,8 @@ import { ClientPublicRoute } from "@/protected/PublicRoute";
 import ProfilePage from "@/components/pages/client/ProfileSidebarPage"; 
 import EventsPage from "@/components/pages/client/EventPage";
 import EventDetailsPage from "@/components/pages/client/EventDetailsPage";
+import ServicesPage from "@/components/pages/client/ServicePage";
+import ServiceDetailsPage from "@/components/pages/client/ServiceDetailsPage";
 
 
 const ClientRoutes = () => {
@@ -28,6 +30,8 @@ const ClientRoutes = () => {
        </Route>
        <Route path="/events" element={<EventsPage/>}/>
       <Route path="/event-details/:eventId" element={<EventDetailsPage/>}/>
+      <Route path="/services" element={<ServicesPage/>}/>
+      <Route path="/service/:id" element={<ServiceDetailsPage/>}/>
       </Route>
 
       <Route path="*" element={<NotFound />} />

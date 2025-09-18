@@ -64,7 +64,7 @@ export const ClientHeader: React.FC = () => {
             <Link to="/events" className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">
               Events
             </Link>
-            <Link to="#" className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">
+            <Link to="/services" className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">
               Services
             </Link>
           </nav>

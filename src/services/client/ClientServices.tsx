@@ -110,6 +110,43 @@ export const getEventDetails = async(eventId:string) =>{
   return response.data
 }
 
+export const getAllServiceForServicePage = async ({
+  page = 1,
+  limit = 6,
+  search = "",
+  sort = "date-asc",
+}: {
+  page: number
+  limit: number
+  search: string
+  sort: string
+}) => {
+  const response = await axiosInstance.get(
+    CLIENT_ROUTES.GET_ALL_SERVICES_FOR_CLIENT,
+    {
+      params: {
+        page,
+        limit,
+        search,
+        sort,
+      },
+    }
+  )
+
+  return response.data
+}
+
+
+
+export const getServiceDetails = async(serviceId:string) =>{
+
+  const response = await axiosInstance.get(
+    CLIENT_ROUTES.GET_SERVICE_DETAILS(serviceId)
+  );
+
+  return response.data
+}
+
 
 export const clientRefreshSession = async() : Promise<ClientResponse> =>{
   const response = await axiosInstance.get<ClientResponse>(

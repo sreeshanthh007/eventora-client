@@ -1,5 +1,4 @@
-
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Calendar, Clock, MapPin, Users, Ticket, Plus, Minus, X } from "lucide-react"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/pages/ui/card"
 import { Button } from "@/components/pages/ui/button"
@@ -12,8 +11,7 @@ import { useGetEventDetails } from "@/hooks/client/UseGetEventDetails"
 import { getCloudinaryImageUrl } from "@/utils/helpers/GetCloudinaryImage"
 import { useParams } from "react-router-dom"
 import LocationPickerReadOnly from "../map/MapPickerReadOnly"
-// import { useSelector } from "react-redux"
-// import type { RootState } from "@/store/store"
+import { CheckoutForm } from "../forms/StripeCheckoutForm"
 
 interface EventDetailsProps {
   eventId: string
@@ -22,8 +20,11 @@ interface EventDetailsProps {
 interface TicketPurchaseData {
   email: string
   name: string
-  ticketType?: string
+  ticketType: string
+  ticketId?: string 
   quantity: number
+  amount: number
+  currency: string 
 }
 
 const formatDate = (dateString: string) => {
@@ -37,20 +38,42 @@ const formatDate = (dateString: string) => {
 }
 
 export const EventDetails: React.FC<EventDetailsProps> = () => {
-  // const client = useSelector((state:RootState)=>state.client.client)
-
   const { eventId } = useParams<{ eventId: string }>()
   const { data: event, isLoading, isError } = useGetEventDetails(eventId!)
 
+  const [isStripeModalOpen, setIsStripeModalOpen] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [purchaseData, setPurchaseData] = useState<TicketPurchaseData>({
     email: "",
     name: "",
     ticketType: "",
+    ticketId: "",
     quantity: 1,
+    amount: 0,
+    currency: "INR",
   })
 
-  console.log("this is the event data", event)
+
+  useEffect(() => {
+    if (event) {
+      const hasTicketTypes = event.event.tickets && event.event.tickets.length > 0
+      const defaultTicketPrice = hasTicketTypes ? event.event.tickets[0].pricePerTicket : event.event.pricePerTicket || 0
+      const defaultTicketType = hasTicketTypes ? event.event.tickets[0].ticketType : ""
+      const defaultTicketId = hasTicketTypes ? event.event.tickets[0].id : ""
+      setPurchaseData((prev) => ({
+        ...prev,
+        ticketType: defaultTicketType,
+        ticketId: defaultTicketId,
+        amount: defaultTicketPrice * prev.quantity,
+        currency: "INR",
+      }))
+    }
+  }, [event])
+
+  
+  useEffect(() => {
+    console.log("Current purchaseData:", purchaseData)
+  }, [purchaseData])
 
   if (isLoading) {
     return <div className="min-h-screen bg-background flex items-center justify-center">Loading...</div>
@@ -63,32 +86,62 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
   }
 
   const ticketPrice =
-    event.event.tickets?.length > 0 ? event.event.tickets[0].pricePerTicket : event.event.pricePerTicket
+    event.event.tickets?.length > 0 ? event.event.tickets[0].pricePerTicket : event.event.pricePerTicket || 0
   const maxTicketsPerUser = event.event.maxTicketsPerUser || 10
   const hasTicketTypes = event.event.tickets && event.event.tickets.length > 0
 
   const handleBuyTickets = () => {
     setIsModalOpen(true)
-    if (hasTicketTypes) {
-      setPurchaseData((prev) => ({ ...prev, ticketType: event.event.tickets[0].ticketType }))
-    }
   }
 
   const handleCloseModal = () => {
     setIsModalOpen(false)
-    setPurchaseData({ email: "", name: "", ticketType: "", quantity: 1 })
+    
+  }
+
+  const handleCloseStripeModal = () => {
+    setIsStripeModalOpen(false)
+    
   }
 
   const handleQuantityChange = (increment: boolean) => {
-    setPurchaseData((prev) => ({
-      ...prev,
-      quantity: increment ? Math.min(prev.quantity + 1, maxTicketsPerUser) : Math.max(prev.quantity - 1, 1),
-    }))
+    setPurchaseData((prev) => {
+      const newQuantity = increment ? Math.min(prev.quantity + 1, maxTicketsPerUser) : Math.max(prev.quantity - 1, 1)
+      const currentPrice = getCurrentTicketPrice()
+      return {
+        ...prev,
+        quantity: newQuantity,
+        amount: currentPrice * newQuantity,
+      }
+    })
+  }
+
+  const handleTicketTypeChange = (value: string) => {
+    setPurchaseData((prev) => {
+      const selectedTicket = event.event.tickets.find((t) => t.ticketType === value)
+      const newPrice = selectedTicket?.pricePerTicket || ticketPrice
+      const newTicketId = selectedTicket?.id || ""
+      return {
+        ...prev,
+        ticketType: value,
+        ticketId: newTicketId,
+        amount: newPrice * prev.quantity,
+      }
+    })
   }
 
   const handleSubmitPurchase = () => {
-    console.log("Purchase data:", purchaseData)
+
+    if (!purchaseData.email || !purchaseData.name || (hasTicketTypes && !purchaseData.ticketType)) {
+      alert("Please fill in all required fields (email, name, and ticket type).")
+      return
+    }
+    if (purchaseData.amount <= 0) {
+      alert("Invalid ticket amount. Please select a valid ticket type and quantity.")
+      return
+    }
     handleCloseModal()
+    setIsStripeModalOpen(true)
   }
 
   const getCurrentTicketPrice = () => {
@@ -98,8 +151,6 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
     }
     return ticketPrice
   }
-
-
 
   return (
     <div className="min-h-screen bg-background">
@@ -126,7 +177,6 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
 
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             <Card>
               <CardHeader>
@@ -259,7 +309,7 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="text-center">
-                  <p className="text-3xl font-bold text-black">{ticketPrice} /-</p>
+                  <p className="text-3xl font-bold text-black">₹{ticketPrice}</p>
                   <p className="text-sm text-muted-foreground">per person</p>
                 </div>
                 <Button
@@ -312,7 +362,7 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
                   <Label htmlFor="ticketType">Ticket Type</Label>
                   <Select
                     value={purchaseData.ticketType}
-                    onValueChange={(value) => setPurchaseData((prev) => ({ ...prev, ticketType: value }))}
+                    onValueChange={handleTicketTypeChange}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select ticket type" />
@@ -355,18 +405,39 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
               <div className="border-t pt-4">
                 <div className="flex justify-between items-center mb-4">
                   <span className="font-medium">Total:</span>
-                  <span className="text-xl font-bold">₹{getCurrentTicketPrice() * purchaseData.quantity}</span>
+                  <span className="text-xl font-bold">₹{purchaseData.amount}</span>
                 </div>
 
                 <Button
                   className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
                   onClick={handleSubmitPurchase}
-                  disabled={!purchaseData.email || !purchaseData.name || (hasTicketTypes && !purchaseData.ticketType)}
+                  disabled={!purchaseData.email || !purchaseData.name || (hasTicketTypes && !purchaseData.ticketType) || purchaseData.amount <= 0}
                 >
-                  Purchase Tickets
+                  Proceed to Payment
                 </Button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {isStripeModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <div className="flex items-center justify-between border-b pb-4 mb-4">
+              <h2 className="text-xl font-semibold">Complete Payment</h2>
+              <Button variant="ghost" size="sm" onClick={handleCloseStripeModal}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            <CheckoutForm
+              eventId={eventId!}
+              purchaseData={purchaseData}
+              onClose={() => {
+                setPurchaseData({ email: "", name: "", ticketType: "", ticketId: "", quantity: 1, amount: 0, currency: "INR" })
+                handleCloseStripeModal()
+              }}
+            />
           </div>
         </div>
       )}

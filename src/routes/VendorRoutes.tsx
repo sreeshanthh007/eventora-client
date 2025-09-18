@@ -13,6 +13,7 @@ import AddServicePage from "@/components/pages/vendor/AddServicePage";
 import ListedServicePage from "@/components/pages/vendor/ListedServicePage";
 import EditServicePage from "@/components/pages/vendor/EditServicePage";
 import EditEventPage from "@/components/pages/vendor/EditEventPage";
+import { VendorDashboard } from "@/components/pages/vendor/VendorDashboard";
 
 
 
@@ -36,6 +37,7 @@ export const VendorRoutes = () => {
       <Route path="services" element={<ListedServicePage/>}/>
       <Route path="/edit-service/:serviceId" element={<EditServicePage/>} />
       <Route path="/edit-event/:eventId" element={<EditEventPage/>}/>
+      <Route path="/dashboard" element={<VendorDashboard/>}/>
       </Route>
     </Routes>
   );

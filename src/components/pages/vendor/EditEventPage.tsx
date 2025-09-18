@@ -52,7 +52,6 @@ const event: IEventFormData | undefined = eventResponse?.events
 
 
 
-
   useEffect(() => {
     if (isError) {
       console.log("Error fetching event:", error);
@@ -66,7 +65,7 @@ const event: IEventFormData | undefined = eventResponse?.events
   const handleSubmit = async (data: IEventFormData) => {
     setIsSubmitting(true);
     try {
-      console.log("data after submit", data);
+      console.log("data before submit", data);
       
           let uploadedImageIds: string[] = [];
     if (data.Images?.length) {
@@ -79,8 +78,15 @@ const event: IEventFormData | undefined = eventResponse?.events
       );
       uploadedImageIds = results.filter(Boolean) as string[];
     }
-    
-    await editEvent({eventId:eventId!,data:data})
+
+   const formattedData = {
+     ...data,
+    location: data.location
+    ? { type: "Point" as const, coordinates: data.location } 
+    : undefined,
+};
+    await editEvent({eventId:eventId!,data:formattedData})
+
     } finally {
       setIsSubmitting(false);
     }

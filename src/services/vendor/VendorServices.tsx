@@ -28,8 +28,8 @@ export const VendorSentOTPForforgotPassword = async(email:string) : Promise<IAxi
 
 
 
-export const GetVendorDetails = async()=>{
-    const response = await axiosInstance.get(VENDOR_ROUTES.VENDOR_DETAILS)
+export const GetVendorDetails = async(vendorId:string)=>{
+    const response = await axiosInstance.get(VENDOR_ROUTES.VENDOR_DETAILS(vendorId))
     return response.data    
 }
 
@@ -114,7 +114,10 @@ export interface IEditEventInformation {
     maxTicketsPerUser: number;
   }>;
   eventLocation: string;
-  location: [number, number] | null;  // Simplified to match your usage
+  location?: {
+    type: "Point";
+    coordinates: [number, number];
+  }
   Images: File[] | string[];          // Support both File objects and string URLs
 
 }

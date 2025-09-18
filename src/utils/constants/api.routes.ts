@@ -12,7 +12,10 @@ export const CLIENT_ROUTES = {
     GET_ALL_CATEGORIES:`${BASE_URL.CLIENT}/all-categories`,
     GET_ALL_EVENTS:`${BASE_URL.CLIENT}/all-events`,
     GET_ALL_EVENTS_FOR_CLIENT:`${BASE_URL.CLIENT}/eventPage`,
-    GET_EVENT_DETAILS:(eventId:string)=>`${BASE_URL.CLIENT}/event-details/${eventId}`
+    GET_ALL_SERVICES_FOR_CLIENT : `${BASE_URL.CLIENT}/servicePage`,
+    GET_EVENT_DETAILS:(eventId:string)=>`${BASE_URL.CLIENT}/event-details/${eventId}`,
+    CREATE_BOOKING:`${BASE_URL.CLIENT}/create-booking`,
+    GET_SERVICE_DETAILS:(serviceId:string)=>`${BASE_URL.CLIENT}/service-details/${serviceId}`
 }
 
 
@@ -38,7 +41,7 @@ export const  ADMIN_ROUTES = {
 export const VENDOR_ROUTES = {
     REFRESH_TOKEN:`${BASE_URL.VENDOR}/refresh-token`,
     REFRESH_SESSION:`${BASE_URL.VENDOR}/refresh-session`,
-    VENDOR_DETAILS:`${BASE_URL.VENDOR}/details`,
+    VENDOR_DETAILS:(vendorId:string)=>`${BASE_URL.CLIENT}/details/${vendorId}`,
     RESEND_VERIFICATION:(vendorId:string)=>`${BASE_URL.VENDOR}/${vendorId}/resend-verification`,
     UPDATE_PROFILE_IMAGE:`${BASE_URL.VENDOR}/update-profileImage`,
     UPDATE_VENDOR_PERSONAL_INFORMATION:`${BASE_URL.VENDOR}/update-profile`,

@@ -1,57 +1,59 @@
 
-import { useState } from "react"
+
 import { Grid, List, Calendar, MapPin, Users } from "lucide-react"
 import { Button } from "@/components/pages/ui/button"
 import { Card, CardContent } from "@/components/pages/ui/card"
 import { Badge } from "@/components/pages/ui/badge"
+import { useState } from "react"
+import { getCloudinaryImageUrl } from "@/utils/helpers/GetCloudinaryImage"
+import { Pagination } from "../common/paginations/Pagination"
+import { Link } from "react-router-dom"
 
-const dummyEvents = [
-  {
-    id: 1,
-    title: "Tech Conference 2024",
-    description: "Join industry leaders for the latest in technology trends and innovations.",
-    date: "2024-03-15",
-    time: "9:00 AM",
-    location: "San Francisco Convention Center",
-    category: "Technology",
-    attendees: 250,
-    price: "$299",
-    image: "/tech-conference.png",
-  },
-  {
-    id: 3,
-    title: "Art Gallery Opening",
-    description: "Discover contemporary art from emerging local artists.",
-    date: "2024-03-28",
-    time: "6:00 PM",
-    location: "Downtown Art Gallery",
-    category: "Arts & Culture",
-    attendees: 75,
-    price: "$25",
-    image: "/vibrant-art-gallery.png",
-  },
-]
+interface Event {
+  _id: string
+  title: string
+  description: string
+  eventLocation: string
+  eventSchedule: { date: string; startTime: string; endTime: string }[]
+  pricePerTicket: number
+  attendiesCount: number
+  images: string
+  status: string
+}
 
-export function EventsGrid() {
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
+interface EventsGridProps {
+  events: Event[]
+  currentPage: number
+  totalPages: number
+  onPageChange: (page: number) => void
+}
+
+export function EventsGrid({ events, currentPage, totalPages, onPageChange }: EventsGridProps) {
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid") // View mode state preserved
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toISOString().split("T")[0]
+  }
+
+  const formatPrice = (price: number) => {
+    return `₹${price}`
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <p className="text-sm text-muted-foreground">
-            Showing <span className="font-medium text-foreground">{dummyEvents.length}</span> events
+            Showing <span className="font-medium text-foreground">{events.length}</span> events
           </p>
-          <Badge variant="secondary" className="bg-muted text-muted-foreground">
-            No filters applied
-          </Badge>
         </div>
 
         <div className="flex items-center gap-2">
           <Button
             variant={viewMode === "grid" ? "default" : "outline"}
             size="sm"
-            onClick={() => setViewMode("grid")}
+            onClick={() => setViewMode("grid")} // setViewMode preserved
             className="bg-primary hover:bg-primary/90 text-primary-foreground"
           >
             <Grid className="w-4 h-4" />
@@ -59,7 +61,7 @@ export function EventsGrid() {
           <Button
             variant={viewMode === "list" ? "default" : "outline"}
             size="sm"
-            onClick={() => setViewMode("list")}
+            onClick={() => setViewMode("list")} // setViewMode preserved
             className="bg-primary hover:bg-primary/90 text-primary-foreground"
           >
             <List className="w-4 h-4" />
@@ -68,16 +70,20 @@ export function EventsGrid() {
       </div>
 
       <div className={`${viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" : "space-y-4"}`}>
-        {dummyEvents.map((event) => (
-          <Card key={event.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+        {events.map((event) => (
+          <Card key={event._id} className="overflow-hidden hover:shadow-lg transition-shadow">
             <div className="aspect-video overflow-hidden">
-              <img src={event.image || "/placeholder.svg"} alt={event.title} className="w-full h-full object-cover" />
+              <img
+                src={event.images ? getCloudinaryImageUrl(event.images) : ""}
+                alt={event.title}
+                className="w-full h-full object-cover"
+              />
             </div>
             <CardContent className="p-6">
               <div className="space-y-3">
                 <div className="flex items-start justify-between">
-                  <Badge variant="secondary">{event.category}</Badge>
-                  <span className="text-lg font-semibold text-primary">{event.price}</span>
+                  <Badge variant="secondary">{event.status}</Badge>
+                  <span className="text-lg font-semibold text-primary">{formatPrice(event.pricePerTicket)}</span>
                 </div>
 
                 <h3 className="text-xl font-semibold text-card-foreground line-clamp-2">{event.title}</h3>
@@ -88,27 +94,35 @@ export function EventsGrid() {
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Calendar className="w-4 h-4" />
                     <span>
-                      {event.date} at {event.time}
+                      {event.eventSchedule[0]
+                        ? `${formatDate(event.eventSchedule[0].date)} at ${event.eventSchedule[0].startTime}`
+                        : "TBD"}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <MapPin className="w-4 h-4" />
-                    <span>{event.location}</span>
+                    <span>{event.eventLocation}</span>
                   </div>
 
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Users className="w-4 h-4" />
-                    <span>{event.attendees} attending</span>
+                    <span>{event.attendiesCount} attending</span>
                   </div>
                 </div>
 
-                <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">View Details</Button>
+                <Link to={`/event-details/${event._id}`}>
+                  <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                    View Details
+                  </Button>
+                </Link>
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
+      <Pagination currentPage={currentPage} onPageChange={onPageChange} totalPages={totalPages} />
+      <div className="flex justify-center mt-6"></div>
     </div>
   )
 }
