@@ -24,14 +24,14 @@ function onRefreshed(token?: string) {
 
 const handleLogout = (role: string) => {
   switch (role) {
-    case "_cl":
+    case URL_PART.client:
       store.dispatch(clientLogout());
       break;
-    case "_ad":
+    case URL_PART.admin:
       store.dispatch(adminLogout());
    
       break;
-    case "_ve":
+    case URL_PART.vendor:
       store.dispatch(vendorLogout());
     
       break;
