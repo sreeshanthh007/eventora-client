@@ -25,9 +25,10 @@ export const ClientLogin = () => {
       {...data,role:"client"},
       {
         onSuccess:(data)=>{
-          console.log(data.user)
+         
           toast.success(data.message)
-          dispatch(clientLogin(data.user))
+          dispatch(clientLogin(data.user));
+          console.log("his si usersdata",data.user)
         },
         onError:(err)=>{
           toast.error(err.response?.data?.message)

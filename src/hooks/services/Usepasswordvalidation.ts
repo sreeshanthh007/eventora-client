@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import {  useMemo } from "react";
 
 export interface PasswordValidation {
   minLength: boolean
@@ -28,12 +28,4 @@ export const usePasswordValidation = (password: string): PasswordValidation => {
       isValid: minLength && hasUpper && hasLower && hasNumber && hasSpecial,
     }
   }, [password])
-
-
-
-    const validateConfirmPassword = useCallback((pwd: string, confirmPwd: string): string | undefined => {
-    if (!confirmPwd) return "Please confirm your password";
-    if (pwd !== confirmPwd) return "Passwords don't match";
-    return undefined;
-  }, []);
 }

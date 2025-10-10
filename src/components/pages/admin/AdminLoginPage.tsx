@@ -24,6 +24,7 @@ export default function AdminLoginPage() {
         onSuccess: (response) => {
           toast.success(response.message)
           dispatch(adminLogin(response.user));
+          
           navigate("/admin/dashboard")
           
         },

@@ -8,11 +8,14 @@ import { VendorProtectedRoute } from "@/protected/ProtectedRoute";
 import {VendorPublicRoute} from "@/protected/PublicRoute";
 import VendorProfilePage from "@/components/vendor/VendorProfilePage";
 import ListedEventsPage from "@/components/pages/vendor/ListedEventsPage";
-import HostEventPage from "@/components/vendor/HostEventPage";
+import HostEventPage from "@/components/pages/vendor/HostEventPage";
 import AddServicePage from "@/components/pages/vendor/AddServicePage";
 import ListedServicePage from "@/components/pages/vendor/ListedServicePage";
 import EditServicePage from "@/components/pages/vendor/EditServicePage";
-import EditEventPage from "@/components/vendor/EditEventPage";
+import EditEventPage from "@/components/pages/vendor/EditEventPage";
+import { VendorDashboard } from "@/components/pages/vendor/VendorDashboard";
+import VendorChangePasswordPage from "@/components/vendor/VendorChangePasswordPage";
+import WorkSamplePage from "@/components/pages/vendor/WorkSamplePage";
 
 
 
@@ -36,6 +39,9 @@ export const VendorRoutes = () => {
       <Route path="services" element={<ListedServicePage/>}/>
       <Route path="/edit-service/:serviceId" element={<EditServicePage/>} />
       <Route path="/edit-event/:eventId" element={<EditEventPage/>}/>
+      <Route path="/dashboard" element={<VendorDashboard/>}/>
+      <Route path="/change-password" element={<VendorChangePasswordPage/>}/>
+      <Route path="/work-sample" element={<WorkSamplePage/>}/>
       </Route>
     </Routes>
   );

@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/pages/ui/avata
 import { Button } from "@/components/pages/ui/button"
 import { Input } from "@/components/pages/ui/input"
 import { useFormik } from "formik"
-import { validationSchema } from "@/utils/validations/vendorProfileValidator"
+import { vendorProfileValidationSchema } from "@/utils/validations/vendorProfileValidator"
 
 interface VendorData {
     id?: string,
@@ -38,9 +38,8 @@ export const VendorEditForm: React.FC<VendorEditFormProps> = ({ vendor, onSave, 
       bio: vendor?.bio || "",
       profileImage: vendor?.profileImage || "",
     },
-    validationSchema,
+    validationSchema:vendorProfileValidationSchema,
     onSubmit: (values) => {
-        console.log("Form submitted with values:", values);
       onSave({
         id: vendor?.id,
         ...values

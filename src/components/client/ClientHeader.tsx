@@ -2,7 +2,7 @@ import {Sheet , SheetTrigger  , SheetContent,SheetHeader} from "../pages/ui/shee
 import React, { useState } from "react"
 import { Users, Bell, Menu, Ticket, Heart, User, CreditCard, Settings, HelpCircle, LogOut } from 'lucide-react'
 import type { RootState } from "@/store/store"
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { clientLogout } from "@/store/slices/clientSlice"
 import { Avatar, AvatarFallback, AvatarImage } from "../pages/ui/avatar"
 import { Separator } from "../pages/ui/separator"
@@ -58,18 +58,18 @@ export const ClientHeader: React.FC = () => {
           
           {/* Navigation Menu - Desktop */}
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="#" className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">
+            <Link to="/" className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">
               Home
-            </a>
-            <a href="#" className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">
+            </Link>
+            <Link to="/events" className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">
               Events
-            </a>
-            <a href="#" className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">
+            </Link>
+            <Link to="/services" className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">
               Services
-            </a>
+            </Link>
           </nav>
           
-          {/* Right side actions */}
+         
           <div className="flex items-center space-x-3">
             {!client ? (
               <Button

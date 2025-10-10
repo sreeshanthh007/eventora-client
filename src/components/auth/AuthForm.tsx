@@ -16,7 +16,6 @@ import { useFormik } from "formik"
 import { signInschema } from "@/utils/validations/signIn.validator"
 import { Link, useNavigate } from "react-router-dom"
 import type { CredentialResponse } from "@react-oauth/google"
-import { UseSaveFcmTokenMutation } from "@/hooks/auth/UseSaveFcmToken"
 
 interface AuthFormProps {
   type: "login" | "register"
@@ -61,7 +60,6 @@ export const AuthForm = ({
   
   const { mutate: sendVerificationOtp } = useSendOtpMutation()
   const { mutate: verifyOtp } = useVerifyOtpMutation()
-  const {mutate:saveFcmToken} = UseSaveFcmTokenMutation()
 
 
   const handleOpenOtpModal = () => {
@@ -228,7 +226,7 @@ export const AuthForm = ({
               {isVendorRegister && (
                 <div className="space-y-3">
                   <label className="block text-sm font-medium text-gray-700">
-                    Profile Image <span className="text-red-500">*</span>
+                    Vendor Verification <span className="text-red-500">*</span>
                   </label>
                   
                   {!previewUrl ? (
@@ -241,7 +239,7 @@ export const AuthForm = ({
                           <Camera className="w-5 h-5 text-gray-500" />
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-gray-900">Upload Profile Image</p>
+                          <p className="text-sm font-medium text-gray-900">Upload Image for Verification</p>
                           <p className="text-xs text-gray-500">PNG, JPG up to 5MB</p>
                         </div>
                         <Button
@@ -398,7 +396,6 @@ export const AuthForm = ({
             {buttonLabel}
           </Button>
 
-          {/* Google Auth for Client Login */}
           {type === "login" && role === "client" && (
             <>
               <div className="relative flex items-center justify-center">
@@ -421,7 +418,7 @@ export const AuthForm = ({
           </Link>
         </div>
 
-        {/* Modals */}
+   
         <OTPModal
           isOpen={isOtpModalOpen}
           onClose={handleCloseOtpModal}
@@ -433,22 +430,21 @@ export const AuthForm = ({
           isOpen={isForgotPasswordModalOpen}
           onClose={handleCLoseForgotPasswordModal}
           onSuccess={handleForgotPasswordSuccess}
-          role={role}
+          role={role!}
         />
         <ResetPasswordModal
           isOpen={isResetPasswordModalOpen}
           onClose={() => setIsResetPasswordModalOpen(false)}
           onSuccess={handleResetPasswordSuccess}
           email={emailForReset}
-          role={role}
+          role={role!}
         />
 
-        {/* Image Cropper Modal */}
         {showCropper && selectedImage && (
           <ImageCropper
             image={selectedImage}
             onCropComplete={handleCropComplete}
-            aspect={1} // Square aspect ratio for profile images
+            aspect={1} 
             showCropper={setShowCropper}
           />
         )}

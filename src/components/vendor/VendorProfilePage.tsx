@@ -1,10 +1,13 @@
+"use client"
+
+import type React from "react"
 
 import { VendorLayout } from "../layouts/VendorLayout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/pages/ui/card"
 import { Badge } from "@/components/pages/ui/badge"
 import { Button } from "@/components/pages/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/pages/ui/avatar"
-import { User, Mail, Phone, MapPin,Edit, Camera, Shield } from "lucide-react"
+import { User, Mail, Phone, MapPin, Edit, Camera, Shield, Briefcase } from "lucide-react"
 import { useSelector } from "react-redux"
 import type { RootState } from "@/store/store"
 import { useState, useRef } from "react"
@@ -15,6 +18,7 @@ import { useUpdateVendorProfileImageMutation } from "@/hooks/vendor/UseUpdatePro
 import { getCloudinaryImageUrl } from "@/utils/helpers/GetCloudinaryImage"
 import { EditProfileModal, type EditProfileData } from "../modals/EditProfileModal"
 import { useUpdateVendorPersonalInformationMutation } from "@/hooks/vendor/UseUpdateVendorPersonal-information"
+import { Navigate, useNavigate } from "react-router-dom"
 
 export default function VendorProfilePage() {
   const [showCropper, setShowCropper] = useState(false)
@@ -24,12 +28,11 @@ export default function VendorProfilePage() {
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { showToast } = useToast()
-  const { mutate: updateVendorProfileImage } = useUpdateVendorProfileImageMutation();
-  const {mutate:updatePersonalInformation} = useUpdateVendorPersonalInformationMutation();
-
+  const { mutate: updateVendorProfileImage } = useUpdateVendorProfileImageMutation()
+  const { mutate: updatePersonalInformation } = useUpdateVendorPersonalInformationMutation()
 
   const vendor = useSelector((state: RootState) => state.vendor.vendor)
-
+  const navigate = useNavigate()
   const handleCameraClick = () => {
     fileInputRef.current?.click()
   }
@@ -70,13 +73,13 @@ export default function VendorProfilePage() {
 
   const handleSaveProfile = async (data: EditProfileData) => {
     const updateDetails = {
-      name:data.name,
-      phone:data.phone,
-      about:data.about,
-      place:data.place
+      name: data.name,
+      phone: data.phone,
+      about: data.about,
+      place: data.place,
     }
 
-    if(updateDetails){
+    if (updateDetails) {
       updatePersonalInformation(updateDetails)
     }
     setIsUpdatingProfile(true)
@@ -87,6 +90,10 @@ export default function VendorProfilePage() {
     } finally {
       setIsUpdatingProfile(false)
     }
+  }
+
+  const handleManageWorkSamples = () => {
+    navigate("/vendor/work-sample")
   }
 
   return (
@@ -101,13 +108,19 @@ export default function VendorProfilePage() {
                 <div className="relative">
                   <Avatar className="h-32 w-32">
                     <AvatarImage
-                      src={vendor?.profilePicture ? getCloudinaryImageUrl(vendor.profilePicture) : "/placeholder"}
+                      src={
+                        vendor?.profilePicture
+                          ? getCloudinaryImageUrl(vendor.profilePicture)
+                          : "/placeholder.svg?height=128&width=128&query=vendor%20profile%20avatar"
+                      }
                     />
                     <AvatarFallback className="text-2xl">
                       {vendor?.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
+                        ? vendor.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")
+                        : "VN"}
                     </AvatarFallback>
                   </Avatar>
                   <Button
@@ -130,31 +143,25 @@ export default function VendorProfilePage() {
               <div className="flex-1 space-y-4">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                   <div>
-                    <h1 className="text-3xl font-bold">{vendor?.name}</h1>
+                    <h1 className="text-3xl font-bold text-pretty">{vendor?.name}</h1>
+                    <p className="text-sm text-muted-foreground">Vendor profile</p>
                   </div>
-                  <Button className="w-fit" onClick={handleEditProfile}>
-                    <Edit className="h-4 w-4 mr-2" />
-                    Edit Profile
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button className="w-fit" variant="secondary" onClick={handleEditProfile}>
+                      <Edit className="h-4 w-4 mr-2" />
+                      Edit Profile
+                    </Button>
+                  </div>
                 </div>
 
-                <p className="text-muted-foreground leading-relaxed">{vendor?.about}</p>
+                <div className="rounded-lg border bg-muted/30 p-4">
+                  <p className="text-muted-foreground leading-relaxed">
+                    {vendor?.about || "Add an About of Yourself."}
+                  </p>
+                </div>
 
                 <div className="flex flex-wrap gap-4 text-sm">
-                  <div className="flex items-center gap-2">
-                    {/* <Star className="h-4 w-4 text-yellow-500" />
-                    <span className="font-medium">{vendorData.rating}</span> */}
-                    {/* <span className="text-muted-foreground">rating</span> */}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {/* <Calendar className="h-4 w-4 text-blue-500" />/ */}
-                    {/* <span className="font-medium">{vendorData.totalEvents}</span> */}
-                    {/* <span className="text-muted-foreground">events completed</span> */}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {/* <Clock className="h-4 w-4 text-green-500" /> */}
-                    {/* <span className="text-muted-foreground">Member since {vendor.joinDate}</span> */}
-                  </div>
+                  {/* reserved for future stats badges like rating, jobs, etc. */}
                 </div>
               </div>
             </div>
@@ -168,20 +175,37 @@ export default function VendorProfilePage() {
                 <User className="h-5 w-5" />
                 Contact Information
               </CardTitle>
+              <CardDescription>Stay reachable and up-to-date</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-3">
                 <Mail className="h-4 w-4 text-muted-foreground" />
-                <span>{vendor?.email}</span>
+                <span>{vendor?.email || "—"}</span>
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="h-4 w-4 text-muted-foreground" />
-                <span>{vendor?.phone}</span>
+                <span>{vendor?.phone || "—"}</span>
               </div>
               <div className="flex items-center gap-3">
                 <MapPin className="h-4 w-4 text-muted-foreground" />
-                <span>{vendor?.place}</span>
+                <span>{vendor?.place || "—"}</span>
               </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Briefcase className="h-5 w-5" />
+                Manage Work Samples
+              </CardTitle>
+              <CardDescription>Showcase your best projects</CardDescription>
+            </CardHeader>
+            <CardContent className="flex items-center justify-between gap-4">
+              <p className="text-sm text-muted-foreground">
+                Add, edit, and reorder your worksamples to attract more clients.
+              </p>
+              <Button onClick={handleManageWorkSamples}>Manage</Button>
             </CardContent>
           </Card>
         </div>
@@ -211,17 +235,15 @@ export default function VendorProfilePage() {
             <CardDescription>Current verification and account standing</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
+            <div className="flex items-center justify-between p-4 rounded-lg border">
               <div className="flex items-center gap-3">
                 <Shield className="h-5 w-5 text-green-600" />
                 <div>
-                  <p className="font-medium text-green-800 dark:text-green-200">Verified Vendor</p>
-                  <p className="text-sm text-green-600 dark:text-green-400">
-                    Your account has been verified by our team
-                  </p>
+                  <p className="font-medium">Verified Vendor</p>
+                  <p className="text-sm text-muted-foreground">Your account has been verified by our team</p>
                 </div>
               </div>
-              <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Active</Badge>
+              <Badge variant="secondary">Active</Badge>
             </div>
           </CardContent>
         </Card>

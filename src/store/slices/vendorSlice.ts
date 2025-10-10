@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit";
 import {type  IVendor } from "@/types/User";
 import { axiosInstance } from "@/api/interceptor";
-// import { vendorAxiosInstance } from "@/api/provider.axios";
+
 
 interface IVendorState {
   vendor: IVendor | null;

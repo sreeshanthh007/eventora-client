@@ -1,10 +1,13 @@
-// import { vendorAxiosInstance } from "@/api/provider.axios";
-import type { IAxiosResponse } from "@/types/Response";
+
+import type { IAxiosResponse, IWorkSampleResponse } from "@/types/Response";
 import type { IVendor } from "@/types/User";
-import { type IEventFormData } from "@/components/forms/AddEventForm";
+import type { IEventFormData } from "@/components/forms/AddEventForm";
 import type { ServiceFormData } from "@/components/forms/AddServiceForm";
 import { axiosInstance } from "@/api/interceptor";
 import { VENDOR_ROUTES } from "@/utils/constants/api.routes";
+import type { IUpdateVendorPersonalInformation } from "@/types/vendor";
+import type { TEditableEventFields } from "@/types/event";
+import type { IWorkSampleData } from "@/types/workSamples";
 
 
 
@@ -27,9 +30,16 @@ export const VendorSentOTPForforgotPassword = async(email:string) : Promise<IAxi
 }
 
 
+export const vendorChangePassword = async(data:{currentPassword:string,newPassword:string}) : Promise<IAxiosResponse>=>{
+    
+    const response = await axiosInstance.patch(VENDOR_ROUTES.CHANGE_PASSWORD,data)
 
-export const GetVendorDetails = async()=>{
-    const response = await axiosInstance.get(VENDOR_ROUTES.VENDOR_DETAILS)
+    return response.data
+}
+  
+
+export const GetVendorDetails = async(vendorId:string)=>{
+    const response = await axiosInstance.get(VENDOR_ROUTES.VENDOR_DETAILS(vendorId))
     return response.data    
 }
 
@@ -53,12 +63,7 @@ export const updateProfileImage = async(image:string)=>{
 };
 
 
-export interface IUpdateVendorPersonalInformation {
-    name:string
-    phone:string
-    about:string
-    place:string
-}
+
 export const updateVendorPersonalInformation = async(data:Partial<Pick<IUpdateVendorPersonalInformation,"about" | "name" | "phone" | "place">>)=>{
     const response = await axiosInstance.patch(
         VENDOR_ROUTES.UPDATE_VENDOR_PERSONAL_INFORMATION,
@@ -96,29 +101,9 @@ export const getEvents = async({
 }
 
 
-export interface IEditEventInformation {
-  title: string;
-  description: string;
-  date: Date;
-  startTime: string;
-  endTime: string;
-  pricePerTicket: number;
-  totalTicket: number;
-  eventLocation: string;
-  location: {
-    type: "Point";
-    coordinates: [number, number]; 
-  };
-  Images:string[];
 
-}
 
-export type TEditableEventFields = Partial<
-  Pick<
-    IEditEventInformation,
-    "title" | "description" | "date" | "startTime" | "endTime" | "pricePerTicket" | "totalTicket" | "eventLocation" | "location" | "Images"
-  >
->;
+
 
 export const editEvents = async ({
   eventId,
@@ -222,7 +207,8 @@ export const toggleService = async ({
   serviceId: string;
   status: string;
 }): Promise<IAxiosResponse> => {
-  return axiosInstance.patch(VENDOR_ROUTES.TOGGLE_SERVICE(serviceId), { status });
+  const response = await axiosInstance.patch(VENDOR_ROUTES.TOGGLE_SERVICE(serviceId), { status });
+  return response.data
 };
 
 export const toggleEvent = async({
@@ -232,5 +218,34 @@ export const toggleEvent = async({
   eventId:string,
   isActive:boolean
 }) : Promise<IAxiosResponse>=>{
-  return axiosInstance.patch(VENDOR_ROUTES.TOGGLE_EVENT(eventId),{isActive})
+  const response = await axiosInstance.patch(VENDOR_ROUTES.TOGGLE_EVENT(eventId),{isActive})
+  return response.data
+}
+
+
+export const updateEventStatus = async({
+  eventId,
+  eventStatus
+}:{
+  eventId:string,
+  eventStatus:string
+}) : Promise<IAxiosResponse>=>{
+  const response =  await axiosInstance.patch(VENDOR_ROUTES.UPDATE_EVENT_STATUS(eventId),{eventStatus})
+
+  return response.data
+}
+
+
+
+export const addWorkSample = async(data:IWorkSampleData) : Promise<IAxiosResponse>=>{
+
+  const response = await axiosInstance.post(VENDOR_ROUTES.ADD_WORK_SAMPLE,{data});
+  return response.data
+} 
+
+
+export const getWorkSampleDetailsByVendors = async() : Promise<IWorkSampleResponse>=>{
+  const response  = await axiosInstance.get(VENDOR_ROUTES.GET_WORKSAMPLE_BY_VENDOR);
+
+  return response.data
 }

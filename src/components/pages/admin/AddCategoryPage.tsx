@@ -28,7 +28,7 @@
           data.image as File,
           "category-images"
         );
-
+        console.log("after upload",uploadImageUrl)
         if (!uploadImageUrl) {
           showToast("failed to upload", "error");
           return;

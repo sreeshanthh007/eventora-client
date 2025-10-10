@@ -1,5 +1,5 @@
 
-import { User, Ticket, Heart, Bell, CreditCard, HelpCircle, Calendar, LogOut } from "lucide-react"
+import { User, Ticket, Bell, CreditCard, HelpCircle, LogOut, MessageCircle, Handshake, Lock } from "lucide-react"
 import { Card } from "@/components/pages/ui/card"
 import { Button } from "@/components/pages/ui/button"
 import { UseLogout } from "@/hooks/auth/Uselogout"
@@ -19,23 +19,23 @@ const menuItems = [
   {
     icon: Ticket,
     label: "My Events",
-    href: "/events",
+    href: "/booked-events",
     active: false,
     description: "Upcoming and past events",
   },
   {
-    icon: Calendar,
-    label: "Calendar",
-    href: "/calendar",
+    icon:MessageCircle,
+    label: "Chats",
+    href: "/events",
     active: false,
-    description: "Event schedule",
+    description: "Chat with Vendors",
   },
   {
-    icon: Heart,
-    label: "Favorites",
-    href: "/favorites",
+    icon:Handshake,
+    label: "Services",
+    href: "/booked-services",
     active: false,
-    description: "Saved events and venues",
+    description: "View your booked services",
   },
   {
     icon: Bell,
@@ -46,10 +46,17 @@ const menuItems = [
   },
   {
     icon: CreditCard,
-    label: "Payment Methods",
-    href: "/payments",
+    label: "Wallet",
+    href: "/wallet",
     active: false,
-    description: "Cards and billing",
+    description: "Wallet details and history",
+  },
+  {
+    icon: Lock,
+    label: "Change Password",
+    href: "/change-password",
+    active: false,
+    description: "change your password",
   },
 
   {

@@ -1,23 +1,24 @@
-
 import { Button } from "@/components/pages/ui/button";
 import { Input } from "@/components/pages/ui/input";
 import { Label } from "@/components/pages/ui/label";
 import { Textarea } from "@/components/pages/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/pages/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/pages/ui/select";
-import { Edit } from "lucide-react";
+import { Checkbox } from "@/components/pages/ui/checkbox";
+import { Badge } from "@/components/pages/ui/badge";
+import { Edit, X } from "lucide-react";
 import { useFormik } from "formik";
 import { ServiceValidationSchema } from "@/utils/validations/addService.validator";
 import { useGetCategoriesForService } from "@/hooks/vendor/UseGetCategoryForService";
 import { toast } from "sonner";
 
 export interface ServiceFormData {
-  serviceId:string
+  serviceId: string;
   serviceTitle: string;
-  yearsOfExperience: number ;
+  yearsOfExperience: number;
   serviceDescription: string;
-  servicePrice: number ;
-  additionalHourPrice: number ;
+  servicePrice: number;
+  additionalHourPrice: number;
   serviceDuration: number;
   cancellationPolicies: string[];
   termsAndConditions: string[];
@@ -25,7 +26,6 @@ export interface ServiceFormData {
 }
 
 interface Service {
-
   serviceTitle: string;
   serviceDescription: string;
   servicePrice: number;
@@ -48,45 +48,80 @@ export function EditServiceForm({ service, onSubmit, onCancel, isSubmitting = fa
   const { data: response, isLoading, isError, error } = useGetCategoriesForService();
   const categories = response?.data ? response.data : [];
 
+
+  const cancellationPolicyOptions = [
+    {
+      value: "24-hour-full-refund",
+      label: "24 Hour Notice - Full Refund",
+      description: "Full refund if cancelled 24 hours before service. No refund for cancellations within 24 hours.",
+    },
+    {
+      value: "48-hour-full-refund",
+      label: "48 Hour Notice - Full Refund",
+      description:
+        "Full refund if cancelled 48 hours before service. 50% refund if cancelled within 24-48 hours. No refund within 24 hours.",
+    },
+    {
+      value: "72-hour-tiered",
+      label: "72 Hour Tiered Policy",
+      description:
+        "Full refund if cancelled 72+ hours before. 75% refund 48-72 hours before. 50% refund 24-48 hours before. No refund within 24 hours.",
+    },
+    {
+      value: "week-notice",
+      label: "1 Week Notice Required",
+      description:
+        "Full refund if cancelled 7+ days before service. 50% refund if cancelled 3-7 days before. No refund within 3 days.",
+    },
+    {
+      value: "non-refundable-deposit",
+      label: "Non-Refundable Deposit",
+      description:
+        "50% deposit is non-refundable upon booking. Remaining balance refundable up to 48 hours before service.",
+    },
+    {
+      value: "flexible-policy",
+      label: "Flexible Cancellation",
+      description:
+        "Full refund available up to 12 hours before service start time. Emergency cancellations considered case-by-case.",
+    },
+  ];
+
   const formik = useFormik<ServiceFormData>({
     initialValues: {
+      serviceId: service.serviceId || "",
       serviceTitle: service.serviceTitle || "",
       yearsOfExperience: service.yearsOfExperience || 0,
       serviceDescription: service.serviceDescription || "",
       servicePrice: service.servicePrice || 0,
       additionalHourPrice: service.additionalHourPrice || 0,
-      serviceDuration: service.serviceDuration || 1,
-      cancellationPolicies: service.cancellationPolicies?.join("\n") || "",
+      serviceDuration: service.duration || 1,
+      cancellationPolicies: service.cancellationPolicies || [],
       termsAndConditions: service.termsAndConditions?.join("\n") || "",
       categoryId: service.categoryId || "",
     },
     validationSchema: ServiceValidationSchema,
     onSubmit: async (values, { resetForm }) => {
       try {
-        const cancellationPolicies = values.cancellationPolicies
-          .split("\n")
-          .map((item) => item.trim())
-          .filter((item) => item.length > 0);
+        if (values.cancellationPolicies.length === 0 || values.termsAndConditions.length === 0) {
+          toast.error("Cancellation policies and terms must have at least one non-empty entry");
+          return;
+        }
+
         const termsAndConditions = values.termsAndConditions
           .split("\n")
           .map((item) => item.trim())
           .filter((item) => item.length > 0);
 
-        if (cancellationPolicies.length === 0 || termsAndConditions.length === 0) {
-          toast.error("Cancellation policies and terms must have at least one non-empty entry");
-          return;
-        }
-
-         onSubmit({
+        onSubmit({
           ...values,
           yearsOfExperience: Number(values.yearsOfExperience),
           servicePrice: Number(values.servicePrice),
           additionalHourPrice: Number(values.additionalHourPrice),
           serviceDuration: Number(values.serviceDuration),
-          cancellationPolicies,
           termsAndConditions,
         });
-  
+
         resetForm();
       } catch (error) {
         console.error("Failed to update service:", error);
@@ -95,6 +130,27 @@ export function EditServiceForm({ service, onSubmit, onCancel, isSubmitting = fa
     },
     enableReinitialize: true,
   });
+
+  const handlePolicyToggle = (policyDescription: string) => {
+    const currentPolicies = formik.values.cancellationPolicies;
+    const isSelected = currentPolicies.includes(policyDescription);
+
+    if (isSelected) {
+      formik.setFieldValue(
+        "cancellationPolicies",
+        currentPolicies.filter((policy) => policy !== policyDescription),
+      );
+    } else {
+      formik.setFieldValue("cancellationPolicies", [...currentPolicies, policyDescription]);
+    }
+  };
+
+  const removePolicyFromSelection = (policyToRemove: string) => {
+    formik.setFieldValue(
+      "cancellationPolicies",
+      formik.values.cancellationPolicies.filter((policy) => policy !== policyToRemove),
+    );
+  };
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-6">
@@ -289,23 +345,61 @@ export function EditServiceForm({ service, onSubmit, onCancel, isSubmitting = fa
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="cancellationPolicies">Cancellation Policy *</Label>
-              <Textarea
-                id="cancellationPolicies"
-                name="cancellationPolicies"
-                placeholder="Enter each cancellation policy on a new line (e.g., 50% refund if canceled 7 days prior)"
-                className={`min-h-32 bg-gray-50/80 border-gray-300 focus:border-gray-600 focus:ring-gray-600/20 rounded-xl ${
-                  formik.touched.cancellationPolicies && formik.errors.cancellationPolicies ? "border-red-500" : ""
-                }`}
-                value={formik.values.cancellationPolicies}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-              />
+            <div className="space-y-3">
+              <Label>Cancellation Policies * (Select one or more)</Label>
+
+              {formik.values.cancellationPolicies.length > 0 && (
+                <div className="flex flex-wrap gap-2 p-3 bg-muted/50 rounded-md">
+                  {formik.values.cancellationPolicies.map((policy, index) => {
+                    const policyOption = cancellationPolicyOptions.find((opt) => opt.description === policy);
+                    return (
+                      <Badge key={index} variant="secondary" className="flex items-center gap-1 pr-1">
+                        <span className="text-xs">{policyOption?.label || policy}</span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-4 w-4 p-0 hover:bg-destructive hover:text-destructive-foreground"
+                          onClick={() => removePolicyFromSelection(policy)}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </Badge>
+                    );
+                  })}
+                </div>
+              )}
+
+              <div className="grid gap-3 max-h-64 overflow-y-auto border rounded-md p-3">
+                {cancellationPolicyOptions.map((policy) => {
+                  const isSelected = formik.values.cancellationPolicies.includes(policy.description);
+                  return (
+                    <div key={policy.value} className="flex items-start space-x-3 p-2 hover:bg-muted/50 rounded-sm">
+                      <Checkbox
+                        id={policy.value}
+                        checked={isSelected}
+                        onCheckedChange={() => handlePolicyToggle(policy.description)}
+                        className="mt-1"
+                      />
+                      <div
+                        className="flex-1 cursor-pointer"
+                        onClick={() => handlePolicyToggle(policy.description)}
+                      >
+                        <Label htmlFor={policy.value} className="font-medium cursor-pointer">
+                          {policy.label}
+                        </Label>
+                        <p className="text-sm text-muted-foreground mt-1">{policy.description}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
               {formik.touched.cancellationPolicies && formik.errors.cancellationPolicies && (
                 <p className="text-red-500 text-sm">{formik.errors.cancellationPolicies}</p>
               )}
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="termsAndConditions">Terms & Conditions *</Label>
               <Textarea
@@ -339,7 +433,7 @@ export function EditServiceForm({ service, onSubmit, onCancel, isSubmitting = fa
         </Button>
         <Button
           type="submit"
-          disabled={isSubmitting || !formik.isValid || !formik.dirty}
+          disabled={isSubmitting ||  !formik.dirty}
           className="min-w-32 px-5 py-2.5 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white"
         >
           {isSubmitting ? "Updating..." : "Update Service"}
@@ -347,4 +441,4 @@ export function EditServiceForm({ service, onSubmit, onCancel, isSubmitting = fa
       </div>
     </form>
   );
-}
+} 

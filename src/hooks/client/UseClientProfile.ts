@@ -1,7 +1,7 @@
 
 import { getClientDetails } from "@/services/client/ClientServices";
 
-import { useMutation , useQuery , useQueryClient } from "@tanstack/react-query";
+import {useQuery} from "@tanstack/react-query";
 
 
 export const UseClientProfileQuery =()=>{

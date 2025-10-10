@@ -5,7 +5,12 @@ export interface IAxiosResponse{
 }
 
 
-
+export interface IWorkSampleResponse {
+    _id: string;
+    title: string;
+    description: string;
+    images: string[];
+}
 
 export interface ICategory {
     image:string,

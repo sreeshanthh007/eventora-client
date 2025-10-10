@@ -32,7 +32,7 @@ const CategoryManagementPage = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const debouncedSearchTerm = useDebounce(searchTerm, 300)
   const navigate = useNavigate()
-  const limit = 10
+  const limit = 5
   const { showToast } = useToast()
   const queryClient = useQueryClient()
 
@@ -59,18 +59,18 @@ const CategoryManagementPage = () => {
     limit,
     search: debouncedSearchTerm,
   })
-
+  console.log("data for  category table",data)
   const { mutateAsync: updateCategoryStatus } = useUpdateCategoryMutation()
   const {mutateAsync:editCategory} = useEditCategoryMutation()
 
   useEffect(() => {
-    if (data?.category) {
-      setCategories(data.category)
+    if (data?.categories) {
+      setCategories(data.categories)
       console.log(data)
     }
   }, [data])
 
-  const totalPages = data?.totalPages || 1
+  const totalPages = data?.total || 1
 
   useEffect(() => {
     if (isError) {

@@ -1,5 +1,5 @@
 import { VendorLayout } from "@/components/layouts/VendorLayout";
-import { EditEventForm, type IEventFormData } from "../forms/EditEventForm";
+import { EditEventForm, type IEventFormData } from "../../forms/EditEventForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/pages/ui/card";
 import { ArrowLeft, Edit, Loader2 } from "lucide-react";
 import { Button } from "@/components/pages/ui/button";
@@ -9,8 +9,7 @@ import { UseGetEventsById } from "@/hooks/vendor/UseGetEventsById";
 import { useToast } from "@/hooks/ui/UseToaster";
 import { uploadImageToCloudinarySigned } from "@/services/cloudinary/cloudinary";
 import { useEditEventMutation } from "@/hooks/vendor/UseEditEvents";
-// import {  useQueryClient } from "@tanstack/react-query";
-// import { uploadImageToCloudinarySigned } from "@/services/cloudinary/cloudinary";
+import { formatDateForInput } from "@/utils/helpers/FormatDate";
 
 export default function EditEventPage() {
   const { eventId } = useParams<{ eventId: string }>();
@@ -20,26 +19,36 @@ export default function EditEventPage() {
 
 
   // Fetch event data
-  const { data: eventResponse, isLoading, isError, error } = UseGetEventsById(eventId ?? "");
+  const { data: eventResponse, isLoading, isError, error } = UseGetEventsById(eventId!);
   const {mutateAsync:editEvent} = useEditEventMutation()
   console.log("data in edit event", eventResponse);
 
-  // Map API response to IEventFormData
-  const event: IEventFormData | undefined = eventResponse?.events
-    ? {
-        title: eventResponse.events.title || "",
-        description: eventResponse.events.description || "",
-        date: eventResponse.events.date ? eventResponse.events.date.split("T")[0] : "",
-        startTime: eventResponse.events.startTime || "",
-        endTime: eventResponse.events.endTime || "",
-        pricePerTicket: String(eventResponse.events.pricePerTicket) || "",
-        totalTicket: String(eventResponse.events.totalTicket) || "",
-        eventLocation: eventResponse.events.eventLocation || "",
-        location: eventResponse.events.location?.coordinates || null,
-        Images: eventResponse.events.images || [],
-      }
-    : undefined;
 
+
+const event: IEventFormData | undefined = eventResponse?.events
+  ? {
+      title: eventResponse.events.title || "",
+      description: eventResponse.events.description || "",
+      eventSchedule: eventResponse.events.eventSchedule?.map((schedule: any) => ({
+        date: formatDateForInput(schedule.date), 
+        startTime: schedule.startTime || "",
+        endTime: schedule.endTime || "",
+      })) || [{ date: "", startTime: "", endTime: "" }],
+      pricePerTicket: Number(eventResponse.events.pricePerTicket) || 0,
+      totalTicket: Number(eventResponse.events.totalTicket) || 0,
+      maxTicketPerUser: Number(eventResponse.events.maxTicketPerUser) || 0,
+      tickets: eventResponse.events.tickets?.map((ticket: any) => ({
+        ticketType: ticket.ticketType || "",
+        pricePerTicket: Number(ticket.pricePerTicket) || 0, 
+        totalTickets: Number(ticket.totalTickets) || 0,
+        maxTicketsPerUser: Number(ticket.maxTicketsPerUser) || 0,
+      })) || [],
+      eventLocation: eventResponse.events.eventLocation || "",
+      location: eventResponse.events.location?.coordinates || null,
+      Images: eventResponse.events.images || [],
+      eventType: eventResponse.events.eventType || "normal",
+    }
+  : undefined;
 
 
 
@@ -56,7 +65,7 @@ export default function EditEventPage() {
   const handleSubmit = async (data: IEventFormData) => {
     setIsSubmitting(true);
     try {
-      console.log("data after submit", data);
+      console.log("data before submit", data);
       
           let uploadedImageIds: string[] = [];
     if (data.Images?.length) {
@@ -64,13 +73,20 @@ export default function EditEventPage() {
         data.Images.map((file) =>
           file instanceof File
             ? uploadImageToCloudinarySigned(file, "event-images")
-            : Promise.resolve(file) // already string
+            : Promise.resolve(file) 
         )
       );
       uploadedImageIds = results.filter(Boolean) as string[];
     }
-    
-    await editEvent({eventId:eventId,data:data})
+
+   const formattedData = {
+     ...data,
+    location: data.location
+    ? { type: "Point" as const, coordinates: data.location } 
+    : undefined,
+};
+    await editEvent({eventId:eventId!,data:formattedData})
+
     } finally {
       setIsSubmitting(false);
     }
