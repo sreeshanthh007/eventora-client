@@ -10,7 +10,7 @@ import { useDebounce } from "@/hooks/services/UseDebounce";
 export default function EventsPage() {
   const [location, setLocation] = useState("all");
   const [sort, setSort] = useState("date-asc");
-  const [search, setSearch] = useState(""); // 
+  const [search, setSearch] = useState(""); 
   const [lat, setLat] = useState<number | null>(null);
   const [lng, setLng] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -62,10 +62,10 @@ export default function EventsPage() {
                 clearFilters={() => {
                   setSort("date-asc");
                   setLocation("all");
-                  setSearch(""); // Clear search on filter reset
+                  setSearch(""); 
                   setCurrentPage(1);
-                  setLat(null); // Clear coordinates
-                  setLng(null); // Clear coordinates
+                  setLat(null); 
+                  setLng(null); 
                 }}
                 location={location}
                 setLocation={setLocation}

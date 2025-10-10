@@ -56,6 +56,6 @@ export default function ListedEventsPage() {
         userName={vendor?.name}
         submissionDate={vendor?.createdAt}
       />
-    </VendorLayout>
+    </VendorLayout> 
   );
 }

@@ -1,8 +1,10 @@
 
 // import { clientAxiosInstance } from "@/api/client.axios";
 import { axiosInstance } from "@/api/interceptor";
+import type { IAxiosResponse } from "@/types/Response";
 import type { ICategory, IEvent } from "@/types/User";
 import { CLIENT_ROUTES } from "@/utils/constants/api.routes";
+import { current } from "@reduxjs/toolkit";
 
 export type Client = {
   _id: string;
@@ -53,6 +55,12 @@ export const updateProfileImage = async(image:string) =>{
     );
     return response.data
   }
+
+
+export const changePassword = async (data: { currentPassword: string; newPassword: string }): Promise<IAxiosResponse> => {
+  const response = await axiosInstance.patch(CLIENT_ROUTES.CHANGE_PASSWORD, data);
+  return response.data;
+};
 
 export const getAllCategories = async() : Promise<ICategory[]>=>{
     const result = await axiosInstance.get<ICategory[]>(
@@ -147,6 +155,28 @@ export const getServiceDetails = async(serviceId:string) =>{
   return response.data
 }
 
+
+export const getBookedEvents = async({
+  page = 1,
+  limit = 6,
+  search = "",
+}:{
+  page:number,
+  limit:number,
+  search:string,
+}) =>{
+  const response = await axiosInstance.get(
+    CLIENT_ROUTES.GET_BOOKED_EVENTS,
+    {
+      params:{
+        page,
+        limit,
+        search,
+      }
+    }
+  );
+  return response.data
+}
 
 export const clientRefreshSession = async() : Promise<ClientResponse> =>{
   const response = await axiosInstance.get<ClientResponse>(

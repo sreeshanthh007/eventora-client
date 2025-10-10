@@ -11,7 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/pages/ui/dropdown-menu";
-import { Edit, MoreHorizontal, Plus, Search, Shield, ShieldOff, Loader2 } from "lucide-react";
+import { Edit, MoreHorizontal, Plus, Search, Shield, ShieldOff, Loader2, Workflow } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { UseGeAllService } from "@/hooks/vendor/UseGetServices";
 import { useDebounce } from "@/hooks/services/UseDebounce";
@@ -58,7 +58,7 @@ export default function ListedServicePage() {
   const { showToast } = useToast();
   const limit = 2;
 
-  // Use the custom hook for fetching services
+
   const { data, isLoading, isError, error } = UseGeAllService({
     page: currentPage,
     limit,
@@ -167,7 +167,6 @@ export default function ListedServicePage() {
             <h1 className="text-3xl text-foreground">Service Management</h1>
             <p className="text-muted-foreground">Manage your event services and pricing</p>
           </div>
-    
             <Button className="flex items-center gap-2" onClick={handleIsVerified}>
               <Plus className="h-4 w-4"/>
               Add New Service
@@ -212,85 +211,84 @@ export default function ListedServicePage() {
               </div>
             ) : (
               <>
-                <div className="rounded-md border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Service Title</TableHead>
-                        <TableHead>Description</TableHead>
-                        <TableHead>Price</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {services.map((service) => (
-                        <TableRow key={service._id}>
-                          <TableCell className="font-medium">
-                            <p className="font-semibold">{service.serviceTitle}</p>
-                          </TableCell>
-                          <TableCell>
-                            <p className="max-w-xs truncate" title={service.serviceDescription}>
-                              {service.serviceDescription}
-                            </p>
-                          </TableCell>
-                          <TableCell>
-                            <span className="font-semibold text-primary">${service.servicePrice}</span>
-                          </TableCell>
-                          <TableCell>
-                            <Badge
-                              variant={service.status === "active" ? "default" : "destructive"}
-                              className="capitalize"
-                            >
-                              {service.status}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => getServiceDetails(service._id)}
-                                className="flex items-center gap-1"
-                                disabled={isToggling}
-                              >
-                                <Edit className="h-3 w-3" />
-                                Edit
+       <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Service Title</TableHead>
+                    <TableHead>Description</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {services.map((service) => (
+                    <TableRow key={service._id}>
+                      <TableCell className="font-medium">
+                        <p className="font-semibold">{service.serviceTitle}</p>
+                      </TableCell>
+                      <TableCell>
+                        <p className="max-w-xs truncate" title={service.serviceDescription}>
+                          {service.serviceDescription}
+                        </p>
+                      </TableCell>
+                      <TableCell>
+                        <span className="font-semibold text-primary">${service.servicePrice}</span>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={service.status === "active" ? "default" : "destructive"}
+                          className="capitalize"
+                        >
+                          {service.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => getServiceDetails(service._id)}
+                            className="flex items-center gap-1"
+                            disabled={isToggling}
+                          >
+                            <Edit className="h-3 w-3" />
+                            Edit
+                          </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm" disabled={isToggling}>
+                                <MoreHorizontal className="h-4 w-4" />
                               </Button>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="sm" disabled={isToggling}>
-                                    <MoreHorizontal className="h-4 w-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem
-                                    onClick={() => handleStatusToggle(service)}
-                                    className="flex items-center gap-2"
-                                  >
-                                    {service.status === "active" ? (
-                                      <>
-                                        <ShieldOff className="h-4 w-4" />
-                                        Block Service
-                                      </>
-                                    ) : (
-                                      <>
-                                        <Shield className="h-4 w-4" />
-                                        Unblock Service
-                                      </>
-                                    )}
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() => handleStatusToggle(service)}
+                                className="flex items-center gap-2"
+                              >
+                                {service.status === "active" ? (
+                                  <>
+                                    <ShieldOff className="h-4 w-4" />
+                                    Block Service
+                                  </>
+                                ) : (
+                                  <>
+                                    <Shield className="h-4 w-4" />
+                                    Unblock Service
+                                  </>
+                                )}
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
 
-                {/* Show pagination if there are multiple pages */}
                 {totalPages > 1 && (
                   <Pagination
                     currentPage={currentPage}
@@ -302,8 +300,6 @@ export default function ListedServicePage() {
             )}
           </CardContent>
         </Card>
-
-        {/* Confirmation Dialog */}
         <Dialog open={confirmDialog.isOpen} onOpenChange={(open) => !open && handleCancelAction()}>
           <DialogContent>
             <DialogHeader>

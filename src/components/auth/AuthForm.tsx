@@ -226,7 +226,7 @@ export const AuthForm = ({
               {isVendorRegister && (
                 <div className="space-y-3">
                   <label className="block text-sm font-medium text-gray-700">
-                    Profile Image <span className="text-red-500">*</span>
+                    Vendor Verification <span className="text-red-500">*</span>
                   </label>
                   
                   {!previewUrl ? (
@@ -239,7 +239,7 @@ export const AuthForm = ({
                           <Camera className="w-5 h-5 text-gray-500" />
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-gray-900">Upload Profile Image</p>
+                          <p className="text-sm font-medium text-gray-900">Upload Image for Verification</p>
                           <p className="text-xs text-gray-500">PNG, JPG up to 5MB</p>
                         </div>
                         <Button

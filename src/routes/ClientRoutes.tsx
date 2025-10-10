@@ -11,6 +11,8 @@ import EventsPage from "@/components/pages/client/EventPage";
 import EventDetailsPage from "@/components/pages/client/EventDetailsPage";
 import ServicesPage from "@/components/pages/client/ServicePage";
 import ServiceDetailsPage from "@/components/pages/client/ServiceDetailsPage";
+import BookedEventsPage from "@/components/pages/client/BookedEventsPage";
+import ChangePasswordPage from "@/components/pages/client/ChangePasswordPage";
 
 
 const ClientRoutes = () => {
@@ -32,6 +34,8 @@ const ClientRoutes = () => {
       <Route path="/event-details/:eventId" element={<EventDetailsPage/>}/>
       <Route path="/services" element={<ServicesPage/>}/>
       <Route path="/service/:id" element={<ServiceDetailsPage/>}/>
+      <Route path="/booked-events" element={<BookedEventsPage/>}/>
+      <Route path="/change-password" element={<ChangePasswordPage/>}/>
       </Route>
 
       <Route path="*" element={<NotFound />} />

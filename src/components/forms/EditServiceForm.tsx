@@ -48,7 +48,7 @@ export function EditServiceForm({ service, onSubmit, onCancel, isSubmitting = fa
   const { data: response, isLoading, isError, error } = useGetCategoriesForService();
   const categories = response?.data ? response.data : [];
 
-  // Predefined cancellation policy options
+
   const cancellationPolicyOptions = [
     {
       value: "24-hour-full-refund",
@@ -151,7 +151,7 @@ export function EditServiceForm({ service, onSubmit, onCancel, isSubmitting = fa
       formik.values.cancellationPolicies.filter((policy) => policy !== policyToRemove),
     );
   };
-console.log("Formik dirty:", formik.dirty);
+
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-6">
       <Card>

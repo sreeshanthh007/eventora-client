@@ -1,4 +1,4 @@
-import { Calendar, Home, Settings, User, LogOut, UserCheck, ChartAreaIcon } from "lucide-react"
+import { Calendar, Home, Settings, User, LogOut, UserCheck, ChartAreaIcon, Lock } from "lucide-react"
 import {useSelector } from "react-redux"
 import { UseLogout } from "@/hooks/auth/Uselogout"
 import { VendorLogout } from "@/services/auth/authServices"
@@ -49,6 +49,11 @@ const items = [
     icon: Settings,
   },
 
+  {
+    title: "Change Password",
+    url: "/vendor/change-password",
+    icon: Lock,
+  },
 
   {
     title:"Analytics",

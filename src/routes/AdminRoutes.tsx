@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import { NotFound } from "@/Custom404Page";
 import Spinner from "@/components/common/spinners/AdminSpinner";
 
-import AdminLoginPage from "@/components/pages/admin/AdminPage";
+import AdminLoginPage from "@/components/pages/admin/AdminLoginPage";
 import { AdminProtectedRoute } from "@/protected/ProtectedRoute";
 import { AdminPublicRoute } from "@/protected/PublicRoute";
 import CategoryManagementPage from "@/components/pages/admin/managementPages/CategoryManagementPage";

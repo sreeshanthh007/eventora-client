@@ -11,4 +11,4 @@ export  const getAllowedStatuses = (currentStatus: string) => {
       default:
         return ["upcoming", "cancelled", "ongoing", "completed"];
     }
-  };
+  };  

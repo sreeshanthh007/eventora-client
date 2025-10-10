@@ -1,10 +1,13 @@
-// import { vendorAxiosInstance } from "@/api/provider.axios";
-import type { IAxiosResponse } from "@/types/Response";
+
+import type { IAxiosResponse, IWorkSampleResponse } from "@/types/Response";
 import type { IVendor } from "@/types/User";
-import { type IEventFormData } from "@/components/forms/AddEventForm";
+import type { IEventFormData } from "@/components/forms/AddEventForm";
 import type { ServiceFormData } from "@/components/forms/AddServiceForm";
 import { axiosInstance } from "@/api/interceptor";
 import { VENDOR_ROUTES } from "@/utils/constants/api.routes";
+import type { IUpdateVendorPersonalInformation } from "@/types/vendor";
+import type { TEditableEventFields } from "@/types/event";
+import type { IWorkSampleData } from "@/types/workSamples";
 
 
 
@@ -27,6 +30,13 @@ export const VendorSentOTPForforgotPassword = async(email:string) : Promise<IAxi
 }
 
 
+export const vendorChangePassword = async(data:{currentPassword:string,newPassword:string}) : Promise<IAxiosResponse>=>{
+    
+    const response = await axiosInstance.patch(VENDOR_ROUTES.CHANGE_PASSWORD,data)
+
+    return response.data
+}
+  
 
 export const GetVendorDetails = async(vendorId:string)=>{
     const response = await axiosInstance.get(VENDOR_ROUTES.VENDOR_DETAILS(vendorId))
@@ -53,12 +63,7 @@ export const updateProfileImage = async(image:string)=>{
 };
 
 
-export interface IUpdateVendorPersonalInformation {
-    name:string
-    phone:string
-    about:string
-    place:string
-}
+
 export const updateVendorPersonalInformation = async(data:Partial<Pick<IUpdateVendorPersonalInformation,"about" | "name" | "phone" | "place">>)=>{
     const response = await axiosInstance.patch(
         VENDOR_ROUTES.UPDATE_VENDOR_PERSONAL_INFORMATION,
@@ -96,48 +101,9 @@ export const getEvents = async({
 }
 
 
-export interface IEditEventInformation {
-  title: string;
-  description: string;
-  eventSchedule: Array<{
-    date: string;
-    startTime: string;
-    endTime: string;
-  }>;
-  pricePerTicket: number;
-  totalTicket: number;
-  maxTicketPerUser: number;
-  tickets: Array<{
-    ticketType: string;
-    price: number;
-    totalTickets: number;
-    maxTicketsPerUser: number;
-  }>;
-  eventLocation: string;
-  location?: {
-    type: "Point";
-    coordinates: [number, number];
-  }
-  Images: File[] | string[];          // Support both File objects and string URLs
 
-}
 
-export type TEditableEventFields = Partial<
-  Pick<
-    IEditEventInformation,
-    | "title" 
-    | "description" 
-    | "eventSchedule"
-    | "pricePerTicket" 
-    | "totalTicket" 
-    | "maxTicketPerUser"
-    | "tickets"
-    | "eventLocation" 
-    | "location" 
-    | "Images"
-       
-  >
->;
+
 
 export const editEvents = async ({
   eventId,
@@ -265,6 +231,21 @@ export const updateEventStatus = async({
   eventStatus:string
 }) : Promise<IAxiosResponse>=>{
   const response =  await axiosInstance.patch(VENDOR_ROUTES.UPDATE_EVENT_STATUS(eventId),{eventStatus})
+
+  return response.data
+}
+
+
+
+export const addWorkSample = async(data:IWorkSampleData) : Promise<IAxiosResponse>=>{
+
+  const response = await axiosInstance.post(VENDOR_ROUTES.ADD_WORK_SAMPLE,{data});
+  return response.data
+} 
+
+
+export const getWorkSampleDetailsByVendors = async() : Promise<IWorkSampleResponse>=>{
+  const response  = await axiosInstance.get(VENDOR_ROUTES.GET_WORKSAMPLE_BY_VENDOR);
 
   return response.data
 }

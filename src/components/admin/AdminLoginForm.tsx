@@ -12,10 +12,9 @@ import type { ILoginData } from "@/services/auth/authServices"
 interface AdminLoginFormProps {
   onLogin: (data: Omit<ILoginData, "role">) => void
   isLoading?: boolean
-  error?: string
 }
 
-export function AdminLoginForm({ onLogin, isLoading = false, error }: AdminLoginFormProps) {
+export function AdminLoginForm({ onLogin, isLoading = false}: AdminLoginFormProps) {
   const [showPassword, setShowPassword] = useState(false)
 
   const formik = useFormik({
