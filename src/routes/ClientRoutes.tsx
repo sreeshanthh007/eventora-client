@@ -13,6 +13,7 @@ import ServicesPage from "@/components/pages/client/ServicePage";
 import ServiceDetailsPage from "@/components/pages/client/ServiceDetailsPage";
 import BookedEventsPage from "@/components/pages/client/BookedEventsPage";
 import ChangePasswordPage from "@/components/pages/client/ChangePasswordPage";
+import ClientWalletPage from "@/components/pages/client/ClientWalletPage";
 
 
 const ClientRoutes = () => {
@@ -36,6 +37,7 @@ const ClientRoutes = () => {
       <Route path="/service/:id" element={<ServiceDetailsPage/>}/>
       <Route path="/booked-events" element={<BookedEventsPage/>}/>
       <Route path="/change-password" element={<ChangePasswordPage/>}/>
+      <Route path="/client/wallet" element={<ClientWalletPage/>}/>
       </Route>
 
       <Route path="*" element={<NotFound />} />

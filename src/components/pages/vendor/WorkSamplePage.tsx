@@ -2,22 +2,29 @@
 import { uploadImageToCloudinarySigned } from "@/services/cloudinary/cloudinary"
 import { WorkSampleForm } from "../../forms/vendor/WorkSamplesForm"
 import { VendorLayout } from "../../layouts/VendorLayout"
-import { useAddWorkSampleMutation } from "@/hooks/vendor/UseAddWorkSample"
+import { useAddWorkSampleMutation } from "@/hooks/vendor/worksample/UseAddWorkSample"
 import { useToast } from "@/hooks/ui/UseToaster"
 import { useNavigate } from "react-router-dom"
+import { useEditWorksampleMutation } from "@/hooks/vendor/worksample/UseEditWorksample"
 
 interface IWorkSampleData {
   title: string
   description: string
-  images: File[]
+  images:  (string | File)[];
 }
+
+
 
 export default function WorkSamplePage() {
 
 
   const {mutate:addWorksample} = useAddWorkSampleMutation()
+  const {mutate:editWorkSample} = useEditWorksampleMutation();
+
   const {showToast} = useToast()
   const navigate = useNavigate()
+
+
   const handleWorksample = async(data: IWorkSampleData) => {
 
     
@@ -40,6 +47,31 @@ export default function WorkSamplePage() {
 
     addWorksample(processedData)
     navigate("/vendor/profile")
+    return true
+  }
+
+  const handleEditWorkSample = async(worksampleId:string,data:IWorkSampleData) =>{
+
+    let uploadImageUrls :string[] = []
+
+    if(data.images && data?.images.length > 0){
+       for (let each of data.images) {
+    if (typeof each === "string") {
+      uploadImageUrls.push(each); 
+    } else {
+      const url = await uploadImageToCloudinarySigned(each, "work-sample-images");
+      if (url) uploadImageUrls.push(url);
+      else showToast("Failed to upload image", "error");
+    }
+  }
+    }
+      const processedData = {
+        ...data,
+        images:uploadImageUrls
+      }
+
+      editWorkSample({worksampleId:worksampleId,data:processedData})
+        navigate("/vendor/profile")
   }
 
   return (
@@ -51,7 +83,7 @@ export default function WorkSamplePage() {
             Showcase your best projects. Add a title, a descriptive summary, and one or more images.
           </p>
         </div>
-        <WorkSampleForm onSubmit={handleWorksample} />
+        <WorkSampleForm onSubmit={handleWorksample} editSubmit={handleEditWorkSample} />
       </div>
     </VendorLayout>
   )

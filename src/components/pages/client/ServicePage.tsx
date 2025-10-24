@@ -3,6 +3,7 @@ import { ClientHeader } from "@/components/client/ClientHeader";
 import { Footer } from "@/components/mainComponents/Footer";
 import { useState, useEffect } from "react";
 import { UseGetAllServiceForServicePage } from "@/hooks/client/UseGetAllServiceForServicePage";
+import { useGetCategoriesForFilter } from "@/hooks/client/UseGetCategoriesForFilter"; // Add this import
 import { Search } from "lucide-react";
 import { useDebounce } from "@/hooks/services/UseDebounce";
 import { ServicesGrid } from "@/components/client/ServiceGrid";
@@ -10,15 +11,24 @@ import { ServicesGrid } from "@/components/client/ServiceGrid";
 export default function ServicesPage() {
   const [sort, setSort] = useState("name-asc");
   const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
+
+
+  const { 
+    data: categoriesData, 
+    isLoading: categoriesLoading, 
+    error: categoriesError 
+  } = useGetCategoriesForFilter();
 
   const debouncedSearch = useDebounce(search, 300);
 
-  const { data, isLoading } = UseGetAllServiceForServicePage({
+  const { data, isLoading: servicesLoading } = UseGetAllServiceForServicePage({
     page: currentPage,
     limit: 6,
     search: debouncedSearch,
     sort,
+    categoryId: category !== "all" ? category : "",
   });
 
   const totalPages = data?.total || 1;
@@ -29,9 +39,8 @@ export default function ServicesPage() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [debouncedSearch]);
+  }, [debouncedSearch, sort, category]);
 
-  console.log("servicd data",data)
   return (
     <div className="min-h-screen flex flex-col">
       <ClientHeader />
@@ -54,18 +63,24 @@ export default function ServicesPage() {
                 clearFilters={() => {
                   setSort("name-asc");
                   setSearch("");
+                  setCategory("all");
                   setCurrentPage(1);
                 }}
                 sort={sort}
                 setSort={setSort}
                 location=""
                 setLocation={() => {}}
-                setLat={() => {}} 
-                setLng={() => {}} 
+                setLat={() => {}}
+                setLng={() => {}}
+                category={category}
+                setCategory={setCategory}
+                categoriesData={categoriesData}
+                categoriesLoading={categoriesLoading}
+                categoriesError={categoriesError}
               />
             </aside>
             <div className="flex-1">
-              {isLoading ? (
+              {servicesLoading ? (
                 <p>Loading services...</p>
               ) : data && data.services && data.services.length > 0 ? (
                 <ServicesGrid

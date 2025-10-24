@@ -17,7 +17,7 @@ import {
 
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { UseTimer } from "@/hooks/UseTimer";
+import { UseTimer } from "@/hooks/common/UseTimer";
 interface OTPModalProps{
     isOpen:boolean,
     onClose:()=>void,

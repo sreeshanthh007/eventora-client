@@ -7,12 +7,12 @@ export default {
   ],
    theme: {
    	extend: {
-   		fontFamily: {
-   			alegreya: [
-   				'Alegreya SC"',
-   				'serif'
-   			]
-   		},
+   		// fontFamily: {
+   		// 	alegreya: [
+   		// 		'Alegreya SC"',
+   		// 		'serif'
+   		// 	]
+   		// },
    		colors: {
    			background: 'hsl(var(--background))',
    			dark: '#2e1f1b',

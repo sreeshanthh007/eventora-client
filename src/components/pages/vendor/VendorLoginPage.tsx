@@ -37,7 +37,8 @@ import { useState } from "react";
             if(fcmToken){
               saveFcmToken({
                 userId:data.user._id,
-                fcmToken:fcmToken
+                fcmToken:fcmToken,
+                role:"vendor"
               });
             }
           },

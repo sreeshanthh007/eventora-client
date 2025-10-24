@@ -31,6 +31,7 @@ interface EventsGridProps {
 export function EventsGrid({ events, currentPage, totalPages, onPageChange }: EventsGridProps) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid") // View mode state preserved
 
+  console.log("events are",events)
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     return date.toISOString().split("T")[0]

@@ -9,10 +9,10 @@ import { Label } from "../pages/ui/label"
 import { Mail, Shield, ArrowLeft } from 'lucide-react'
 import { useVerifyOtpMutation } from "@/hooks/auth/UseVerifyOtp"
 import { toast } from "sonner"
-import { UseTimer } from "@/hooks/UseTimer"
+import { UseTimer } from "@/hooks/common/UseTimer"
 import { useEffect } from "react"
 import { useSendForgotOTPMutation } from "@/hooks/auth/useSendForgotOTP"
-import { UseVendorSentOTP } from "@/hooks/vendor/UseVendorSentOTP"
+import { UseVendorSentOTP } from "@/hooks/vendor/auth/UseVendorSentOTP"
 
 interface ForgotPasswordModalProps {
   isOpen: boolean

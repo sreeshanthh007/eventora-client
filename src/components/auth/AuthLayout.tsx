@@ -139,7 +139,7 @@ export const AuthLayout = ({ children, imageSrc, heading, subHeading }: AuthLayo
               transition={{ duration: 0.6, delay: 1 }}
             >
               <motion.h1
-                className="text-3xl lg:text-4xl  bg-gradient-to-r from-gray-900 to-black bg-clip-text text-transparent mb-4 font-thin"
+                className="text-3xl lg:text-4xl  bg-gradient-to-r from-gray-900 to-black bg-clip-text text-transparent mb-4 font-serif"
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.6, delay: 1.1 }}
@@ -147,7 +147,7 @@ export const AuthLayout = ({ children, imageSrc, heading, subHeading }: AuthLayo
                 {heading}
               </motion.h1>
               <motion.p
-                className="text-base text-gray-600 tracking-wide leading-relaxed"
+                className="text-base text-gray-600 tracking-wide leading-relaxed font-serif"
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.6, delay: 1.2 }}
@@ -156,7 +156,7 @@ export const AuthLayout = ({ children, imageSrc, heading, subHeading }: AuthLayo
               </motion.p>
             </motion.div>
             <motion.div
-              className="relative z-10"
+              className="relative z-10 font-serif"
               initial={{ y: 30, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.6, delay: 1.3 }}

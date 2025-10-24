@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import type { RootState } from "@/store/store";
 
 
@@ -11,7 +11,6 @@ export const VendorProtectedRoute = () => {
 
 export const ClientProtectedRoute = () => {
   const client = useSelector((state: RootState) => state.client.client);
-
   return client ? <Outlet /> : <Navigate to="/login" />;
 };
 
@@ -20,3 +19,15 @@ export const AdminProtectedRoute = () => {
   
   return admin ? <Outlet /> : <Navigate to="/admin/login"  replace/>
 }
+
+
+export const ProtectedScanRoute = () => {
+  const location = useLocation();
+  const eventData = location.state?.eventData;
+
+  if (!eventData) {
+    return <Navigate to="/vendor/events" replace />;
+  }
+
+  return <Outlet context={{ eventData }} />;
+};

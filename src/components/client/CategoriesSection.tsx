@@ -34,7 +34,7 @@ export const CategoriesSection: React.FC = () => {
       <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl mb-6 text-gray-900">Popular Categories</h2>
+            <h2 className="text-4xl font-serif  md:text-5xl mb-6 text-gray-900">Popular Categories</h2>
             <div className="w-24 h-1 bg-blue-600 mx-auto rounded-full"></div>
             <p className="text-gray-600 mt-4 text-lg">Loading categories...</p>
           </div>

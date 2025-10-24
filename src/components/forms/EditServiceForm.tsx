@@ -6,11 +6,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/pages/ui/select";
 import { Checkbox } from "@/components/pages/ui/checkbox";
 import { Badge } from "@/components/pages/ui/badge";
-import { Edit, X } from "lucide-react";
+import { Edit, Plus, X } from "lucide-react";
 import { useFormik } from "formik";
 import { ServiceValidationSchema } from "@/utils/validations/addService.validator";
-import { useGetCategoriesForService } from "@/hooks/vendor/UseGetCategoryForService";
+import { useGetCategoriesForService } from "@/hooks/vendor/service/UseGetCategoryForService";
 import { toast } from "sonner";
+import { convertUTCToIST } from "@/utils/helpers/ConvertUTCtoIST";
+import { cancellationPolicyOptions } from "@/utils/helpers/CancellationPolicies";
 
 export interface ServiceFormData {
   serviceId: string;
@@ -23,9 +25,15 @@ export interface ServiceFormData {
   cancellationPolicies: string[];
   termsAndConditions: string[];
   categoryId: string;
+  slots: {
+    startDateTime: string;
+    endDateTime: string;
+    capacity: string;
+  }[];
 }
 
 interface Service {
+  serviceId?: string;
   serviceTitle: string;
   serviceDescription: string;
   servicePrice: number;
@@ -35,6 +43,11 @@ interface Service {
   cancellationPolicies?: string[];
   termsAndConditions?: string[];
   categoryId?: string;
+  slots?: {
+    startDateTime: string;
+    endDateTime: string;
+    capacity: number;
+  }[];
 }
 
 interface EditServiceFormProps {
@@ -44,48 +57,15 @@ interface EditServiceFormProps {
   isSubmitting?: boolean;
 }
 
+
+
+
+
 export function EditServiceForm({ service, onSubmit, onCancel, isSubmitting = false }: EditServiceFormProps) {
   const { data: response, isLoading, isError, error } = useGetCategoriesForService();
   const categories = response?.data ? response.data : [];
 
 
-  const cancellationPolicyOptions = [
-    {
-      value: "24-hour-full-refund",
-      label: "24 Hour Notice - Full Refund",
-      description: "Full refund if cancelled 24 hours before service. No refund for cancellations within 24 hours.",
-    },
-    {
-      value: "48-hour-full-refund",
-      label: "48 Hour Notice - Full Refund",
-      description:
-        "Full refund if cancelled 48 hours before service. 50% refund if cancelled within 24-48 hours. No refund within 24 hours.",
-    },
-    {
-      value: "72-hour-tiered",
-      label: "72 Hour Tiered Policy",
-      description:
-        "Full refund if cancelled 72+ hours before. 75% refund 48-72 hours before. 50% refund 24-48 hours before. No refund within 24 hours.",
-    },
-    {
-      value: "week-notice",
-      label: "1 Week Notice Required",
-      description:
-        "Full refund if cancelled 7+ days before service. 50% refund if cancelled 3-7 days before. No refund within 3 days.",
-    },
-    {
-      value: "non-refundable-deposit",
-      label: "Non-Refundable Deposit",
-      description:
-        "50% deposit is non-refundable upon booking. Remaining balance refundable up to 48 hours before service.",
-    },
-    {
-      value: "flexible-policy",
-      label: "Flexible Cancellation",
-      description:
-        "Full refund available up to 12 hours before service start time. Emergency cancellations considered case-by-case.",
-    },
-  ];
 
   const formik = useFormik<ServiceFormData>({
     initialValues: {
@@ -95,16 +75,21 @@ export function EditServiceForm({ service, onSubmit, onCancel, isSubmitting = fa
       serviceDescription: service.serviceDescription || "",
       servicePrice: service.servicePrice || 0,
       additionalHourPrice: service.additionalHourPrice || 0,
-      serviceDuration: service.duration || 1,
+      serviceDuration: service.serviceDuration || 1,
       cancellationPolicies: service.cancellationPolicies || [],
       termsAndConditions: service.termsAndConditions?.join("\n") || "",
       categoryId: service.categoryId || "",
+      slots: service.slots ? service.slots.map(slot => ({
+        startDateTime: convertUTCToIST(slot.startDateTime),
+        endDateTime: convertUTCToIST(slot.endDateTime),
+        capacity: slot.capacity.toString(),
+      })) : [],
     },
     validationSchema: ServiceValidationSchema,
     onSubmit: async (values, { resetForm }) => {
       try {
-        if (values.cancellationPolicies.length === 0 || values.termsAndConditions.length === 0) {
-          toast.error("Cancellation policies and terms must have at least one non-empty entry");
+        if (values.cancellationPolicies.length === 0 || values.termsAndConditions.length === 0 || values.slots.length === 0) {
+          toast.error("Cancellation policies, terms, and at least one slot must have at least one non-empty entry");
           return;
         }
 
@@ -112,6 +97,11 @@ export function EditServiceForm({ service, onSubmit, onCancel, isSubmitting = fa
           .split("\n")
           .map((item) => item.trim())
           .filter((item) => item.length > 0);
+        const processedSlots = values.slots.map(slot => ({
+          startDateTime: convertUTCToIST(slot.startDateTime),
+          endDateTime: convertUTCToIST(slot.endDateTime),
+          capacity: Number(slot.capacity),
+        }));
 
         onSubmit({
           ...values,
@@ -120,6 +110,7 @@ export function EditServiceForm({ service, onSubmit, onCancel, isSubmitting = fa
           additionalHourPrice: Number(values.additionalHourPrice),
           serviceDuration: Number(values.serviceDuration),
           termsAndConditions,
+          slots: processedSlots,
         });
 
         resetForm();
@@ -150,6 +141,25 @@ export function EditServiceForm({ service, onSubmit, onCancel, isSubmitting = fa
       "cancellationPolicies",
       formik.values.cancellationPolicies.filter((policy) => policy !== policyToRemove),
     );
+  };
+
+  const addSlot = () => {
+    formik.setFieldValue("slots", [
+      ...formik.values.slots,
+      { startDateTime: "", endDateTime: "", capacity: "" },
+    ]);
+  };
+
+  const removeSlot = (index: number) => {
+    const newSlots = formik.values.slots.filter((_, i) => i !== index);
+    formik.setFieldValue("slots", newSlots);
+  };
+
+  const updateSlotField = (index: number, field: keyof typeof formik.values.slots[0], value: string) => {
+    const newSlots = formik.values.slots.map((slot, i) =>
+      i === index ? { ...slot, [field]: value } : slot
+    );
+    formik.setFieldValue("slots", newSlots);
   };
 
   return (
@@ -278,6 +288,74 @@ export function EditServiceForm({ service, onSubmit, onCancel, isSubmitting = fa
               <p className="text-red-500 text-sm">{formik.errors.serviceDescription}</p>
             )}
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Availability Slots */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Edit className="h-5 w-5" />
+            Availability Slots
+          </CardTitle>
+          <CardDescription>Update the available time slots for your service (Times shown in IST)</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Button type="button" onClick={addSlot} variant="outline" className="w-full">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Slot
+          </Button>
+          {formik.values.slots.length > 0 && (
+            <div className="space-y-4">
+              {formik.values.slots.map((slot, index) => (
+                <div key={index} className="border rounded-md p-4 space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label>Start Date & Time (IST)</Label>
+                      <Input
+                        type="datetime-local"
+                        value={slot.startDateTime}
+                        onChange={(e) => updateSlotField(index, "startDateTime", e.target.value)}
+                        className="h-12 bg-gray-50/80 border-gray-300 focus:border-gray-600 focus:ring-gray-600/20 rounded-xl"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>End Date & Time (IST)</Label>
+                      <Input
+                        type="datetime-local"
+                        value={slot.endDateTime}
+                        onChange={(e) => updateSlotField(index, "endDateTime", e.target.value)}
+                        className="h-12 bg-gray-50/80 border-gray-300 focus:border-gray-600 focus:ring-gray-600/20 rounded-xl"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Capacity</Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        value={slot.capacity}
+                        onChange={(e) => updateSlotField(index, "capacity", e.target.value)}
+                        className="h-12 bg-gray-50/80 border-gray-300 focus:border-gray-600 focus:ring-gray-600/20 rounded-xl"
+                        placeholder="e.g., 10"
+                      />
+                    </div>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={() => removeSlot(index)}
+                    className="w-full md:w-auto"
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Remove Slot
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+          {formik.touched.slots && formik.errors.slots && (
+            <p className="text-red-500 text-sm">{formik.errors.slots}</p>
+          )}
         </CardContent>
       </Card>
 
@@ -441,4 +519,4 @@ export function EditServiceForm({ service, onSubmit, onCancel, isSubmitting = fa
       </div>
     </form>
   );
-} 
+}

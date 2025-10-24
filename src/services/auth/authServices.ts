@@ -83,8 +83,8 @@ export const verifyOtp = async(data:{email:string,otp:string}) : Promise<IAxiosR
     
 }
 
-export const saveFcmToken = async({userId,fcmToken}:{userId:string,fcmToken:string}) =>{
-    const response = await AuthAxiosInstance.post("/save-fcm",{userId,fcmToken:fcmToken})
+export const saveFcmToken = async({userId,fcmToken,role}:{userId:string,fcmToken:string,role:string}) =>{
+    const response = await AuthAxiosInstance.post("/save-fcm",{userId,fcmToken:fcmToken,role})
     return response.data
 }
 export const logOutClient = async() : Promise<IAxiosResponse> =>{

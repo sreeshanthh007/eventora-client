@@ -1,6 +1,6 @@
 import { VendorChangePasswordForm } from "@/components/forms/vendor/VendorChangePasswordForm"
 import { VendorLayout } from "../layouts/VendorLayout"
-import { useVendorChangePasswordMutation } from "@/hooks/vendor/UseVendorChangePassword"
+import { useVendorChangePasswordMutation } from "@/hooks/vendor/auth/UseVendorChangePassword"
 import { useToast } from "@/hooks/ui/UseToaster"
 
 interface PasswordFormData {

@@ -1,10 +1,9 @@
 
-// import { clientAxiosInstance } from "@/api/client.axios";
 import { axiosInstance } from "@/api/interceptor";
 import type { IAxiosResponse } from "@/types/Response";
 import type { ICategory, IEvent } from "@/types/User";
 import { CLIENT_ROUTES } from "@/utils/constants/api.routes";
-import { current } from "@reduxjs/toolkit";
+
 
 export type Client = {
   _id: string;
@@ -38,6 +37,13 @@ export const getClientDetails = async () => {
   return result.data;
 };
 
+
+export const getClientNotificaion = async()=>{
+  const response = await axiosInstance.get(
+      CLIENT_ROUTES.GET_CLIENT_NOTIFICATION
+  );
+  return response.data
+}
 
 export const updateProfileImage = async(image:string) =>{
   const result = await axiosInstance.post(
@@ -123,11 +129,13 @@ export const getAllServiceForServicePage = async ({
   limit = 6,
   search = "",
   sort = "date-asc",
+  categoryId
 }: {
   page: number
   limit: number
   search: string
   sort: string
+  categoryId:string
 }) => {
   const response = await axiosInstance.get(
     CLIENT_ROUTES.GET_ALL_SERVICES_FOR_CLIENT,
@@ -137,6 +145,7 @@ export const getAllServiceForServicePage = async ({
         limit,
         search,
         sort,
+        categoryId
       },
     }
   )
@@ -150,6 +159,17 @@ export const getServiceDetails = async(serviceId:string) =>{
 
   const response = await axiosInstance.get(
     CLIENT_ROUTES.GET_SERVICE_DETAILS(serviceId)
+  );
+
+  return response.data
+}
+
+
+
+export const getCategoryForFilter = async() =>{
+
+  const response = await axiosInstance.get(
+    CLIENT_ROUTES.GET_CATEGORIES_FOR_FILTER
   );
 
   return response.data
@@ -178,6 +198,29 @@ export const getBookedEvents = async({
   return response.data
 }
 
+
+export const getVendorWorkfolioForClient = async(vendorId:string) =>{
+
+  const response = await axiosInstance.get(
+      CLIENT_ROUTES.GET_VENDOR_WORKFOLIO(vendorId)
+  );
+
+  return response.data
+}
+
+export const getClientWalletDetails= async()=>{
+  const response = await axiosInstance.get(
+    CLIENT_ROUTES.GET_CLIENT_WALLET_DETAILS
+  );
+  return response.data
+}
+
+export const cancelTicket = async(ticketId:string,eventId:string) =>{
+  const response = await axiosInstance.patch(
+    CLIENT_ROUTES.CANCEL_TICKET(ticketId,eventId),
+  );
+  return response.data
+}
 export const clientRefreshSession = async() : Promise<ClientResponse> =>{
   const response = await axiosInstance.get<ClientResponse>(
     CLIENT_ROUTES.REFRESH_SESSION

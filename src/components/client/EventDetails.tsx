@@ -6,7 +6,7 @@ import { Badge } from "@/components/pages/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/pages/ui/avatar"
 import { Input } from "@/components/pages/ui/input"
 import { Label } from "@/components/pages/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/pages/ui/select"
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/pages/ui/select"
 import { useGetEventDetails } from "@/hooks/client/UseGetEventDetails"
 import { getCloudinaryImageUrl } from "@/utils/helpers/GetCloudinaryImage"
 import { useParams } from "react-router-dom"
@@ -14,17 +14,25 @@ import LocationPickerReadOnly from "../map/MapPickerReadOnly"
 import { CheckoutForm } from "../forms/StripeCheckoutForm"
 
 interface EventDetailsProps {
-  eventId: string
+  eventId?: string
+}
+
+interface TicketItem {
+  id: string
+  ticketType?: string
+  pricePerTicket: number
+  quantity: number
+  maxPerUser: number
+  available: number
 }
 
 interface TicketPurchaseData {
+  title: string
   email: string
   name: string
-  ticketType: string
-  ticketId?: string 
-  quantity: number
-  amount: number
-  currency: string 
+  tickets: TicketItem[]
+  totalAmount: number
+  currency: string
 }
 
 const formatDate = (dateString: string) => {
@@ -40,32 +48,48 @@ const formatDate = (dateString: string) => {
 export const EventDetails: React.FC<EventDetailsProps> = () => {
   const { eventId } = useParams<{ eventId: string }>()
   const { data: event, isLoading, isError } = useGetEventDetails(eventId!)
-
+  console.log("event dtails",event)
   const [isStripeModalOpen, setIsStripeModalOpen] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [purchaseData, setPurchaseData] = useState<TicketPurchaseData>({
+    title: "",
     email: "",
     name: "",
-    ticketType: "",
-    ticketId: "",
-    quantity: 1,
-    amount: 0,
+    tickets: [],
+    totalAmount: 0,
     currency: "INR",
   })
-
 
   useEffect(() => {
     if (event) {
       const hasTicketTypes = event.event.tickets && event.event.tickets.length > 0
-      const defaultTicketPrice = hasTicketTypes ? event.event.tickets[0].pricePerTicket : event.event.pricePerTicket || 0
-      const defaultTicketType = hasTicketTypes ? event.event.tickets[0].ticketType : ""
-      const defaultTicketId = hasTicketTypes ? event.event.tickets[0].id : ""
+      const ticketItems: TicketItem[] = []
+      if (hasTicketTypes) {
+        ticketItems.push(
+          ...event.event.tickets.map((t) => ({
+            id: t._id || t.id || "",
+            ticketType: t.ticketType || "Unknown",
+            pricePerTicket: Number(t.pricePerTicket) || 0,
+            quantity: 0,
+            maxPerUser: t.maxTicketsPerUser,
+            available: Math.max(0, (Number(t.totalTickets) || 0) - (Number(t.bookedTickets) || 0)),
+          }))
+        )
+      } else {
+        ticketItems.push({
+          id: "",
+          pricePerTicket: Number(event.event.pricePerTicket) || 0,
+          quantity: 0,
+          maxPerUser: event.event.maxTicketPerUser,
+          available: event.event.totalTicket
+        })
+      }
       setPurchaseData((prev) => ({
         ...prev,
-        ticketType: defaultTicketType,
-        ticketId: defaultTicketId,
-        amount: defaultTicketPrice * prev.quantity,
+        tickets: ticketItems,
+        totalAmount: 0,
         currency: "INR",
+        title: event.event?.title || ""
       }))
     }
   }, [event])
@@ -86,9 +110,10 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
   }
 
   const ticketPrice =
-    event.event.tickets?.length > 0 ? event.event.tickets[0].pricePerTicket : event.event.pricePerTicket || 0
-  const maxTicketsPerUser = event.event.maxTicketsPerUser || 10
-  const hasTicketTypes = event.event.tickets && event.event.tickets.length > 0
+    event.event.tickets?.length > 0 ? Number(event.event.tickets[0].pricePerTicket) || 0 : Number(event.event.pricePerTicket) || 0
+  const maxTicketsPerUser = event.event.maxTicketPerUser
+
+  const totalQuantity = purchaseData.tickets.reduce((sum, t) => sum + t.quantity, 0)
 
   const handleBuyTickets = () => {
     setIsModalOpen(true)
@@ -104,52 +129,73 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
     
   }
 
-  const handleQuantityChange = (increment: boolean) => {
+  const handleQuantityChange = (index: number, increment: boolean) => {
     setPurchaseData((prev) => {
-      const newQuantity = increment ? Math.min(prev.quantity + 1, maxTicketsPerUser) : Math.max(prev.quantity - 1, 1)
-      const currentPrice = getCurrentTicketPrice()
-      return {
-        ...prev,
-        quantity: newQuantity,
-        amount: currentPrice * newQuantity,
-      }
-    })
-  }
+      const newTickets = [...prev.tickets]
+      const currentItem = newTickets[index]
+      const currentTotalQuantity = prev.tickets.reduce((sum, t) => sum + t.quantity, 0)
 
-  const handleTicketTypeChange = (value: string) => {
-    setPurchaseData((prev) => {
-      const selectedTicket = event.event.tickets.find((t) => t.ticketType === value)
-      const newPrice = selectedTicket?.pricePerTicket || ticketPrice
-      const newTicketId = selectedTicket?.id || ""
+      if (increment) {
+        const newQuantityForThis = currentItem.quantity + 1
+        if (newQuantityForThis > currentItem.maxPerUser) {
+          return prev
+        }
+        if (newQuantityForThis > currentItem.available) {
+          return prev
+        }
+        const newTotalQuantity = currentTotalQuantity + 1
+        if (newTotalQuantity > maxTicketsPerUser) {
+          return prev
+        }
+      }
+
+      let newQuantity = increment ? currentItem.quantity + 1 : currentItem.quantity - 1
+      if (newQuantity < 0) {
+        newQuantity = 0
+      }
+
+      newTickets[index] = { ...currentItem, quantity: newQuantity }
+      const newTotalAmount = newTickets.reduce((sum, t) => {
+        const price = Number(t.pricePerTicket) || 0
+        const qty = Number(t.quantity) || 0
+        return sum + (price * qty)
+      }, 0)
+
       return {
         ...prev,
-        ticketType: value,
-        ticketId: newTicketId,
-        amount: newPrice * prev.quantity,
+        tickets: newTickets,
+        totalAmount: newTotalAmount,
       }
     })
   }
 
   const handleSubmitPurchase = () => {
+    if (!purchaseData.email || !purchaseData.name || totalQuantity === 0) {
+      alert("Please fill in all required fields (email, name) and select at least one ticket.")
+      return
+    }
+    if (isNaN(purchaseData.totalAmount) || purchaseData.totalAmount <= 0) {
+      alert("Invalid ticket amount. Please select valid quantities.")
+      return
+    }
 
-    if (!purchaseData.email || !purchaseData.name || (hasTicketTypes && !purchaseData.ticketType)) {
-      alert("Please fill in all required fields (email, name, and ticket type).")
+    // Additional validation for per-ticket limits (defense in depth)
+    let isValid = true
+    purchaseData.tickets.forEach((t) => {
+      if (t.quantity > t.maxPerUser || t.quantity > t.available) {
+        isValid = false
+      }
+    })
+    if (totalQuantity > maxTicketsPerUser) {
+      isValid = false
+    }
+    if (!isValid) {
+      alert("Selected quantities exceed limits. Please adjust.")
       return
     }
-    if (purchaseData.amount <= 0) {
-      alert("Invalid ticket amount. Please select a valid ticket type and quantity.")
-      return
-    }
+
     handleCloseModal()
     setIsStripeModalOpen(true)
-  }
-
-  const getCurrentTicketPrice = () => {
-    if (hasTicketTypes && purchaseData.ticketType) {
-      const selectedTicket = event.event.tickets.find((t) => t.ticketType === purchaseData.ticketType)
-      return selectedTicket?.pricePerTicket || ticketPrice
-    }
-    return ticketPrice
   }
 
   return (
@@ -276,30 +322,34 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
             </Card>
           </div>
 
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Event Host</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-12 w-12">
-                    <AvatarImage
-                      src={
-                        event.event.vendor?.avatar
-                          ? getCloudinaryImageUrl(event.event.vendor.avatar)
-                          : "/placeholder.svg"
-                      }
-                    />
-                    <AvatarFallback>{event.event.vendor?.name?.[0] || "B"}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h3 className="font-semibold">{event.event.vendor?.name || "bro"}</h3>
-                  </div>
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Event Host</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-3">
+                <Avatar className="h-12 w-12">
+                  <AvatarImage
+                    src={
+                      event.event.vendor?.profilePicture
+                        ? getCloudinaryImageUrl(event.event.vendor.profilePicture)
+                        : "/placeholder.svg"
+                    }
+                  />
+                  <AvatarFallback>{event.event.vendor?.name?.[0] || "B"}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <h3 className="font-semibold">{event.event.vendor?.name || "bro"}</h3>
+                  {event.event.vendor?.email && (
+                    <p className="text-sm text-muted-foreground">
+                      {event.event.vendor.email}
+                    </p>
+                  )}
                 </div>
-              </CardContent>
-            </Card>
-
+              </div>
+            </CardContent>
+          </Card>
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -357,61 +407,53 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
                 />
               </div>
 
-              {hasTicketTypes && (
-                <div className="space-y-2">
-                  <Label htmlFor="ticketType">Ticket Type</Label>
-                  <Select
-                    value={purchaseData.ticketType}
-                    onValueChange={handleTicketTypeChange}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select ticket type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {event.event.tickets.map((ticket, index) => (
-                        <SelectItem key={index} value={ticket.ticketType}>
-                          {ticket.ticketType} - ₹{ticket.pricePerTicket}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-
               <div className="space-y-2">
-                <Label>Quantity</Label>
-                <div className="flex items-center gap-3">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleQuantityChange(false)}
-                    disabled={purchaseData.quantity <= 1}
-                  >
-                    <Minus className="h-4 w-4" />
-                  </Button>
-                  <span className="text-lg font-medium min-w-[2rem] text-center">{purchaseData.quantity}</span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleQuantityChange(true)}
-                    disabled={purchaseData.quantity >= maxTicketsPerUser}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
+                <Label>Select Tickets</Label>
+                <div className="space-y-3">
+                  {purchaseData.tickets.map((item, index) => (
+                    <div key={item.id || index} className="flex justify-between items-center p-3 border rounded-lg">
+                      <div>
+                        <span className="font-medium block">{item.ticketType} - ₹{item.pricePerTicket}</span>
+                        <span className="text-sm text-muted-foreground">({item.available} available, max {item.maxPerUser} per user)</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleQuantityChange(index, false)}
+                          disabled={item.quantity <= 0}
+                        >
+                          <Minus className="h-4 w-4" />
+                        </Button>
+                        <span className="text-lg font-medium min-w-[2rem] text-center">{item.quantity}</span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleQuantityChange(index, true)}
+                          disabled={
+                            item.quantity >= item.maxPerUser ||
+                            item.quantity >= item.available ||
+                            totalQuantity >= maxTicketsPerUser
+                          }
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <p className="text-sm text-muted-foreground">Maximum {maxTicketsPerUser} tickets per user</p>
               </div>
 
               <div className="border-t pt-4">
                 <div className="flex justify-between items-center mb-4">
-                  <span className="font-medium">Total:</span>
-                  <span className="text-xl font-bold">₹{purchaseData.amount}</span>
+                  <span className="font-medium">Total ({totalQuantity} tickets):</span>
+                  <span className="text-xl font-bold">₹{purchaseData.totalAmount}</span>
                 </div>
 
                 <Button
                   className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
                   onClick={handleSubmitPurchase}
-                  disabled={!purchaseData.email || !purchaseData.name || (hasTicketTypes && !purchaseData.ticketType) || purchaseData.amount <= 0}
+                  disabled={!purchaseData.email || !purchaseData.name || totalQuantity === 0 || isNaN(purchaseData.totalAmount) || purchaseData.totalAmount <= 0}
                 >
                   Proceed to Payment
                 </Button>
@@ -434,13 +476,19 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
               eventId={eventId!}
               purchaseData={purchaseData}
               onClose={() => {
-                setPurchaseData({ email: "", name: "", ticketType: "", ticketId: "", quantity: 1, amount: 0, currency: "INR" })
+                setPurchaseData(prev => ({
+                  ...prev,
+                  email: "",
+                  name: "",
+                  tickets: prev.tickets.map(t => ({ ...t, quantity: 0 })),
+                  totalAmount: 0
+                }))
                 handleCloseStripeModal()
               }}
             />
           </div>
         </div>
-      )}
+      )}  
     </div>
   )
 }

@@ -47,7 +47,7 @@ interface UserManagementTableProps<T extends TableItem> {
   onRequestVendorClick?: () => void
 }
 
-export function ReusableTable<T extends TableItem>({
+export function  ReusableTable<T extends TableItem>({
   data,
   loading,
   updatingItems,
@@ -71,7 +71,7 @@ export function ReusableTable<T extends TableItem>({
     <Card className="w-full">
       <div className="p-6 space-y-6">
         <div className="flex justify-between items-center mb-4 flex-wrap gap-4">
-          <h1 className="text-3xl font-bold">
+          <h1 className="text-3xl  font-serif">
             {`${entityType.charAt(0).toUpperCase() + entityType.slice(1)} Management`}
           </h1>
           {entityType === "vendor" && onRequestVendorClick && (

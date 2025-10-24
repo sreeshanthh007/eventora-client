@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query"
 
 
 export const UseSaveFcmTokenMutation = ()=>{
-    return useMutation<IAxiosResponse,Error,{userId:string,fcmToken:string}>({
+    return useMutation<IAxiosResponse,Error,{userId:string,fcmToken:string,role:string}>({
         mutationFn:saveFcmToken
     })
 } 

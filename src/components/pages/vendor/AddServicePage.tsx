@@ -5,7 +5,7 @@ import { AddServiceForm , type  ServiceFormData } from "@/components/forms/AddSe
 import { Button } from "@/components/pages/ui/button"
 import { ArrowLeft } from "lucide-react"
 import { Link, useNavigate } from "react-router-dom"
-import { useAddServiceMutation } from "@/hooks/vendor/UseAddService"
+import { useAddServiceMutation } from "@/hooks/vendor/service/UseAddService"
 
 export default function AddServicePage() {
 

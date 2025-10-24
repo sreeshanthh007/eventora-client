@@ -5,3 +5,13 @@ export interface IWorkSampleData{
     description:string,
     images:string[]
 }
+
+
+export type TEditableWorkSampleData = Partial<
+Pick<
+IWorkSampleData,
+"description" | 
+"images" | 
+"title"
+>
+>;

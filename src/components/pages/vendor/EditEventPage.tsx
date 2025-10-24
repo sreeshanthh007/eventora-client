@@ -5,10 +5,10 @@ import { ArrowLeft, Edit, Loader2 } from "lucide-react";
 import { Button } from "@/components/pages/ui/button";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { UseGetEventsById } from "@/hooks/vendor/UseGetEventsById";
+import { UseGetEventsById } from "@/hooks/vendor/event/UseGetEventsById";
 import { useToast } from "@/hooks/ui/UseToaster";
 import { uploadImageToCloudinarySigned } from "@/services/cloudinary/cloudinary";
-import { useEditEventMutation } from "@/hooks/vendor/UseEditEvents";
+import { useEditEventMutation } from "@/hooks/vendor/event/UseEditEvents";
 import { formatDateForInput } from "@/utils/helpers/FormatDate";
 
 export default function EditEventPage() {

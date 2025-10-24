@@ -10,6 +10,8 @@ import { clientLogin } from "@/store/slices/clientSlice"
 import type { CredentialResponse } from "@react-oauth/google"
 import { UseGoogleAuth } from "@/hooks/auth/UseGoogleAuth"
 import { useToast } from "@/hooks/ui/UseToaster"
+import { requestNotificationPermission } from "@/services/firebase/notification"
+import { UseSaveFcmTokenMutation } from "@/hooks/auth/UseSaveFcmToken"
 
 
 
@@ -18,17 +20,27 @@ export const ClientLogin = () => {
 
   const {mutate:loginUser} = useLoginMutation()
   const {mutate:GoogleLogin} = UseGoogleAuth()
+  const {mutate:saveFcmToken} = UseSaveFcmTokenMutation()
   const {showToast} = useToast()
   const handleLoginSubmit = (data:Omit<ILoginData,"role">)=>{
     
     loginUser(
       {...data,role:"client"},
       {
-        onSuccess:(data)=>{
+        onSuccess:async(data)=>{
          
           toast.success(data.message)
           dispatch(clientLogin(data.user));
-          console.log("his si usersdata",data.user)
+          const fcmToken = await requestNotificationPermission()
+
+          if(fcmToken){
+            saveFcmToken({
+              userId:data.user._id,
+              fcmToken:fcmToken,
+              role:"client"
+            });
+          }
+
         },
         onError:(err)=>{
           toast.error(err.response?.data?.message)

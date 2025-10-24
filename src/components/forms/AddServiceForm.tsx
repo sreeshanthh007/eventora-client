@@ -1,5 +1,3 @@
-
-
 import { Button } from "@/components/pages/ui/button"
 import { Input } from "@/components/pages/ui/input"
 import { Label } from "@/components/pages/ui/label"
@@ -10,7 +8,7 @@ import { Checkbox } from "@/components/pages/ui/checkbox"
 import { Badge } from "@/components/pages/ui/badge"
 import { Plus, X } from "lucide-react"
 import { useFormik } from "formik"
-import { useGetCategoriesForService } from "@/hooks/vendor/UseGetCategoryForService"
+import { useGetCategoriesForService } from "@/hooks/vendor/service/UseGetCategoryForService"
 
 export interface ServiceFormData {
   serviceTitle: string
@@ -22,6 +20,11 @@ export interface ServiceFormData {
   cancellationPolicies: string[]
   termsAndConditions: string[]
   categoryId: string
+  slots: {
+    startDateTime: string
+    endDateTime: string
+    capacity: number | string
+  }[]
 }
 
 interface AddServiceFormProps {
@@ -83,6 +86,7 @@ export function AddServiceForm({ onSubmit, onCancel, isSubmitting = false }: Add
     if (!values.termsAndConditions) errors.termsAndConditions = "Terms and conditions are required"
     if (values.cancellationPolicies.length === 0)
       errors.cancellationPolicies = "At least one cancellation policy must be selected"
+    if (!values.slots || values.slots.length === 0) errors.slots = "At least one slot is required"
 
     return errors
   }
@@ -98,6 +102,7 @@ export function AddServiceForm({ onSubmit, onCancel, isSubmitting = false }: Add
       cancellationPolicies: [],
       termsAndConditions: [],
       categoryId: "",
+      slots: [],
     },
     validate: validateForm,
     onSubmit: (values) => {
@@ -109,6 +114,11 @@ export function AddServiceForm({ onSubmit, onCancel, isSubmitting = false }: Add
         serviceDuration: Number(values.serviceDuration),
         termsAndConditions: [values.termsAndConditions],
         cancellationPolicies: values.cancellationPolicies,
+        slots: values.slots.map(slot => ({
+          startDateTime: slot.startDateTime,
+          endDateTime: slot.endDateTime,
+          capacity: Number(slot.capacity),
+        })),
       })
     },
   })
@@ -132,6 +142,25 @@ export function AddServiceForm({ onSubmit, onCancel, isSubmitting = false }: Add
       "cancellationPolicies",
       formik.values.cancellationPolicies.filter((policy) => policy !== policyToRemove),
     )
+  }
+
+  const addSlot = () => {
+    formik.setFieldValue("slots", [
+      ...formik.values.slots,
+      { startDateTime: "", endDateTime: "", capacity: "" },
+    ])
+  }
+
+  const removeSlot = (index: number) => {
+    const newSlots = formik.values.slots.filter((_, i) => i !== index)
+    formik.setFieldValue("slots", newSlots)
+  }
+
+  const updateSlotField = (index: number, field: keyof typeof formik.values.slots[0], value: string) => {
+    const newSlots = formik.values.slots.map((slot, i) =>
+      i === index ? { ...slot, [field]: value } : slot
+    )
+    formik.setFieldValue("slots", newSlots)
   }
 
   return (
@@ -249,6 +278,74 @@ export function AddServiceForm({ onSubmit, onCancel, isSubmitting = false }: Add
               <p className="text-red-500 text-sm">{formik.errors.serviceDescription}</p>
             )}
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Availability Slots */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Plus className="h-5 w-5" />
+            Availability Slots
+          </CardTitle>
+          <CardDescription>Define the available time slots for your service</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Button type="button" onClick={addSlot} variant="outline" className="w-full">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Slot
+          </Button>
+          {formik.values.slots.length > 0 && (
+            <div className="space-y-4">
+              {formik.values.slots.map((slot, index) => (
+                <div key={index} className="border rounded-md p-4 space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label>Start Date & Time</Label>
+                      <Input
+                        type="datetime-local"
+                        value={slot.startDateTime}
+                        onChange={(e) => updateSlotField(index, "startDateTime", e.target.value)}
+                        className="w-full"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>End Date & Time</Label>
+                      <Input
+                        type="datetime-local"
+                        value={slot.endDateTime}
+                        onChange={(e) => updateSlotField(index, "endDateTime", e.target.value)}
+                        className="w-full"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Capacity</Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        value={slot.capacity}
+                        onChange={(e) => updateSlotField(index, "capacity", e.target.value)}
+                        className="w-full"
+                        placeholder="e.g., 10"
+                      />
+                    </div>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={() => removeSlot(index)}
+                    className="w-full md:w-auto"
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Remove Slot
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+          {formik.touched.slots && formik.errors.slots && (
+            <p className="text-red-500 text-sm">{formik.errors.slots}</p>
+          )}
         </CardContent>
       </Card>
 
