@@ -1,21 +1,29 @@
-import { useState } from "react";
-import { ChevronDown, MapPin, Calendar, Filter } from "lucide-react";
-import { Button } from "@/components/pages/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/pages/ui/card";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/pages/ui/collapsible";
-import { RadioGroup, RadioGroupItem } from "@/components/pages/ui/radio-group";
-import { Label } from "@/components/pages/ui/label";
-import { Separator } from "@/components/pages/ui/separator";
+import { useState } from "react"
+
+import { ChevronDown, MapPin, Calendar, Filter, Tag } from "lucide-react"
+import { Button } from "@/components/pages/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/pages/ui/card"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/pages/ui/collapsible"
+import { RadioGroup, RadioGroupItem } from "@/components/pages/ui/radio-group"
+import { Label } from "@/components/pages/ui/label"
+import { Separator } from "@/components/pages/ui/separator"
+
 
 interface FiltersProps {
-  type: "event" | "service";
-  sort: string;
-  setSort: (value: string) => void;
-  location: string;
-  setLocation: (value: string) => void;
-  clearFilters: () => void;
-  setLat: (lat: number | null) => void;
-  setLng: (lng: number | null) => void;
+  type: "event" | "service"
+  sort: string
+  setSort: (value: string) => void
+  location: string
+  setLocation: (value: string) => void
+  category?: string
+  setCategory?: (value: string) => void
+  clearFilters: () => void
+  setLat: (lat: number | null) => void
+  setLng: (lng: number | null) => void
+
+  categoriesData?: any 
+  categoriesLoading?: boolean
+  categoriesError?: any
 }
 
 export function Filters({
@@ -27,9 +35,22 @@ export function Filters({
   clearFilters,
   setLat,
   setLng,
+  category,
+  setCategory,
+  categoriesData,
+  categoriesError,
+  categoriesLoading
 }: FiltersProps) {
-  const [sortOpen, setSortOpen] = useState(true);
-  const [locationOpen, setLocationOpen] = useState(true);
+  const [sortOpen, setSortOpen] = useState(true)
+  const [locationOpen, setLocationOpen] = useState(true)
+  const [categoryOpen, setCategoryOpen] = useState(true)
+
+  const [internalCategory, setInternalCategory] = useState("all")
+  const categoryValue = category ?? internalCategory
+  const setCategoryValue = setCategory ?? setInternalCategory
+
+
+
 
   return (
     <Card>
@@ -48,9 +69,7 @@ export function Filters({
                 <Calendar className="w-4 h-4" />
                 Sort By
               </span>
-              <ChevronDown
-                className={`w-4 h-4 transition-transform ${sortOpen ? "rotate-180" : ""}`}
-              />
+              <ChevronDown className={`w-4 h-4 transition-transform ${sortOpen ? "rotate-180" : ""}`} />
             </Button>
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-3">
@@ -87,6 +106,57 @@ export function Filters({
           </CollapsibleContent>
         </Collapsible>
 
+         {/* Service-only: Category filter */}
+              {type === "service" && (
+                <>
+                  <Separator />
+                  <Collapsible open={categoryOpen} onOpenChange={setCategoryOpen}>
+                    <CollapsibleTrigger asChild>
+                      <Button variant="ghost" className="w-full justify-between">
+                        <span className="flex items-center gap-2">
+                          <Tag className="w-4 h-4" />
+                          Filter By Category
+                        </span>
+                        <ChevronDown className={`w-4 h-4 transition-transform ${categoryOpen ? "rotate-180" : ""}`} />
+                      </Button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="mt-3">
+                      {categoriesLoading ? (
+                        <div className="flex items-center gap-2 py-4">
+                          <div className="animate-spin w-4 h-4 border-2 border-primary border-t-transparent rounded-full"></div>
+                          <span>Loading categories...</span>
+                        </div>
+                      ) : categoriesError ? (
+                        <div className="text-destructive py-4">
+                          Error loading categories. Showing default options.
+                        </div>
+                      ) : (
+                        <RadioGroup value={categoryValue} onValueChange={setCategoryValue} className="space-y-3">
+                          <div className="flex items-center gap-2">
+                            <RadioGroupItem value="all" id="cat-all" />
+                            <Label htmlFor="cat-all">All Categories</Label>
+                          </div>
+                          {categoriesData?.categories?.length > 0 ? (
+                            categoriesData.categories.map((categoryObj: any) => {
+                              const categoryId = categoryObj.categoryId;
+                              return (
+                                <div key={categoryObj.categoryId} className="flex items-center gap-2">
+                                  <RadioGroupItem value={categoryId} id={categoryObj.categoryId} />
+                                  <Label htmlFor={categoryObj.categoryId}>{categoryObj.title}</Label>
+                                </div>
+                              );
+                            })
+                          ) : (
+                            <div className="text-muted-foreground py-2">
+                              No categories available
+                            </div>
+                          )}
+                        </RadioGroup>
+                      )}
+                    </CollapsibleContent>
+                  </Collapsible>
+                </>
+              )}
         {type === "event" && (
           <>
             <Separator />
@@ -97,32 +167,28 @@ export function Filters({
                     <MapPin className="w-4 h-4" />
                     Location
                   </span>
-                  <ChevronDown
-                    className={`w-4 h-4 transition-transform ${locationOpen ? "rotate-180" : ""}`}
-                  />
+                  <ChevronDown className={`w-4 h-4 transition-transform ${locationOpen ? "rotate-180" : ""}`} />
                 </Button>
               </CollapsibleTrigger>
               <CollapsibleContent className="mt-3">
                 <RadioGroup
                   value={location}
                   onValueChange={(value) => {
-                    setLocation(value);
-                    // Get location for all distance-based filters
+                    setLocation(value)
                     if (["near-me", "10-20km", "30-40km"].includes(value)) {
                       navigator.geolocation.getCurrentPosition(
                         (pos) => {
-                          setLat(pos.coords.latitude);
-                          setLng(pos.coords.longitude);
+                          setLat(pos.coords.latitude)
+                          setLng(pos.coords.longitude)
                         },
                         (err) => {
-                          console.error("Error getting location:", err);
-                          // Optional: Show error message to user
-                          alert("Unable to get your location. Please enable location access.");
-                        }
-                      );
+                          console.error("Error getting location:", err)
+                          alert("Unable to get your location. Please enable location access.")
+                        },
+                      )
                     } else {
-                      setLat(null);
-                      setLng(null);
+                      setLat(null)
+                      setLng(null)
                     }
                   }}
                   className="space-y-3"
@@ -152,11 +218,17 @@ export function Filters({
         <Separator />
 
         <div className="pt-2">
-          <Button variant="outline" onClick={clearFilters}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              clearFilters()
+              if (!setCategory) setInternalCategory("all")
+            }}
+          >
             Clear All Filters
           </Button>
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }

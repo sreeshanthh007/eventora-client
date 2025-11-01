@@ -1,31 +1,58 @@
-import type React from "react"
-import { useCallback, useMemo, useRef, useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/pages/ui/card"
-import { Input } from "@/components/pages/ui/input"
-import { Textarea } from "@/components/pages/ui/textarea"
-import { Button } from "@/components/pages/ui/button"
-import { Badge } from "@/components/pages/ui/badge"
-import { X, ImagePlus, Upload } from "lucide-react"
-import { useFormik } from "formik"
-import { workSampleSchema } from "@/utils/validations/work-sample.validator"
-import { UseGetWorksampleData } from "@/hooks/vendor/UseGetWorksampleData"
+import type React from "react";
+import { useCallback, useMemo, useRef, useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/pages/ui/card";
+import { Input } from "@/components/pages/ui/input";
+import { Textarea } from "@/components/pages/ui/textarea";
+import { Button } from "@/components/pages/ui/button";
+import { Badge } from "@/components/pages/ui/badge";
+import { X, ImagePlus, Upload } from "lucide-react";
+import { useFormik } from "formik";
+import { workSampleSchema } from "@/utils/validations/work-sample.validator";
+import { UseGetWorksampleData } from "@/hooks/vendor/worksample/UseGetWorksampleData";
+import { getCloudinaryImageUrl } from "@/utils/helpers/GetCloudinaryImage";
 
 type ImageItem = {
-  id: string
-  file: File
-  url: string
-}
+  id: string;
+  file?: File; 
+  url: string;
+};
 
 type WorkSampleFormProps = {
-  onSubmit: (values: { title: string; description: string; images: File[] }) => void
-}
+  onSubmit: (values: { title: string; description: string; images: File[] }) => void;
+  editSubmit: (worksampleId:string,values: { title: string; description: string; images:  (string | File)[]; }) => void;
+};
 
-export function WorkSampleForm({ onSubmit }: WorkSampleFormProps) {
-  const [images, setImages] = useState<ImageItem[]>([])
-  const inputRef = useRef<HTMLInputElement | null>(null)
+export function WorkSampleForm({ onSubmit,editSubmit }: WorkSampleFormProps) {
+  const [images, setImages] = useState<ImageItem[]>([]);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const {data,error,isLoading} = UseGetWorksampleData();
+  const { data,  isLoading } = UseGetWorksampleData();
+
+  const worksample = data?.data
+
+
+
   
+  useEffect(() => {
+    if (data) {
+     
+      formik.setValues({
+        title: worksample.title || "",
+        description: worksample.description || "",
+      });
+
+      if (worksample.images) {
+        const fetchedImages: ImageItem[] = worksample.images.map((publicId: string) => ({
+          id: publicId,
+          url: getCloudinaryImageUrl(publicId),
+        }));
+        setImages(fetchedImages);
+      }
+    }
+  }, [data]);
+
+  
+  const isEditing = worksample  ? true : false
 
   const formik = useFormik({
     initialValues: {
@@ -34,63 +61,82 @@ export function WorkSampleForm({ onSubmit }: WorkSampleFormProps) {
     },
     validationSchema: workSampleSchema,
     onSubmit: (values) => {
-      handleSubmit(values)
+      
+    isEditing==true ?  handleEditSubmit(values) : handleSubmit(values) 
     },
-  })
+  });
 
   const onFilesSelected = useCallback((files: FileList | null) => {
-    if (!files) return
-    const newItems: ImageItem[] = []
+    if (!files) return;
+    const newItems: ImageItem[] = [];
     Array.from(files).forEach((file) => {
-      if (!file.type.startsWith("image/")) return
-      const url = URL.createObjectURL(file)
+      if (!file.type.startsWith("image/")) return;
+      const url = URL.createObjectURL(file);
       newItems.push({
         id: `${file.name}-${file.size}-${file.lastModified}-${crypto.randomUUID()}`,
         file,
         url,
-      })
-    })
-    setImages((prev) => [...prev, ...newItems])
-    if (inputRef.current) inputRef.current.value = ""
-  }, [])
+      });
+    });
+    setImages((prev) => [...prev, ...newItems]);
+    if (inputRef.current) inputRef.current.value = "";
+  }, []);
 
   const removeImage = useCallback((id: string) => {
     setImages((prev) => {
-      const removing = prev.find((i) => i.id === id)
-      if (removing) URL.revokeObjectURL(removing.url)
-      return prev.filter((i) => i.id !== id)
-    })
-  }, [])
+      const removing = prev.find((i) => i.id === id);
+      if (removing && removing.file) URL.revokeObjectURL(removing.url);
+      return prev.filter((i) => i.id !== id);
+    });
+  }, []);
 
   const handleDrop = useCallback(
     (e: React.DragEvent<HTMLDivElement>) => {
-      e.preventDefault()
-      e.stopPropagation()
-      onFilesSelected(e.dataTransfer.files)
+      e.preventDefault();
+      e.stopPropagation();
+      onFilesSelected(e.dataTransfer.files);
     },
     [onFilesSelected],
-  )
+  );
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
-  }, [])
+    e.preventDefault();
+    e.stopPropagation();
+  }, []);
 
-  const previewCount = useMemo(() => images.length, [images])
+  const previewCount = useMemo(() => images.length, [images]);
 
   const handleSubmit = (values: { title: string; description: string }) => {
 
-    onSubmit({ ...values, images: images.map(img => img.file) })
-    formik.resetForm()
-    images.forEach((i) => URL.revokeObjectURL(i.url))
-    setImages([])
+    const uploadedImages = images.filter((img) => img.file).map((img) => img.file!);
+    onSubmit({ ...values, images: uploadedImages });
+  };
+
+  const handleEditSubmit = (values:{title:string,description:string})=>{
+    
+  const newImages = images.filter((img) => img.file).map((img) => img.file!);
+
+
+  const existingImages = images.filter((img) => !img.file).map((img) => img.id); 
+
+
+  editSubmit(worksample._id, {
+    ...values,
+    images: [...existingImages, ...newImages],
+  });
   }
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+ 
 
   return (
     <div className="grid grid-cols-1 gap-6">
       <Card className="border">
         <CardHeader>
-          <CardTitle className="text-lg">Add Work Sample</CardTitle>
+          <CardTitle className="text-lg">Work Sample</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <form className="space-y-4" onSubmit={formik.handleSubmit}>
@@ -192,13 +238,17 @@ export function WorkSampleForm({ onSubmit }: WorkSampleFormProps) {
               )}
             </div>
             <div className="pt-2">
-              <Button type="submit" className="w-full md:w-auto" disabled={formik.isSubmitting}>
+             { worksample?.length > 0 ?
+             <Button type="submit" className="w-full md:w-auto" disabled={formik.isSubmitting}>
                 Save Work Sample
-              </Button>
+              </Button> 
+           :  <Button type="submit"   className="w-full md:w-auto bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4" disabled={formik.isSubmitting}>
+                Edit Work Sample
+              </Button> }
             </div>
           </form>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

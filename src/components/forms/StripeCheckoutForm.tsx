@@ -5,22 +5,27 @@ import { CLIENT_ROUTES } from "@/utils/constants/api.routes"
 import { axiosInstance } from "@/api/interceptor"
 import { useToast } from "@/hooks/ui/UseToaster"
 
+interface TicketItem {
+  ticketType: string
+  pricePerTicket: number
+  quantity: number
+}
+
 interface CheckoutFormProps {
   eventId: string
   purchaseData: {
     email: string
     name: string
-    ticketType: string
-    quantity: number
-    amount: number
-    currency: string 
+    tickets: TicketItem[]
+    totalAmount: number
+    currency: string
   }
   onClose: () => void
 }
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISH_KEY)
 const CheckoutFormInner: React.FC<CheckoutFormProps> = ({ eventId, purchaseData, onClose }) => {
-  console.log("CheckoutForm purchaseData:", purchaseData)
+  console.log("checkout data",purchaseData)
   const {showToast} = useToast()
   const stripe = useStripe()
   const elements = useElements()
@@ -33,12 +38,24 @@ const CheckoutFormInner: React.FC<CheckoutFormProps> = ({ eventId, purchaseData,
     setLoading(true)
 
     try {
+   
+      const selectedTickets = purchaseData.tickets.filter(t => t.quantity > 0)
+
+      if (selectedTickets.length === 0) {
+        showToast("No tickets selected", "error")
+        setLoading(false)
+        return
+      }
+
       const res = await axiosInstance.post(CLIENT_ROUTES.CREATE_BOOKING, {
         eventId,
-        ticketType: purchaseData.ticketType,
-        amount: purchaseData.amount,
+        tickets: selectedTickets.map(t => ({
+          ticketType: t.ticketType,
+          quantity: t.quantity,
+          pricePerTicket: t.pricePerTicket
+        })),
+        amount: purchaseData.totalAmount,
         currency: purchaseData.currency,
-        quantity: purchaseData.quantity,
       })
 
       const clientSecret = res.data.clientSecret
@@ -51,22 +68,24 @@ const CheckoutFormInner: React.FC<CheckoutFormProps> = ({ eventId, purchaseData,
             email: purchaseData.email,
           },
         },
+        receipt_email: purchaseData.email,
       })
 
       if (result.error) {
         console.log("result error",result.error)
-        alert(result.error.message)
+        showToast(result.error.message || "Payment failed", "error")
       } else if (result.paymentIntent?.status === "succeeded") {
-        showToast("payment Successfull","success")
+        showToast("Payment Successful", "success")
         onClose()
       }
     } catch (err: any) {
       console.error("Payment error:", err)
       if(err.response?.data?.message){
-        showToast(err.response?.data?.message,"error");
+        showToast(err.response?.data?.message, "error");
        onClose()
+      } else {
+        showToast(err.message || "An error occurred during payment", "error")
       }
-      showToast(err.message,"error")
     }
 
     setLoading(false)
@@ -80,7 +99,7 @@ const CheckoutFormInner: React.FC<CheckoutFormProps> = ({ eventId, purchaseData,
         disabled={!stripe || loading}
         className="w-full bg-accent hover:bg-accent/90 text-accent-foreground py-2 rounded"
       >
-        {loading ? "Processing..." : `Pay ${purchaseData.currency} ${purchaseData.amount}`}
+        {loading ? "Processing..." : `Pay ${purchaseData.currency} ${purchaseData.totalAmount}`}
       </button>
     </form>
   )

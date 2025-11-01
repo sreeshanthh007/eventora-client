@@ -33,7 +33,7 @@ export const uploadImageToCloudinarySigned = async (
 
     const uploadUrl = `https://api.cloudinary.com/v1_1/${sigData.cloudName}/image/upload`;
       
-    console.log("Uploading to:", uploadUrl);
+  
 
 
     const response = await fetch(uploadUrl, {

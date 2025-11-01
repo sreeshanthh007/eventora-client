@@ -5,9 +5,10 @@
 @tailwind utilities;
 
 @layer base {
-  body {
-    @apply font-serif bg-background text-dark;
-  }
+body {
+  @apply font-sans bg-background text-dark;
+}
+
 
   :root {
     --background: 0 0% 100%;

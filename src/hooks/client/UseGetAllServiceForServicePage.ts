@@ -9,11 +9,13 @@ interface IGetAllServiceParams {
     limit:number
     search:string
     sort:string
+    categoryId:string
 }
-export const UseGetAllServiceForServicePage = ({page,limit,search,sort} : IGetAllServiceParams) =>{
+export const UseGetAllServiceForServicePage = ({page,limit,search,sort,categoryId} : IGetAllServiceParams) =>{
 
     return useQuery({
-        queryKey:["service-for-servicePage",page,limit,search,sort],
-        queryFn:()=>getAllServiceForServicePage({page,limit,search,sort})
+        queryKey:["service-for-servicePage",page,limit,search,sort,categoryId],
+        queryFn:()=>getAllServiceForServicePage({page,limit,search,sort,categoryId}),
+        staleTime: 1 * 60 * 1000,
     });
 }

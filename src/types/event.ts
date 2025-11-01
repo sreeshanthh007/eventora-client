@@ -12,6 +12,7 @@ export interface Event {
   title: string;
   status: string;          
   pricePerTicket: number;
+  qrCode:string;
   totalTicket: number;
   isActive: boolean;
   eventSchedule: EventSchedule[]; 

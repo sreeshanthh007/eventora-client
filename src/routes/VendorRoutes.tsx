@@ -4,7 +4,7 @@ import { VendorRegisterPage } from "@/components/pages/vendor/VendorRegisterPage
 import { VendorLoginPage } from "@/components/pages/vendor/VendorLoginPage";
 import VendorEntryPage from "@/components/vendor/VendorEntryPage";
 
-import { VendorProtectedRoute } from "@/protected/ProtectedRoute";
+import { ProtectedScanRoute, VendorProtectedRoute } from "@/protected/ProtectedRoute";
 import {VendorPublicRoute} from "@/protected/PublicRoute";
 import VendorProfilePage from "@/components/vendor/VendorProfilePage";
 import ListedEventsPage from "@/components/pages/vendor/ListedEventsPage";
@@ -16,6 +16,9 @@ import EditEventPage from "@/components/pages/vendor/EditEventPage";
 import { VendorDashboard } from "@/components/pages/vendor/VendorDashboard";
 import VendorChangePasswordPage from "@/components/vendor/VendorChangePasswordPage";
 import WorkSamplePage from "@/components/pages/vendor/WorkSamplePage";
+import VendorWalletPage from "@/components/pages/vendor/VendorWalletPage";
+import VendorBookedServicesPage from "@/components/pages/vendor/VendorBookedServicePage";
+import VerifyAttendiesPage from "@/components/pages/vendor/VerifyAttendiesPage";
 
 
 
@@ -42,6 +45,12 @@ export const VendorRoutes = () => {
       <Route path="/dashboard" element={<VendorDashboard/>}/>
       <Route path="/change-password" element={<VendorChangePasswordPage/>}/>
       <Route path="/work-sample" element={<WorkSamplePage/>}/>
+      <Route path="/wallet-details" element={<VendorWalletPage/>}/>
+      <Route path="/booked-services" element={<VendorBookedServicesPage/>}/>
+      </Route>
+
+        <Route element={<ProtectedScanRoute />}>
+      <Route path="/verify-attendies" element={<VerifyAttendiesPage />} />
       </Route>
     </Routes>
   );

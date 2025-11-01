@@ -176,3 +176,17 @@ export const rejectVendor = async ({ vendorId, rejectReason }:{vendorId:string,r
   return response.data;
 };
 
+
+export const getAdminWalletDetails = async()=>{
+  const response = await axiosInstance.get(ADMIN_ROUTES.GET_ADMIN_WALLET_DETAILS);
+  return response.data
+}
+
+
+export const getAdminNotification = async()=>{
+  const response = await axiosInstance.get(
+    ADMIN_ROUTES.GET_ADMIN_NOTIFICATION
+  );
+
+  return response.data
+}

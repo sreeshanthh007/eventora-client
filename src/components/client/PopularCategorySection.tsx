@@ -9,7 +9,7 @@ export const PopularCategorySection : React.FC = () => {
     <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-black mb-4">Popular Categories</h2>
+            <h2 className="text-3xl font-serif   text-black mb-4">Popular Categories</h2>
             <div className="w-24 h-1 bg-black mx-auto"></div>
           </div>
 

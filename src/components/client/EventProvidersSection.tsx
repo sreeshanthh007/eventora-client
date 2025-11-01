@@ -85,7 +85,7 @@ export const EventProvidersSection: React.FC = () => {
     <section className="py-20 bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl mb-6 text-gray-900">
+          <h2 className="text-4xl md:text-5xl mb-6 text-gray-900 font-serif">
             Our Event Providers
           </h2>
           <div className="w-24 h-1 bg-blue-600 mx-auto rounded-full"></div>

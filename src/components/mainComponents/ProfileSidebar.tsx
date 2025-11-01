@@ -1,7 +1,7 @@
-
 import { User, Ticket, Bell, CreditCard, HelpCircle, LogOut, MessageCircle, Handshake, Lock } from "lucide-react"
 import { Card } from "@/components/pages/ui/card"
 import { Button } from "@/components/pages/ui/button"
+import { Link } from "react-router-dom" // Add this import
 import { UseLogout } from "@/hooks/auth/Uselogout"
 import { logOutClient } from "@/services/auth/authServices"
 import { clientLogout } from "@/store/slices/clientSlice"
@@ -12,79 +12,77 @@ const menuItems = [
   {
     icon: User,
     label: "My Profile",
-    href: "/profile",
+    to: "/profile", 
     active: true,
     description: "Personal information",
   },
   {
     icon: Ticket,
     label: "My Events",
-    href: "/booked-events",
+    to: "/booked-events", 
     active: false,
     description: "Upcoming and past events",
   },
   {
-    icon:MessageCircle,
+    icon: MessageCircle,
     label: "Chats",
-    href: "/events",
+    to: "/events", 
     active: false,
     description: "Chat with Vendors",
   },
   {
-    icon:Handshake,
+    icon: Handshake,
     label: "Services",
-    href: "/booked-services",
+    to: "/booked-services", 
     active: false,
     description: "View your booked services",
   },
   {
     icon: Bell,
     label: "Notifications",
-    href: "/notifications",
+    to: "/notifications", 
     active: false,
     description: "Alerts and updates",
   },
   {
     icon: CreditCard,
     label: "Wallet",
-    href: "/wallet",
+    to: "/client/wallet", 
     active: false,
     description: "Wallet details and history",
   },
   {
     icon: Lock,
     label: "Change Password",
-    href: "/change-password",
+    to: "/change-password", 
     active: false,
     description: "change your password",
   },
-
   {
-    icon:LogOut,
-    label:"Log out",
-    active:false,
-    description:"click to log out"
+    icon: LogOut,
+    label: "Log out",
+    active: false,
+    description: "click to log out"
   }
 ]
 
-
 export function ProfileSidebar() {
-
-
-   const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch()
   const { mutate: logoutReq } = UseLogout(logOutClient)
-  const {showToast} =  useToast()
+  const { showToast } = useToast()
+  
   const handleLogout = () => {
     logoutReq(undefined, {
       onSuccess: (data) => {
         dispatch(clientLogout())
-        showToast(data.message,"success")
+        showToast(data.message, "success")
       },
       onError: (err: any) => {
-       showToast(err.response?.data?.message,"error")
+        showToast(err.response?.data?.message, "error")
       }
     })
   }
+
   return (
     <div className="space-y-4">
       {/* Main Navigation */}
@@ -94,54 +92,93 @@ export function ProfileSidebar() {
           Account
         </h3>
         <nav className="space-y-1">
-          {menuItems.map((item, index) => (
-            <a
-              key={index}
-              href={item.href}
-              className={`
-                flex items-start gap-3 p-3 rounded-lg transition-all duration-200 group
-                ${
-                  item.active
-                    ? "bg-blue-50 text-blue-700 border border-blue-200"
-                    : "hover:bg-gray-50 text-gray-700 hover:text-gray-900"
-                }
-              `}
-            >
-              <item.icon
-                className={`
-                h-5 w-5 mt-0.5 transition-colors
-                ${item.active ? "text-blue-600" : "text-gray-500 group-hover:text-gray-700"}
-              `}
-              />
-              <div className="flex-1 min-w-0">
-                <p
+          {menuItems.map((item, index) => {
+            // Check if it's the logout item (no 'to' property)
+            if (item.label === "Log out") {
+              return (
+                <button
+                  key={index}
+                  onClick={handleLogout}
                   className={`
-                  font-medium text-sm
-                  ${item.active ? "text-blue-900" : "text-gray-900"}
-                `}
+                    flex items-start gap-3 p-3 rounded-lg transition-all duration-200 group w-full text-left
+                    ${
+                      item.active
+                        ? "bg-blue-50 text-blue-700 border border-blue-200"
+                        : "hover:bg-gray-50 text-gray-700 hover:text-gray-900"
+                    }
+                  `}
                 >
-                  {item.label === "Log out" ? (
-                  <button onClick={handleLogout}>{item.label}</button>
-                ) : (
-              item.label
-                 )}
+                  <item.icon
+                    className={`
+                      h-5 w-5 mt-0.5 transition-colors
+                      ${item.active ? "text-blue-600" : "text-gray-500 group-hover:text-gray-700"}
+                    `}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p
+                      className={`
+                        font-medium text-sm
+                        ${item.active ? "text-blue-900" : "text-gray-900"}
+                      `}
+                    >
+                      {item.label}
+                    </p>
+                    <p
+                      className={`
+                        text-xs mt-0.5
+                        ${item.active ? "text-blue-600" : "text-gray-500"}
+                      `}
+                    >
+                      {item.description}
+                    </p>
+                  </div>
+                </button>
+              )
+            }
 
-                </p>
-                <p
-                  className={`
-                  text-xs mt-0.5
-                  ${item.active ? "text-blue-600" : "text-gray-500"}
+            // Regular navigation items with Link
+            return (
+              <Link
+                key={index}
+                to={item.to}
+                className={`
+                  flex items-start gap-3 p-3 rounded-lg transition-all duration-200 group block
+                  ${
+                    item.active
+                      ? "bg-blue-50 text-blue-700 border border-blue-200"
+                      : "hover:bg-gray-50 text-gray-700 hover:text-gray-900"
+                  }
                 `}
-                >
-                  {item.description}
-                </p>
-              </div>
-            </a>
-          ))}
+              >
+                <item.icon
+                  className={`
+                    h-5 w-5 mt-0.5 transition-colors
+                    ${item.active ? "text-blue-600" : "text-gray-500 group-hover:text-gray-700"}
+                  `}
+                />
+                <div className="flex-1 min-w-0">
+                  <p
+                    className={`
+                      font-medium text-sm
+                      ${item.active ? "text-blue-900" : "text-gray-900"}
+                    `}
+                  >
+                    {item.label}
+                  </p>
+                  <p
+                    className={`
+                      text-xs mt-0.5
+                      ${item.active ? "text-blue-600" : "text-gray-500"}
+                    `}
+                  >
+                    {item.description}
+                  </p>
+                </div>
+              </Link>
+            )
+          })}
         </nav>
       </Card>
-
-  
 
       {/* Support */}
       <Card className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">

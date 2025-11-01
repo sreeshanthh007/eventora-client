@@ -1,21 +1,20 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/pages/ui/card";
-import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/pages/ui/table";
-import { Pagination } from "@/components/common/paginations/Pagination";
-import { EventTableRow } from "./EventTableRow";
-import type { Event, EventStatus } from "@/types/event";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/pages/ui/card"
+import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/pages/ui/table"
+import { Pagination } from "@/components/common/paginations/Pagination"
+import { EventTableRow } from "./EventTableRow"
+import type { Event, EventStatus } from "@/types/event"
 
 interface EventsTableProps {
-  events: Event[];
-  isLoading: boolean;
-  searchTerm: string;
-  currentPage: number;
-  totalPages: number;
-  onToggleStatus: (eventId: string, currentStatus: boolean) => void;
-  onStatusChange: (eventId: string, status: EventStatus) => void;
-  onEdit: (eventId: string) => void;
-  onPageChange: (page: number) => void;
+  events: Event[]
+  isLoading: boolean
+  searchTerm: string
+  currentPage: number
+  totalPages: number
+  onToggleStatus: (eventId: string, currentStatus: boolean) => void
+  onStatusChange: (eventId: string, status: EventStatus) => void
+  onEdit: (eventId: string) => void
+  onPageChange: (page: number) => void
 }
-
 export function EventsTable({
   events,
   isLoading,
@@ -40,7 +39,7 @@ export function EventsTable({
           </div>
         </CardContent>
       </Card>
-    );
+    )
   }
 
   if (events.length === 0) {
@@ -57,11 +56,11 @@ export function EventsTable({
           </div>
         </CardContent>
       </Card>
-    );
+    )
   }
 
   return (
-    <Card>
+<Card>
       <CardHeader>
         <CardTitle>Your Events</CardTitle>
       </CardHeader>
@@ -77,6 +76,7 @@ export function EventsTable({
                 <TableHead>Total Tickets</TableHead>
                 <TableHead>Active Status</TableHead>
                 <TableHead>Event Status</TableHead>
+                <TableHead>Track Attendees</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -94,14 +94,8 @@ export function EventsTable({
             </TableBody>
           </Table>
         </div>
-        {totalPages > 1 && (
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={onPageChange}
-          />
-        )}
+        {totalPages > 1 && <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={onPageChange} />}
       </CardContent>
     </Card>
-  );
+  )
 }

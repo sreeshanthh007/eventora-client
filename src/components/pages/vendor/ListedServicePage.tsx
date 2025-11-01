@@ -11,13 +11,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/pages/ui/dropdown-menu";
-import { Edit, MoreHorizontal, Plus, Search, Shield, ShieldOff, Loader2, Workflow } from "lucide-react";
+import { Edit, MoreHorizontal, Plus, Search, Shield, ShieldOff, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { UseGeAllService } from "@/hooks/vendor/UseGetServices";
+import { UseGeAllService } from "@/hooks/vendor/service/UseGetServices";
 import { useDebounce } from "@/hooks/services/UseDebounce";
 import { useToast } from "@/hooks/ui/UseToaster";
 import { Pagination } from "@/components/common/paginations/Pagination";
-import { useToggleServiceMutation } from "@/hooks/vendor/UseToggleServices";
+import { useToggleServiceMutation } from "@/hooks/vendor/service/UseToggleServices";
 import {
   Dialog,
   DialogContent,
@@ -87,7 +87,7 @@ export default function ListedServicePage() {
     setCurrentPage(1);
   }, [debouncedSearchTerm]);
 
-  const totalPages = data?.total ? Math.ceil(data.total / limit) : 1;
+  const totalPages = data?.total 
 
   const handleStatusToggle = (service: Service) => {
     const action = service.status === "active" ? "block" : "unblock";

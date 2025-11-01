@@ -2,7 +2,7 @@ import { VendorLayout } from "@/components/layouts/VendorLayout"
 import { AddEventForm } from "@/components/forms/AddEventForm"
 import { uploadImageToCloudinarySigned } from "@/services/cloudinary/cloudinary"
 import { useToast } from "@/hooks/ui/UseToaster"
-import { useAddEventMutation } from "@/hooks/vendor/UseAddEvent"
+import { useAddEventMutation } from "@/hooks/vendor/event/UseAddEvent"
 
 
 export default function HostEventPage() {
@@ -18,7 +18,6 @@ export default function HostEventPage() {
       if (data.Images?.length > 0) {
   for (let file of data.Images) {
     const url = await uploadImageToCloudinarySigned(file, "event-images");
-    console.log("tje uslr after ",url)
     if (url) { 
       uploadImageUrl.push(url);
     } else {
@@ -26,7 +25,7 @@ export default function HostEventPage() {
     }
   }
 }
-
+      
         const processedData = {
           ...data,
           Images:uploadImageUrl,

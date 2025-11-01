@@ -1,4 +1,4 @@
-import { Calendar, Home, Settings, User, LogOut, UserCheck, ChartAreaIcon, Lock } from "lucide-react"
+import { Calendar, Home, Settings, User, LogOut, UserCheck, ChartAreaIcon, Lock, Wallet, Notebook } from "lucide-react"
 import {useSelector } from "react-redux"
 import { UseLogout } from "@/hooks/auth/Uselogout"
 import { VendorLogout } from "@/services/auth/authServices"
@@ -21,7 +21,7 @@ import { Button } from "@/components/pages/ui/button"
 import { Link } from "react-router-dom"
 import { useAppDispatch, type RootState } from "@/store/store"
 import { useState } from "react"
-import { useResendVerificationMutation } from "@/hooks/vendor/UseResendVerification"
+import { useResendVerificationMutation } from "@/hooks/vendor/auth/UseResendVerification"
 
 const items = [
   {
@@ -47,6 +47,16 @@ const items = [
     title: "Services",
     url: "/vendor/services",
     icon: Settings,
+  },
+  {
+    title: "Wallet",
+    url: "/vendor/wallet-details",
+    icon: Wallet,
+  },
+  {
+    title: "Booked Services",
+    url: "/vendor/booked-services",
+    icon: Notebook,
   },
 
   {
@@ -135,8 +145,8 @@ export function VendorSidebar() {
             </Button>
 
             <div className="text-center text-sm text-muted-foreground">
-              <p className="font-semibold text-foreground mb-1">Vendor</p>
-              <p>© 2024 All rights reserved</p>
+              <p className="font-semibold text-foreground mb-1">Vendor Portal</p>
+              <p>© 2025 All rights reserved</p>
               <p className="mt-2">Making events memorable</p>
             </div>
           </div>

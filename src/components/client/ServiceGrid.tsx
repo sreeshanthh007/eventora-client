@@ -69,7 +69,7 @@ export function ServicesGrid({ services, currentPage, totalPages, onPageChange }
                 className="w-full mt-4 font-semibold group-hover:bg-primary/90 transition-colors"
                 onClick={() => console.log(`Booking service: ${service.serviceTitle}`)}
               >
-                Book Service
+                View Service
               </Button>
               
               </Link>

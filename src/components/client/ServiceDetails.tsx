@@ -1,6 +1,4 @@
-"use client";
 import { useFormik } from "formik";
-import * as Yup from "yup";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/pages/ui/card";
 import { Button } from "@/components/pages/ui/button";
 import { Input } from "@/components/pages/ui/input";
@@ -12,6 +10,7 @@ import { Separator } from "@/components/pages/ui/separator";
 import { CalendarIcon, Clock, IndianRupee, Award } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { BookServiceSchema } from "@/utils/validations/bookServiceValidator";
 
 interface Service {
   _id: string;
@@ -38,7 +37,7 @@ interface ServiceDetailsProps {
 }
 
 export function ServiceDetails({ service, onBookService }: ServiceDetailsProps) {
-  console.log("service is", service);
+
 
   const formik = useFormik({
     initialValues: {
@@ -48,17 +47,7 @@ export function ServiceDetails({ service, onBookService }: ServiceDetailsProps) 
       date: undefined as Date | undefined,
       message: "",
     },
-    validationSchema: Yup.object({
-      name: Yup.string().required("Full name is required"),
-      email: Yup.string().email("Invalid email address").required("Email is required"),
-      phone: Yup.string()
-        .matches(/^\d{10}$/, "Phone number must be 10 digits")
-        .required("Phone number is required"),
-      date: Yup.date()
-        .min(new Date(new Date().setHours(0, 0, 0, 0)), "Date must be today or later")
-        .required("Service date is required"),
-      message: Yup.string(),
-    }),
+    validationSchema: BookServiceSchema,
     onSubmit: (values) => {
       onBookService({
         serviceId: service._id,
@@ -75,7 +64,6 @@ export function ServiceDetails({ service, onBookService }: ServiceDetailsProps) 
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
         <div className="space-y-6">
-          {/* Service Details */}
           <Card className="shadow-lg">
             <CardHeader>
               <CardTitle className="text-2xl text-gray-900 mb-2">{service.serviceTitle}</CardTitle>

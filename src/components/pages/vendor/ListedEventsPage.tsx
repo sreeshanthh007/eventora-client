@@ -3,7 +3,7 @@ import { CheckVerifiedModal } from "@/components/modals/CheckVerifiedModal";
 import { EventsHeader } from "@/components/vendor/events/EventsHeader";
 import { EventsSearchBar } from "@/components/vendor/events/EventSearchBar";
 import { EventsTable } from "@/components/vendor/events/EventTable";
-import { useEventsPage } from "@/hooks/vendor/UseEventsPage";
+import { useEventsPage } from "@/hooks/vendor/event/UseEventsPage";
 
 export default function ListedEventsPage() {
   const {
@@ -45,6 +45,7 @@ export default function ListedEventsPage() {
           onStatusChange={handleStatusChange}
           onEdit={handleEdit}
           onPageChange={handlePageChange}
+          
         />
       </div>
 

@@ -9,6 +9,7 @@ import { AdminPublicRoute } from "@/protected/PublicRoute";
 import CategoryManagementPage from "@/components/pages/admin/managementPages/CategoryManagementPage";
 import { AddCategoryPage } from "@/components/pages/admin/AddCategoryPage";
 import RequestedVendorsPage from "@/components/pages/admin/managementPages/VendorRequestManagementPage";
+import AdminWalletDetailsPage from "@/components/pages/admin/AdminWalletPage";
 
 
 const AdminDashboard = lazy(() => import("@/components/admin/Admindashboard"));
@@ -70,9 +71,13 @@ export const AdminRoutes = () => {
         <RequestedVendorsPage/>
       </Suspense>
     }
-
-
     />
+
+       <Route path="/wallet-details" element={
+      <Suspense fallback={<Spinner/>}>
+        <AdminWalletDetailsPage/>
+      </Suspense>
+    }/>
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

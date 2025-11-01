@@ -6,9 +6,9 @@ import { ArrowLeft, Loader2 } from "lucide-react"
 import { Button } from "@/components/pages/ui/button"
 
 import { Link, useNavigate, useParams } from "react-router-dom"
-import { UseGetServiceById } from "@/hooks/vendor/UseGetserviceById"
+import { UseGetServiceById } from "@/hooks/vendor/service/UseGetserviceById"
 import { useToast } from "@/hooks/ui/UseToaster"
-import { useEditServiceMutation } from "@/hooks/vendor/UseEditService"
+import { useEditServiceMutation } from "@/hooks/vendor/service/UseEditService"
 
 export default function EditServicePage() {
   const { serviceId } = useParams<{ serviceId: string }>()
@@ -38,6 +38,7 @@ export default function EditServicePage() {
     try {
    
 
+      console.log("eited esrvicce",data)
       await editService({serviceId:serviceId,data:data})
 
       navigate("/vendor/services")

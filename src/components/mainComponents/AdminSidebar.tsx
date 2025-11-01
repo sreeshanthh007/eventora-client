@@ -1,7 +1,6 @@
-"use client"
 
 import type * as React from "react"
-import { BarChart3, Building2, Home, Calendar, Settings, Tag, Users, Wallet } from "lucide-react"
+import { BarChart3, Building2, Home, Calendar, Settings, Tag, Users, Wallet, Bell } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -14,8 +13,8 @@ import {
   SidebarGroupLabel,
   SidebarGroupContent,
   SidebarRail,
-} from "@/components/pages/ui/sidebar" // Adjusted import path
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/pages/ui/avatar" // Adjusted import path
+} from "@/components/pages/ui/sidebar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/pages/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from "@/components/pages/ui/dropdown-menu" 
 import { Link, useLocation } from "react-router-dom" 
 import { useDispatch, useSelector } from "react-redux"
@@ -24,6 +23,8 @@ import { AdminLogout } from "@/services/auth/authServices"
 import { UseLogout } from "@/hooks/auth/Uselogout"
 import { useToast } from "@/hooks/ui/UseToaster"
 import { adminLogout } from "@/store/slices/adminSlice"
+import { AdminNotificationPopover } from "../common/card/AdminNotificationPopOver"
+import { useState } from "react"
 
 // Menu items
 const navData = {
@@ -45,58 +46,45 @@ const navData = {
     },
     {
       title: "Category",
-      url: "/admin/category", // Updated URL to match the new page
+      url: "/admin/category",
       icon: Tag,
     },
-    // {
-    //   title: "Events",
-    //   url: "/admin/events",
-    //   icon: Calendar,
-    // },
-    // {
-    //   title: "Analytics",
-    //   url: "#",
-    //   icon: BarChart3,
-    // },
-    // {
-    //   title: "Payments",
-    //   url: "#",
-    //   icon: Wallet,
-    // },
-    // {
-    //   title: "Settings",
-    //   url: "#",
-    //   icon: Settings,
-    // },
+    {
+      title: "Wallet",
+      url: "/admin/wallet-details",
+      icon: Wallet,
+    },
+    {
+      title: "Notifications",
+      url: "#", // Changed to # since it's now a popover trigger
+      icon: Bell,
+      isNotification: true, // Flag to identify notification item
+    },
   ],
 }
 
-interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-  // currentPath is now derived internally from useLocation
-}
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {}
 
 export function AppSidebar({ ...props }: AppSidebarProps) {
   const location = useLocation() 
   const currentPath = location.pathname
-const {showToast} =  useToast()
-
+  const { showToast } = useToast()
+  const [notificationOpen, setNotificationOpen] = useState(false)
 
   const dispatch = useDispatch()
-  const admin = useSelector((state:RootState)=>state.admin.admin)
-  const {mutate:logoutReq} = UseLogout(AdminLogout)
+  const admin = useSelector((state: RootState) => state.admin.admin)
+  const { mutate: logoutReq } = UseLogout(AdminLogout)
 
-  const handleLogout = ()=>{
-    logoutReq(undefined,
-      {
-        onSuccess:(data)=>{
-          showToast(data.message,"success")
-          dispatch(adminLogout())
-        },
-        onError:(err:any)=>{
-          showToast(err.message,"error")
-        }
+  const handleLogout = () => {
+    logoutReq(undefined, {
+      onSuccess: (data) => {
+        showToast(data.message, "success")
+        dispatch(adminLogout())
+      },
+      onError: (err: any) => {
+        showToast(err.message, "error")
       }
-    )
+    })
   }
 
   return (
@@ -125,12 +113,22 @@ const {showToast} =  useToast()
             <SidebarMenu>
               {navData.navMain.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={currentPath === item.url}>
-                    <Link to={item.url} className="flex items-center gap-2">
+                  {item.isNotification ? (
+                    <SidebarMenuButton 
+                      onClick={() => setNotificationOpen(true)}
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
                       <item.icon className="size-4" />
                       <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
+                    </SidebarMenuButton>
+                  ) : (
+                    <SidebarMenuButton asChild isActive={currentPath === item.url}>
+                      <Link to={item.url} className="flex items-center gap-2">
+                        <item.icon className="size-4" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  )}
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
@@ -151,9 +149,9 @@ const {showToast} =  useToast()
                     <AvatarFallback className="rounded-lg">AD</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    {admin?.email &&
-                    <span className="truncate text-xs text-muted-foreground">{admin.email}</span>
-                    }
+                    {admin?.email && (
+                      <span className="truncate text-xs text-muted-foreground">{admin.email}</span>
+                    )}
                   </div>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
@@ -178,6 +176,12 @@ const {showToast} =  useToast()
         </SidebarMenu>
       </SidebarFooter>
       <SidebarRail />
+      
+      {/* Notification Popover - positioned outside sidebar but controlled by it */}
+      <AdminNotificationPopover 
+        open={notificationOpen} 
+        onOpenChange={setNotificationOpen} 
+      />
     </Sidebar>
   )
 }

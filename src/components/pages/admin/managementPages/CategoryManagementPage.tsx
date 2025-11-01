@@ -59,7 +59,7 @@ const CategoryManagementPage = () => {
     limit,
     search: debouncedSearchTerm,
   })
-  console.log("data for  category table",data)
+
   const { mutateAsync: updateCategoryStatus } = useUpdateCategoryMutation()
   const {mutateAsync:editCategory} = useEditCategoryMutation()
 

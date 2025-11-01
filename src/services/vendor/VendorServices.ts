@@ -8,6 +8,7 @@ import { VENDOR_ROUTES } from "@/utils/constants/api.routes";
 import type { IUpdateVendorPersonalInformation } from "@/types/vendor";
 import type { TEditableEventFields } from "@/types/event";
 import type { IWorkSampleData } from "@/types/workSamples";
+import { number } from "yup";
 
 
 
@@ -168,16 +169,29 @@ export const getservicesById = async(serviceId:string)=>{
   return response.data
 }
 
+export interface IServiceSchedule {
+  frequency: "ONCE" | "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY";
+  startDate: string;       // ISO string
+  endDate: string;         // ISO string
+  startTime: string;       // "HH:mm"
+  endTime: string;         // "HH:mm"
+  workingDays?: number[];  // 0 = Sun ... 6 = Sat
+  holidays?: string[];     // ISO strings
+  duration: number;        // minutes per slot
+  capacity: number;
+}
 
+// Editable service info
 export interface IEditServiceInformation {
-    serviceTitle:string;
-    serviceDescription:string
-    servicePrice:number
-    serviceDuration:number
-    additionalHourPrice:number
-    cancellationPolicies:string[]
-    termsAndConditions:string[]
-    yearsOfExperience:number
+  serviceTitle?: string;
+  serviceDescription?: string;
+  servicePrice?: number;
+  serviceDuration?: number;
+  additionalHourPrice?: number;
+  cancellationPolicies?: string[];
+  termsAndConditions?: string[];
+  yearsOfExperience?: number;
+  schedule?: IServiceSchedule[]; 
 }
 
 export const editService = async ({
@@ -189,7 +203,7 @@ export const editService = async ({
     "additionalHourPrice" | "cancellationPolicies" | 
     "serviceDescription"  | "serviceDuration" | 
     "servicePrice" | "serviceTitle" | 
-    "termsAndConditions" | "yearsOfExperience"
+    "termsAndConditions" | "yearsOfExperience" | "schedule"
   >>
 }) => {
   const response = await axiosInstance.patch(
@@ -249,3 +263,102 @@ export const getWorkSampleDetailsByVendors = async() : Promise<IWorkSampleRespon
 
   return response.data
 }
+
+
+export const getVendorNotification = async()=>{
+  const response = await axiosInstance.get(
+    VENDOR_ROUTES.GET_VENDOR_NOTIFICATION
+  );
+  return response.data
+}
+
+export const getVendorWalletDetails = async()=>{
+  const response = await axiosInstance.get(VENDOR_ROUTES.GET_VENDOR_WALLET_DETAILS);
+  return response.data
+}
+
+
+
+export interface IEditWorksample{
+  title:string
+  description:string
+  images:string[]
+}
+
+export type TEditableWorkSampleFields = Partial<Pick<IEditWorksample,"description" | "images" | "title">>
+
+
+export const editWorkSample = async ({
+  worksampleId,
+  data,
+}: {
+  worksampleId: string;
+  data: TEditableWorkSampleFields;
+}): Promise<IAxiosResponse> => {
+  const response = await axiosInstance.patch(
+    `${VENDOR_ROUTES.EDIT_WORK_SAMPLE(worksampleId)}`,
+    data
+  );
+  return response.data; 
+};
+
+
+
+export const scanAndVerifyAttendies = async(data:{vendorId:string,eventId:string})=>{
+
+  const response = await axiosInstance.post(VENDOR_ROUTES.SCAN_EVENT_QR,data)
+
+  return response.data
+}
+
+
+export const scanAndVerifyTicket = async(data:{eventId:string,ticketId:string,ticketType:string})=>{
+
+  const response = await axiosInstance.post(VENDOR_ROUTES.SCAN_AND_VERIFY_TICKET,data)
+
+  return response.data
+}
+
+
+export const getTicketDetails = async({
+  eventId,
+  page=1,
+  limit=6,
+  search=""
+}:{
+  eventId:string
+  page:number,
+  limit:number,
+  search:string
+}) =>{
+  const response = await axiosInstance.get(VENDOR_ROUTES.GET_TICKET_DETAILS,{
+    params:{
+      eventId,
+      page,
+      limit,
+      search
+    }
+  });
+
+  return response.data
+}
+
+
+export const getBookedServices = async({
+  page=1,
+  limit=6,
+  search=""
+} : {
+  page:number
+  limit:number
+  search:string
+}) =>{
+  const response = await axiosInstance.get(VENDOR_ROUTES.GET_BOOKINGS,{
+    params:{
+      page,
+      limit,
+      search
+    }
+  });
+  return response.data
+} 

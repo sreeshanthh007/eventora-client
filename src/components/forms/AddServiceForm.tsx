@@ -1,5 +1,3 @@
-
-
 import { Button } from "@/components/pages/ui/button"
 import { Input } from "@/components/pages/ui/input"
 import { Label } from "@/components/pages/ui/label"
@@ -10,18 +8,31 @@ import { Checkbox } from "@/components/pages/ui/checkbox"
 import { Badge } from "@/components/pages/ui/badge"
 import { Plus, X } from "lucide-react"
 import { useFormik } from "formik"
-import { useGetCategoriesForService } from "@/hooks/vendor/UseGetCategoryForService"
+import { useGetCategoriesForService } from "@/hooks/vendor/service/UseGetCategoryForService"
+import { ScheduleSlotConfig, type ScheduleSlotConfig as ScheduleSlotConfigType } from "./ScheduleSlotConfg"
+import { useState } from "react"
 
-export interface ServiceFormData {
+interface ServiceFormData {
   serviceTitle: string
-  yearsOfExperience: number | string
+  yearsOfExperience: number
   serviceDescription: string
-  servicePrice: number | string
-  additionalHourPrice: number | string
+  servicePrice: number
+  additionalHourPrice: number
   serviceDuration: number
   cancellationPolicies: string[]
   termsAndConditions: string[]
   categoryId: string
+  scheduleConfig: {
+    frequency: string
+    startDate: string
+    endDate: string
+    startTime: string
+    endTime: string
+    slotDuration: number
+    slotCapacity: number
+    workingDays: string[]
+    holidays: string[]
+  }
 }
 
 interface AddServiceFormProps {
@@ -33,6 +44,18 @@ interface AddServiceFormProps {
 export function AddServiceForm({ onSubmit, onCancel, isSubmitting = false }: AddServiceFormProps) {
   const { data: response, isLoading, isError, error } = useGetCategoriesForService()
   const categories = response?.data ? response.data : []
+
+  const [scheduleConfig, setScheduleConfig] = useState<ScheduleSlotConfigType>({
+    frequency: "once",
+    startDate: "",
+    endDate: "",
+    startTime: "",
+    endTime: "",
+    slotDuration: 30,
+    slotCapacity: 1,
+    workingDays: [],
+    holidays: [],
+  })
 
   const cancellationPolicyOptions = [
     {
@@ -73,7 +96,7 @@ export function AddServiceForm({ onSubmit, onCancel, isSubmitting = false }: Add
   ]
 
   const validateForm = (values: ServiceFormData) => {
-    const errors: any = {}
+    const errors: Partial<ServiceFormData> & { scheduleConfig?: string } = {}
 
     if (!values.serviceTitle) errors.serviceTitle = "Service title is required"
     if (!values.yearsOfExperience) errors.yearsOfExperience = "Years of experience is required"
@@ -84,34 +107,51 @@ export function AddServiceForm({ onSubmit, onCancel, isSubmitting = false }: Add
     if (values.cancellationPolicies.length === 0)
       errors.cancellationPolicies = "At least one cancellation policy must be selected"
 
+    // Schedule validation
+    const config = values.scheduleConfig
+    if (!config.startDate || !config.startTime || !config.endTime) {
+      errors.scheduleConfig = "Schedule start date, start time, and end time are required"
+    } else if (config.frequency !== "once" && !config.endDate) {
+      errors.scheduleConfig = "End date is required for recurring schedules"
+    
+    } else if ((config.frequency === "daily" || config.frequency === "weekly") && config.workingDays.length === 0) {
+      errors.scheduleConfig = "At least one working day must be selected for daily or weekly schedules"
+    }
+
     return errors
   }
 
   const formik = useFormik<ServiceFormData>({
     initialValues: {
       serviceTitle: "",
-      yearsOfExperience: "",
+      yearsOfExperience: 0,
       serviceDescription: "",
-      servicePrice: "",
-      additionalHourPrice: "",
+      servicePrice: 0,
+      additionalHourPrice: 0,
       serviceDuration: 1,
       cancellationPolicies: [],
       termsAndConditions: [],
       categoryId: "",
+      scheduleConfig,
     },
     validate: validateForm,
     onSubmit: (values) => {
       onSubmit({
         ...values,
-        yearsOfExperience: values.yearsOfExperience ? Number(values.yearsOfExperience) : "",
-        servicePrice: values.servicePrice ? Number(values.servicePrice) : "",
-        additionalHourPrice: Number(values.additionalHourPrice),
+        yearsOfExperience: values.yearsOfExperience ? Number(values.yearsOfExperience) : 0,
+        servicePrice: values.servicePrice ? Number(values.servicePrice) : 0,
+        additionalHourPrice: Number(values.additionalHourPrice) || 0,
         serviceDuration: Number(values.serviceDuration),
-        termsAndConditions: [values.termsAndConditions],
-        cancellationPolicies: values.cancellationPolicies,
+        scheduleConfig,
       })
     },
   })
+
+  const handleScheduleChange = (newConfig: ScheduleSlotConfigType) => {
+    setScheduleConfig(newConfig)
+    formik.setFieldValue("scheduleConfig", newConfig)
+    formik.setFieldTouched("scheduleConfig", true)
+  }
 
   const handlePolicyToggle = (policyValue: string, policyDescription: string) => {
     const currentPolicies = formik.values.cancellationPolicies
@@ -251,6 +291,11 @@ export function AddServiceForm({ onSubmit, onCancel, isSubmitting = false }: Add
           </div>
         </CardContent>
       </Card>
+
+      <ScheduleSlotConfig value={scheduleConfig} onChange={handleScheduleChange} />
+      {formik.touched.scheduleConfig && formik.errors.scheduleConfig && (
+        <p className="text-red-500 text-sm">{formik.errors.scheduleConfig}</p>
+      )}
 
       {/* Pricing Information */}
       <Card>
