@@ -8,6 +8,7 @@ import { VENDOR_ROUTES } from "@/utils/constants/api.routes";
 import type { IUpdateVendorPersonalInformation } from "@/types/vendor";
 import type { TEditableEventFields } from "@/types/event";
 import type { IWorkSampleData } from "@/types/workSamples";
+import { number } from "yup";
 
 
 
@@ -168,21 +169,29 @@ export const getservicesById = async(serviceId:string)=>{
   return response.data
 }
 
-export interface IServiceSlot {
-  startDateTime: string; 
-  endDateTime: string;   
+export interface IServiceSchedule {
+  frequency: "ONCE" | "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY";
+  startDate: string;       // ISO string
+  endDate: string;         // ISO string
+  startTime: string;       // "HH:mm"
+  endTime: string;         // "HH:mm"
+  workingDays?: number[];  // 0 = Sun ... 6 = Sat
+  holidays?: string[];     // ISO strings
+  duration: number;        // minutes per slot
   capacity: number;
 }
+
+// Editable service info
 export interface IEditServiceInformation {
-    serviceTitle:string;
-    serviceDescription:string
-    servicePrice:number
-    serviceDuration:number
-    additionalHourPrice:number
-    cancellationPolicies:string[]
-    termsAndConditions:string[]
-    yearsOfExperience:number
-     slots?: IServiceSlot[];
+  serviceTitle?: string;
+  serviceDescription?: string;
+  servicePrice?: number;
+  serviceDuration?: number;
+  additionalHourPrice?: number;
+  cancellationPolicies?: string[];
+  termsAndConditions?: string[];
+  yearsOfExperience?: number;
+  schedule?: IServiceSchedule[]; 
 }
 
 export const editService = async ({
@@ -194,7 +203,7 @@ export const editService = async ({
     "additionalHourPrice" | "cancellationPolicies" | 
     "serviceDescription"  | "serviceDuration" | 
     "servicePrice" | "serviceTitle" | 
-    "termsAndConditions" | "yearsOfExperience" | "slots"
+    "termsAndConditions" | "yearsOfExperience" | "schedule"
   >>
 }) => {
   const response = await axiosInstance.patch(
@@ -295,7 +304,7 @@ export const editWorkSample = async ({
 
 
 
-export const scanAndVerifyAttendies = async(data:{vendorId:string})=>{
+export const scanAndVerifyAttendies = async(data:{vendorId:string,eventId:string})=>{
 
   const response = await axiosInstance.post(VENDOR_ROUTES.SCAN_EVENT_QR,data)
 
@@ -335,12 +344,21 @@ export const getTicketDetails = async({
 }
 
 
-// export const getBookingDetails = async({
-//   page=1,
-//   limit=6,
-//   search=""
-// }:{
-//   page:number,
-//   limit:number,
-//   search:string
-// }) 
+export const getBookedServices = async({
+  page=1,
+  limit=6,
+  search=""
+} : {
+  page:number
+  limit:number
+  search:string
+}) =>{
+  const response = await axiosInstance.get(VENDOR_ROUTES.GET_BOOKINGS,{
+    params:{
+      page,
+      limit,
+      search
+    }
+  });
+  return response.data
+} 

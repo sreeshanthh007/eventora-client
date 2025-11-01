@@ -5,7 +5,8 @@ export enum  BASE_URL{
   CLIENT=`/api_v1/_cl`,
   VENDOR=`/api_v1/_ve`,
   ADMIN=`/api_v1/_ad`,
-  AUTH=`/auth`
+  AUTH=`/auth`,
+  COMMON="/api"
 }
 
 

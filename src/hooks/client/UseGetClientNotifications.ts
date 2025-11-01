@@ -7,6 +7,6 @@ export const useGetClientNotificaton = ()=>{
     return useQuery({
         queryKey:["get-client-notification"],
         queryFn:getClientNotificaion,
-        staleTime:8*6000
+        staleTime:1*60*6000
     })
 }

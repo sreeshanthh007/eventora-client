@@ -215,6 +215,29 @@ export const getClientWalletDetails= async()=>{
   return response.data
 }
 
+
+export const getClientBookingDetails = async({
+  page=1,
+  limit=6,
+  search=""
+} : {
+  page:number,
+  limit:number,
+  search:string
+})=>{
+  const response = await axiosInstance.get(
+    CLIENT_ROUTES.GET_CLIENT_BOOKING_DETAILS,
+    {
+      params:{
+        page,
+        limit,
+        search
+      }
+    }
+  );
+  return response.data
+}
+
 export const cancelTicket = async(ticketId:string,eventId:string) =>{
   const response = await axiosInstance.patch(
     CLIENT_ROUTES.CANCEL_TICKET(ticketId,eventId),

@@ -6,7 +6,7 @@ export const useGetBookedEventsQuery = ({page, limit, search}: {page: number, li
     return useQuery({
         queryKey: ["booked-events", page, limit, search],
         queryFn: () => getBookedEvents({ page, limit, search }),
-        staleTime:1*6000
+        staleTime:1*60*6000
 
     })
 }

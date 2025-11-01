@@ -16,5 +16,6 @@ export const UseGetAllServiceForServicePage = ({page,limit,search,sort,categoryI
     return useQuery({
         queryKey:["service-for-servicePage",page,limit,search,sort,categoryId],
         queryFn:()=>getAllServiceForServicePage({page,limit,search,sort,categoryId}),
+        staleTime: 1 * 60 * 1000,
     });
 }

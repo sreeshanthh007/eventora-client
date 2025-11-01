@@ -21,6 +21,7 @@ export const CLIENT_ROUTES = {
     GET_CATEGORIES_FOR_FILTER:`${BASE_URL.CLIENT}/get-category-for-filter`,
     GET_BOOKED_EVENTS:`${BASE_URL.CLIENT}/booked-events`,
     GET_CLIENT_WALLET_DETAILS:`${BASE_URL.CLIENT}/wallet-details`,
+    GET_CLIENT_BOOKING_DETAILS:`${BASE_URL.CLIENT}/booked-services`,
     CANCEL_TICKET:(ticketId:string,eventId:string) => `${BASE_URL.CLIENT}/cancel-ticket/${ticketId}/${eventId}`,
     GET_VENDOR_WORKFOLIO:(vendorId:string)=>`${BASE_URL.CLIENT}/workfolio/${vendorId}`,
     GET_CLIENT_NOTIFICATION:`${BASE_URL.CLIENT}/client-notification`
@@ -68,12 +69,18 @@ export const VENDOR_ROUTES = {
     TOGGLE_SERVICE:(serviceId:string)=>`${BASE_URL.VENDOR}/toggle-service/${serviceId}`,
     TOGGLE_EVENT:(eventId:string)=>`${BASE_URL.VENDOR}/toggle-status/${eventId}`,
     UPDATE_EVENT_STATUS:(eventId:string)=>`${BASE_URL.VENDOR}/update-event-status/${eventId}`,
-     ADD_WORK_SAMPLE:`${BASE_URL.VENDOR}/add-work-sample`,
-     GET_WORKSAMPLE_BY_VENDOR:`${BASE_URL.VENDOR}/get-work-sample-details`,
-        GET_VENDOR_WALLET_DETAILS:`${BASE_URL.VENDOR}/wallet-details`,
-        GET_VENDOR_NOTIFICATION:`${BASE_URL.VENDOR}/vendor-notification`,
-     EDIT_WORK_SAMPLE:(worksampleId:string)=>`${BASE_URL.VENDOR}/edit-work-sample/${worksampleId}`,
-     SCAN_EVENT_QR:`${BASE_URL.VENDOR}/scan-event`,
-     SCAN_AND_VERIFY_TICKET:`${BASE_URL.VENDOR}/scan-ticket`,
-     GET_TICKET_DETAILS:`${BASE_URL.VENDOR}/get-ticket-details`
+    ADD_WORK_SAMPLE:`${BASE_URL.VENDOR}/add-work-sample`,
+    GET_WORKSAMPLE_BY_VENDOR:`${BASE_URL.VENDOR}/get-work-sample-details`,
+    GET_VENDOR_WALLET_DETAILS:`${BASE_URL.VENDOR}/wallet-details`,
+    GET_BOOKINGS:`${BASE_URL.VENDOR}/get-booked-services`,
+    GET_VENDOR_NOTIFICATION:`${BASE_URL.VENDOR}/vendor-notification`,
+    EDIT_WORK_SAMPLE:(worksampleId:string)=>`${BASE_URL.VENDOR}/edit-work-sample/${worksampleId}`,
+    SCAN_EVENT_QR:`${BASE_URL.VENDOR}/scan-event`,
+    SCAN_AND_VERIFY_TICKET:`${BASE_URL.VENDOR}/scan-ticket`,
+    GET_TICKET_DETAILS:`${BASE_URL.VENDOR}/get-ticket-details`
+}
+
+
+export const COMMON_ROUTES ={
+    MARK_NOTIFICATON_AS_READ:(notificationId:string)=>`${BASE_URL.COMMON}/read-notification/:${notificationId}`
 }

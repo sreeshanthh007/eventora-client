@@ -11,7 +11,7 @@ export const useEditServiceMutation = ()=>{
         "additionalHourPrice" | "cancellationPolicies" | 
         "serviceDescription" | "serviceDuration"  | 
         "servicePrice" | "serviceTitle" |
-        "termsAndConditions" | "yearsOfExperience"  | "slots"    
+        "termsAndConditions" | "yearsOfExperience"  | "schedule"    
         >>}>({
             mutationFn:editService,
             onSuccess:(data)=>{

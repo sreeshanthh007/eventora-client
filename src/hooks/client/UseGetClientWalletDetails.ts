@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query"
 export const useGetClientWalletDetails = ()=>{
     return useQuery({
         queryKey:["get-client-wallet-details"],
-        queryFn:()=>getClientWalletDetails()
+        queryFn:()=>getClientWalletDetails(),
+        staleTime: 3 * 60 * 1000
     });
 }

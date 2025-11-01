@@ -6,12 +6,12 @@ import { Badge } from "@/components/pages/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/pages/ui/avatar"
 import { Input } from "@/components/pages/ui/input"
 import { Label } from "@/components/pages/ui/label"
-// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/pages/ui/select"
 import { useGetEventDetails } from "@/hooks/client/UseGetEventDetails"
 import { getCloudinaryImageUrl } from "@/utils/helpers/GetCloudinaryImage"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import LocationPickerReadOnly from "../map/MapPickerReadOnly"
 import { CheckoutForm } from "../forms/StripeCheckoutForm"
+import { TicketBookedAnimation } from "../animations/TicketBookedAnimation"
 
 interface EventDetailsProps {
   eventId?: string
@@ -48,9 +48,10 @@ const formatDate = (dateString: string) => {
 export const EventDetails: React.FC<EventDetailsProps> = () => {
   const { eventId } = useParams<{ eventId: string }>()
   const { data: event, isLoading, isError } = useGetEventDetails(eventId!)
-  console.log("event dtails",event)
+  const navigate = useNavigate()
   const [isStripeModalOpen, setIsStripeModalOpen] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [showAnimation, setShowAnimation] = useState(false)
   const [purchaseData, setPurchaseData] = useState<TicketPurchaseData>({
     title: "",
     email: "",
@@ -68,7 +69,7 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
         ticketItems.push(
           ...event.event.tickets.map((t) => ({
             id: t._id || t.id || "",
-            ticketType: t.ticketType || "Unknown",
+            ticketType: t.ticketType ,
             pricePerTicket: Number(t.pricePerTicket) || 0,
             quantity: 0,
             maxPerUser: t.maxTicketsPerUser,
@@ -81,7 +82,8 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
           pricePerTicket: Number(event.event.pricePerTicket) || 0,
           quantity: 0,
           maxPerUser: event.event.maxTicketPerUser,
-          available: event.event.totalTicket
+          available: event.event.totalTicket,
+          ticketType:"General"
         })
       }
       setPurchaseData((prev) => ({
@@ -127,6 +129,18 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
   const handleCloseStripeModal = () => {
     setIsStripeModalOpen(false)
     
+  }
+
+  const handlePaymentSuccess = () => {
+    setPurchaseData(prev => ({
+      ...prev,
+      email: "",
+      name: "",
+      tickets: prev.tickets.map(t => ({ ...t, quantity: 0 })),
+      totalAmount: 0
+    }))
+    handleCloseStripeModal()
+    setShowAnimation(true)
   }
 
   const handleQuantityChange = (index: number, increment: boolean) => {
@@ -179,7 +193,7 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
       return
     }
 
-    // Additional validation for per-ticket limits (defense in depth)
+
     let isValid = true
     purchaseData.tickets.forEach((t) => {
       if (t.quantity > t.maxPerUser || t.quantity > t.available) {
@@ -198,8 +212,29 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
     setIsStripeModalOpen(true)
   }
 
+
+  const firstSchedule = event.event.eventSchedule[0]
+  const ticketAnimationData = {
+    title: event.event.title,
+    date: firstSchedule ? formatDate(firstSchedule.date) : '',
+    time: firstSchedule ? `${firstSchedule.startTime} - ${firstSchedule.endTime} pm` : '',
+    venue: event.event.eventLocation || 'Kochi',
+    price:ticketPrice,
+    image:getCloudinaryImageUrl(event.event.images[0]),
+  }
+
+  const handleViewTicket = () => {
+    setShowAnimation(false)
+    navigate("/booked-events")
+  }
+
+  const handleBrowseEvents = () => {
+    setShowAnimation(false)
+    navigate("/events")
+  }
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
       <div className="relative h-64 overflow-hidden">
         <img
           src={event.event.images?.[0] ? getCloudinaryImageUrl(event.event.images[0]) : "/placeholder.svg"}
@@ -475,20 +510,19 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
             <CheckoutForm
               eventId={eventId!}
               purchaseData={purchaseData}
-              onClose={() => {
-                setPurchaseData(prev => ({
-                  ...prev,
-                  email: "",
-                  name: "",
-                  tickets: prev.tickets.map(t => ({ ...t, quantity: 0 })),
-                  totalAmount: 0
-                }))
-                handleCloseStripeModal()
-              }}
+              onClose={handlePaymentSuccess}
             />
           </div>
         </div>
       )}  
+
+      {showAnimation && (
+        <TicketBookedAnimation
+          ticketData={ticketAnimationData}
+          onViewTicket={handleViewTicket}
+          onBrowseEvents={handleBrowseEvents}
+        />
+      )}
     </div>
   )
 }

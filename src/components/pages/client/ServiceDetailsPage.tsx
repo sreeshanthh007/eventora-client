@@ -3,7 +3,7 @@ import { Star } from "lucide-react"
 import { Button } from "@/components/pages/ui/button"
 import { Card } from "@/components/pages/ui/card"
 import ServiceDescription from "@/components/client/serviceDetailsComponents/ServiceDescription"
-import AvailableSlots from "@/components/client/serviceDetailsComponents/AvailableSlots"
+import SlotDisplayer from "@/components/client/serviceDetailsComponents/SlotDisplayer" // Updated import
 import ServiceBookingModal from "@/components/modals/ServiceBookingModal"
 import VendorCard from "@/components/client/serviceDetailsComponents/VendorCard"
 import ReviewsSection from "@/components/client/serviceDetailsComponents/ReviewsSection"
@@ -11,9 +11,12 @@ import TermsAndConditions from "@/components/client/serviceDetailsComponents/Ter
 import CancellationPolicies from "@/components/client/serviceDetailsComponents/CancellationPolicies"
 import { ClientLayout } from "@/components/layouts/ClientLayout"
 import { useGetServiceDetails } from "@/hooks/client/UseGetServiceDetails"
-import { useState } from "react"
+import { useState, useCallback } from "react"
 
-
+interface SelectedSlot {
+  date: string
+  time: string
+}
 
 export default function ServiceDetailsPage() {
   const params = useParams()
@@ -22,7 +25,7 @@ export default function ServiceDetailsPage() {
   const service =  serviceResponse?.service 
   console.log("service details",service)
 
-  const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
+  const [selectedSlot, setSelectedSlot] = useState<SelectedSlot | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [bookingData, setBookingData] = useState<{
     selectedSlot: string;
@@ -31,19 +34,20 @@ export default function ServiceDetailsPage() {
     phone: string;
   } | null>(null)
 
-  const handleSlotSelect = (slotStartTime: string | null) => {
-    setSelectedSlot(slotStartTime)
-  }
+  const handleSlotSelect = useCallback((slot: SelectedSlot | null) => {
+    setSelectedSlot(slot)
+  }, [])
 
-  const handleBookNow = () => {
+  const handleBookNow = useCallback(() => {
     if (selectedSlot) {
       setIsModalOpen(true)
     }
-  }
+  }, [selectedSlot])
 
-  const handleBookService = (bookingData: { selectedSlot: string; name: string; email: string; phone: string }) => {
-    setBookingData(bookingData)
-  }
+  const handleBookService = useCallback((bookingData: { selectedSlot: string; name: string; email: string; phone: string }) => {
+    console.log('booked data is',bookingData)
+    // setBookingData(bookingData)
+  }, [])
 
   if (isLoading) {
     return (
@@ -64,6 +68,11 @@ export default function ServiceDetailsPage() {
       </ClientLayout>
     )
   }
+
+
+  const selectedSlotString = selectedSlot 
+    ? `${selectedSlot.date} ${selectedSlot.time.split(' - ')[0]}` 
+    : null
 
   return (
     <ClientLayout>
@@ -96,8 +105,9 @@ export default function ServiceDetailsPage() {
 
               <ServiceDescription description={service.serviceDescription} />
 
-              <AvailableSlots 
+              <SlotDisplayer 
                 slots={service.slots} 
+                schedule={service.schedule}
                 duration={service.serviceDuration}
                 onSlotSelect={handleSlotSelect}
               />
@@ -136,7 +146,7 @@ export default function ServiceDetailsPage() {
         <ServiceBookingModal
           open={isModalOpen}
           onOpenChange={setIsModalOpen}
-          selectedSlot={selectedSlot}
+          selectedSlot={selectedSlotString}
           serviceDuration={service.serviceDuration}
           onBook={handleBookService}
           bookingData={bookingData}

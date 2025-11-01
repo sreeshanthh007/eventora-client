@@ -107,7 +107,7 @@ export const CategoriesSection: React.FC = () => {
                         <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300" />
                       </div>
                       <div className="p-6 text-center bg-white">
-                        <h3 className="font-semibold text-gray-800 text-lg group-hover:text-blue-600 transition-colors duration-300">
+                        <h3 className=" text-gray-800 text-lg group-hover:text-blue-600 transition-colors duration-300 font-serif">
                           {category.title}
                         </h3>
                       </div>

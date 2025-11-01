@@ -7,5 +7,6 @@ export const useGetServiceDetails = (serviceId:string)=>{
     return useQuery({
         queryKey:["service-details",serviceId],
         queryFn:()=>getServiceDetails(serviceId),
+        staleTime:5*60*1000
     });
 }

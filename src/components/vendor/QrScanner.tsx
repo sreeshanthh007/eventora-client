@@ -53,8 +53,8 @@ export default function QRScanner({
     scannerRef.current = scanner;
 
     const onScanSuccess = (decodedText: string) => {
-      console.log("decoded text is",decodedText)
-
+ 
+      console.log("decoded texxt",decodedText)
       if(!decodedText){
         showToast("qr scanned but  didnt catch !","error");
         return  
@@ -64,7 +64,7 @@ export default function QRScanner({
       
       if(scanningType=="scan-event"){
         mutate(
-        {vendorId:decodedText},  
+        {vendorId:decodedText,eventId:eventId},  
         {
           onSuccess: (res) => {
             showToast(res.message,"success");

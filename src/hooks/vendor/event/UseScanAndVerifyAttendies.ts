@@ -6,7 +6,7 @@ import { useMutation } from "@tanstack/react-query"
 
 export const useScanAndVerifyAttendiesMutation = ()=>{
 
-    return useMutation<IAxiosResponse,Error,{vendorId:string}>({
+    return useMutation<IAxiosResponse,Error,{vendorId:string,eventId:string}>({
         mutationFn:scanAndVerifyAttendies,
     })
 }

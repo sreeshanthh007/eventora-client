@@ -7,6 +7,6 @@ export const UsegetVendorWorkfolioForClient = (vendorId:string)=>{
     return useQuery({
         queryKey:["get-vendor-portfolio",vendorId],
         queryFn:()=>getVendorWorkfolioForClient(vendorId),
-        staleTime:3*6000
+        staleTime:10*60*1000
     });
 }

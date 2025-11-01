@@ -22,7 +22,7 @@ export default function EditServicePage() {
   const {mutateAsync:editService}  = useEditServiceMutation()
 
   const service = serviceResponse?.service
-console.log("serivvce fo r edit",service)
+
 
 
   useEffect(() => {
@@ -38,6 +38,7 @@ console.log("serivvce fo r edit",service)
     try {
    
 
+      console.log("eited esrvicce",data)
       await editService({serviceId:serviceId,data:data})
 
       navigate("/vendor/services")

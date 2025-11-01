@@ -4,34 +4,9 @@ import { ProfileSidebar } from "@/components/mainComponents/ProfileSidebar"
 import { useGetClientWalletDetails } from "@/hooks/client/UseGetClientWalletDetails"
 
 export default function ClientWalletPage() {
-  const { data:wallet, isLoading, isError } = useGetClientWalletDetails()
- const walletData = wallet?.wallet
- console.log(walletData)
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen">
-        <ProfileSidebar />
-        <main className="flex-1 bg-gradient-to-br from-background via-background to-muted/20 p-4 md:p-8 overflow-auto">
-          <div className="max-w-6xl mx-auto flex items-center justify-center h-full">
-            <p className="text-muted-foreground">Loading wallet details...</p>
-          </div>
-        </main>
-      </div>
-    )
-  }
-
-  if (isError || !wallet?.success) {
-    return (
-      <div className="flex min-h-screen">
-        <ProfileSidebar />
-        <main className="flex-1 bg-gradient-to-br from-background via-background to-muted/20 p-4 md:p-8 overflow-auto">
-          <div className="max-w-6xl mx-auto flex items-center justify-center h-full">
-            <p className="text-red-500">Error loading wallet details. Please try again.</p>
-          </div>
-        </main>
-      </div>
-    )
-  }
+  const { data: wallet, isLoading, isError } = useGetClientWalletDetails()
+  const walletData = wallet?.wallet
+  const hasError = isError || !wallet?.success
 
   return (
     <div className="flex min-h-screen">
@@ -43,11 +18,19 @@ export default function ClientWalletPage() {
             <p className="text-muted-foreground">Manage your balance and track transactions</p>
           </div>
 
-          <WalletCard walletData={walletData} />
+          <WalletCard 
+            walletData={walletData} 
+            isLoading={isLoading} 
+            isError={hasError} 
+          />
 
           <div className="space-y-4">
             <h2 className="text-2xl font-bold text-foreground">Transaction History</h2>
-            <TransactionTable transactions={walletData.transactions} />
+            <TransactionTable 
+              transactions={walletData?.transactions ?? null} 
+              isLoading={isLoading} 
+              isError={hasError} 
+            />
           </div>
         </div>
       </main>
