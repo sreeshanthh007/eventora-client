@@ -3,7 +3,7 @@
 import { Sheet, SheetTrigger, SheetContent, SheetHeader } from "../pages/ui/sheet"
 import type React from "react"
 import { useState } from "react"
-import { Users, Menu, Ticket, User, HelpCircle, LogOut } from "lucide-react"
+import { Users, Menu, Ticket, User, HelpCircle, LogOut, MessageCircle } from "lucide-react"
 import type { RootState } from "@/store/store"
 import { Link, useNavigate } from "react-router-dom"
 import { clientLogout } from "@/store/slices/clientSlice"
@@ -20,10 +20,11 @@ import { NotificationPopover } from "../common/card/NotificationPopOver"
 export const ClientHeader: React.FC = () => {
   const client = useSelector((state: RootState) => state.client.client)
   const navigate = useNavigate()
-
+console.log("client slice is",client)
   const sidebarMenuItems = [
     { icon: User, label: "My Profile", to: "/profile" },
     { icon: Ticket, label: "My Events", to: "/booked-events" },
+    { icon: MessageCircle, label: "Chat", to: "/chat" },
     { icon: Users, label: "Become a Provider", to: "/vendor/register" },
     { icon: HelpCircle, label: "Help & Support", to: "/help" },
   ]

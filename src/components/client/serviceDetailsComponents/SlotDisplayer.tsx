@@ -24,7 +24,6 @@ interface AvailableSlotsByMonthProps {
 
 export default function SlotDisplayer({
   slots = [],
-  schedule,
   duration,
   onSlotSelect,
 }: AvailableSlotsByMonthProps) {

@@ -48,6 +48,9 @@ const formatDate = (dateString: string) => {
 export const EventDetails: React.FC<EventDetailsProps> = () => {
   const { eventId } = useParams<{ eventId: string }>()
   const { data: event, isLoading, isError } = useGetEventDetails(eventId!)
+
+  const vendorId = event?.event.vendor?.vendorId
+  console.log("vendor id is ",vendorId)
   const navigate = useNavigate()
   const [isStripeModalOpen, setIsStripeModalOpen] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -508,6 +511,7 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
               </Button>
             </div>
             <CheckoutForm
+            vendorId={vendorId}
               eventId={eventId!}
               purchaseData={purchaseData}
               onClose={handlePaymentSuccess}

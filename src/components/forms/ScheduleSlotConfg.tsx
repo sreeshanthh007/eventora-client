@@ -189,8 +189,7 @@ export function ScheduleSlotConfig({ value, onChange }: ScheduleSlotConfigProps)
                 <Input
                   id="slotDuration"
                   type="number"
-                  min="15"
-                  step="15"
+                  min={1}
                   value={value.duration}
                   onChange={(e) => onChange({ ...value, duration: Number.parseInt(e.target.value) || 30 })}
                 />

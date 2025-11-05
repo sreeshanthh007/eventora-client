@@ -23,8 +23,15 @@ export const CLIENT_ROUTES = {
     GET_CLIENT_WALLET_DETAILS:`${BASE_URL.CLIENT}/wallet-details`,
     GET_CLIENT_BOOKING_DETAILS:`${BASE_URL.CLIENT}/booked-services`,
     CANCEL_TICKET:(ticketId:string,eventId:string) => `${BASE_URL.CLIENT}/cancel-ticket/${ticketId}/${eventId}`,
+    CANCEL_SERVICE:(serviceId:string,vendorId:string,bookingId:string) => `${BASE_URL.CLIENT}/cancel-service/${serviceId}/${vendorId}/${bookingId}`,
+    ADD_RATING:`${BASE_URL.CLIENT}/add-rating`,
+    EDIT_RATING:(ratingId:string)=>`${BASE_URL.CLIENT}/edit-rating/${ratingId}`,
+    GET_ALL_RATINGS_WITH_AVERAGE:(serviceId:string)=>`${BASE_URL.CLIENT}/ratings/${serviceId}`,
+    REMOVE_REVIEW:(reviewId:string)=>`${BASE_URL.CLIENT}/delete-rating/${reviewId}`,
     GET_VENDOR_WORKFOLIO:(vendorId:string)=>`${BASE_URL.CLIENT}/workfolio/${vendorId}`,
-    GET_CLIENT_NOTIFICATION:`${BASE_URL.CLIENT}/client-notification`
+    GET_CLIENT_NOTIFICATION:`${BASE_URL.CLIENT}/client-notification`,
+    GET_CHATS_OF_CLIENT:`${BASE_URL.CLIENT}/client/chats`,
+    GET_CLIENT_CHAT_BY_ID:`${BASE_URL.CLIENT}/client/chat`
 }
 
 
@@ -77,7 +84,11 @@ export const VENDOR_ROUTES = {
     EDIT_WORK_SAMPLE:(worksampleId:string)=>`${BASE_URL.VENDOR}/edit-work-sample/${worksampleId}`,
     SCAN_EVENT_QR:`${BASE_URL.VENDOR}/scan-event`,
     SCAN_AND_VERIFY_TICKET:`${BASE_URL.VENDOR}/scan-ticket`,
-    GET_TICKET_DETAILS:`${BASE_URL.VENDOR}/get-ticket-details`
+    GET_TICKET_DETAILS:`${BASE_URL.VENDOR}/get-ticket-details`,
+    START_BOOKED_SERVICE:(bookingId:string)=>`${BASE_URL.VENDOR}/start-service/${bookingId}`,
+    STOP_BOOKED_SERVICE:(bookingId:string) =>`${BASE_URL.VENDOR}/stop-service/${bookingId}`,
+    GET_CHATS_OF_VENDOR:`${BASE_URL.VENDOR}/vendor/chats`,
+    GET_VENDOR_CHAT_ID : `${BASE_URL.VENDOR}/vendor/chat`,
 }
 
 

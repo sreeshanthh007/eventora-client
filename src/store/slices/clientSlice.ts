@@ -3,6 +3,7 @@
 import { axiosInstance } from "@/api/interceptor";
 import type { IClient } from "@/types/User";
 import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import  { AxiosError } from "axios";
 
 
 
@@ -36,7 +37,9 @@ void,
         const {data} = await axiosInstance.get("/api_v1/_cl/refresh-session")
         return data.user
     } catch (error) {
+        if(error instanceof AxiosError){
         return rejectWithValue(error.response?.data?.message || "failed to refresh session")
+        }
     }
 })
 

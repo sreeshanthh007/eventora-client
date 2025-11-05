@@ -16,6 +16,7 @@ interface VendorLayoutProps {
 export function VendorLayout({ children }: VendorLayoutProps) {
   const dispatch = useAppDispatch()
   const vendor = useSelector((state:RootState)=>state.vendor.vendor)
+
 useEffect(() => {
     dispatch(refreshVendorSessionThunk())
 }, [dispatch])

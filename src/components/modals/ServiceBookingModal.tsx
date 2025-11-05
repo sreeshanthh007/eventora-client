@@ -7,6 +7,11 @@ import { serviceBookingModalSchema } from "@/utils/validations/serviceBookingMod
 import ServiceCheckoutForm from "../forms/StripeServiceCheckoutForm"
 import { Card } from "@/components/pages/ui/card"
 
+interface SelectedSlot {
+  date: string
+  time: string
+}
+
 interface BookingForm {
   name: string
   email: string
@@ -16,11 +21,12 @@ interface BookingForm {
 interface BookingModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  selectedSlot: string | null
+  selectedSlot: SelectedSlot | null
   serviceDuration: number
-  onBook: (bookingData: { selectedSlot: string; name: string; email: string; phone: string }) => void
+  onBook: (bookingData: { selectedSlotTime: string; selectedDate: string;  name: string; email: string; phone: string }) => void
   bookingData: {
-    selectedSlot: string;
+    selectedSlotTime: string;
+    selectedDate: string;
     name: string;
     email: string;
     phone: string;
@@ -55,25 +61,22 @@ export default function BookingModal({
     onSubmit: (values) => {
       if (!selectedSlot) return
 
+
+
       onBook({
-        selectedSlot: selectedSlot,
+        selectedSlotTime: selectedSlot.time,
+        selectedDate: selectedSlot.date,
         ...values
       })
-
-      // Do not close modal yet; payment step will handle closing
     }
   })
 
-  const slotDate = selectedSlot ? new Date(selectedSlot).toLocaleDateString('en-US', { 
+  const slotDate = selectedSlot ? new Date(selectedSlot.date).toLocaleDateString('en-US', { 
     month: 'long', 
     day: 'numeric', 
     year: 'numeric' 
   }) : ''
-  const slotTime = selectedSlot ? new Date(selectedSlot).toLocaleTimeString('en-US', { 
-    hour: 'numeric', 
-    minute: '2-digit', 
-    hour12: true 
-  }) : ''
+  const slotTime = selectedSlot ? selectedSlot.time : ''
 
   // Determine if we are in payment step
   const isPaymentStep = !!bookingData
@@ -85,8 +88,8 @@ export default function BookingModal({
       serviceName,
       amount,
       currency,
-      slotStart: bookingData!.selectedSlot,
-      slotEnd: new Date(new Date(bookingData!.selectedSlot).getTime() + serviceDuration * 60 * 60 * 1000).toISOString(),
+      selectedSlotTime: bookingData!.selectedSlotTime,
+      selectedDate: bookingData!.selectedDate,
       name: bookingData!.name,
       email: bookingData!.email,
       phone: bookingData!.phone,

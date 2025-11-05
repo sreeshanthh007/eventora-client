@@ -8,6 +8,7 @@ import { useDebounce } from "@/hooks/services/UseDebounce"
 import { Input } from "@/components/pages/ui/input"
 import { Search } from "lucide-react"
 import { useToast } from "@/hooks/ui/UseToaster" 
+import { useCancelServiceMutation } from "@/hooks/client/UseCancelService"
 
 const LIMIT = 6
 
@@ -16,12 +17,24 @@ export default function ClientBookedServicesPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const debouncedSearchTerm = useDebounce(searchTerm, 300)
   const { showToast } = useToast()
-
+  const {mutate:cancelService} = useCancelServiceMutation()
   const { data, isLoading, isError, error } = useGetClientBookingDetails({
     page: currentPage,
     limit: LIMIT,
     search: debouncedSearchTerm,
   })
+
+
+
+  const handleCancelService = (serviceId:string,vendorId:string,bookingId:string)=>{
+
+    if(serviceId && vendorId && bookingId){
+      cancelService({serviceId,vendorId,bookingId})
+    }else{
+      showToast("failed to cancel service","error")
+    }
+
+  }
 
   const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value)
@@ -85,6 +98,7 @@ export default function ClientBookedServicesPage() {
                 </div>
 
                 <ClientBookedServices
+                onCancelSubmit={handleCancelService}
                   bookings={data?.bookings || []}
                   totalPages={totalPages}
                   isLoading={isLoading}
