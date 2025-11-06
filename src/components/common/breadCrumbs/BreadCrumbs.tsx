@@ -7,37 +7,44 @@ import {
   BreadcrumbItem,
 } from "@/components/pages/ui/breadcrumb"
 import { Link, useLocation } from "react-router-dom";
+import type { UserRole } from "@/types/UserRoles";
 
+interface BreadcrumbsProps {
+  role?: UserRole;
+}
 
-export function Breadcrumbs() {
+export function Breadcrumbs({ role }: BreadcrumbsProps) {
   const location = useLocation()
   const pathSegments = location.pathname.split("/").filter(Boolean)
-
 
   const filteredSegments = pathSegments.filter(
     (seg) => isNaN(Number(seg))
   )
 
-
   const formatSegment = (seg: string) =>
     seg.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+
+  const showHome = role !== 'vendor';
 
   return (
     <Breadcrumb>
       <BreadcrumbList>
-        <BreadcrumbItem>
-          <BreadcrumbLink asChild>
-            <Link to="/">Home</Link>
-          </BreadcrumbLink>
-        </BreadcrumbItem>
+        {showHome && (
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/">Home</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+        )}
 
         {filteredSegments.map((segment, index) => {
           const href = "/" + filteredSegments.slice(0, index + 1).join("/")
           const isLast = index === filteredSegments.length - 1
+          const isFirst = index === 0
 
           return (
             <BreadcrumbItem key={index}>
-              <BreadcrumbSeparator />
+              {(showHome || !isFirst) && <BreadcrumbSeparator />}
               {isLast ? (
                 <BreadcrumbPage>{formatSegment(segment)}</BreadcrumbPage>
               ) : (

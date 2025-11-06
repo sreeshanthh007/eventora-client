@@ -3,9 +3,7 @@ import { SidebarProvider } from "../pages/ui/sidebar"
 import { VendorSidebar } from "@/components/vendor/VendorSidebar"
 import { VendorHeader } from "@/components/vendor/VendorHeader"
 import { VendorFooter } from "@/components/mainComponents/VendorFooter"
-import { useSelector } from "react-redux"
-import { useAppDispatch, type RootState } from "@/store/store"
-import { ConnectSocket } from "@/lib/socket/ConnectSocket"
+import { useAppDispatch,  } from "@/store/store"
 import { useEffect } from "react"
 import { refreshVendorSessionThunk } from "@/store/slices/vendorSlice"
 
@@ -15,7 +13,6 @@ interface VendorLayoutProps {
 
 export function VendorLayout({ children }: VendorLayoutProps) {
   const dispatch = useAppDispatch()
-  const vendor = useSelector((state:RootState)=>state.vendor.vendor)
 
 useEffect(() => {
     dispatch(refreshVendorSessionThunk())
@@ -26,7 +23,7 @@ useEffect(() => {
         <VendorSidebar />
         <div className="flex flex-1 flex-col">
           <VendorHeader />
-          {vendor && <ConnectSocket user={vendor}/>}
+          {/* {vendor && <ConnectSocket user={vendor}/>} */}
           <main className="flex-1 p-6 bg-background">{children}</main>
           <VendorFooter />
         </div>
