@@ -8,6 +8,7 @@ import { VENDOR_ROUTES } from "@/utils/constants/api.routes";
 import type { IUpdateVendorPersonalInformation } from "@/types/vendor";
 import type { TEditableEventFields } from "@/types/event";
 import type { IWorkSampleData } from "@/types/workSamples";
+import { string } from "yup";
 
 
 
@@ -394,7 +395,7 @@ export const getVendorChatByChatId = async({
   chatId
 }:{
   userId:string,
-  chatId:string
+  chatId?:string
 })=>{
   const response = await axiosInstance.get(
     VENDOR_ROUTES.GET_VENDOR_CHAT_ID,
@@ -407,4 +408,27 @@ export const getVendorChatByChatId = async({
     }
   );
   return response.data
+}
+
+
+export const getVendorAnalyticsDashboard = async({
+  period="month",
+  startDate,
+  endDate
+}:{
+  period:string,
+  startDate?:string,
+  endDate?:string
+})=>{
+  const resoponse = await axiosInstance.get(
+    VENDOR_ROUTES.GET_VENDOR_ANALYTICS_DASHBOARD,
+    {
+      params:{
+        period,
+        startDate,
+        endDate
+      }
+    }
+  );
+  return resoponse.data
 }

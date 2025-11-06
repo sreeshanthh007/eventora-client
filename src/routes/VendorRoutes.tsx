@@ -13,12 +13,13 @@ import AddServicePage from "@/components/pages/vendor/AddServicePage";
 import ListedServicePage from "@/components/pages/vendor/ListedServicePage";
 import EditServicePage from "@/components/pages/vendor/EditServicePage";
 import EditEventPage from "@/components/pages/vendor/EditEventPage";
-import { VendorDashboard } from "@/components/pages/vendor/VendorDashboard";
+import { VendorAnalyticsDashboardPage } from "@/components/pages/vendor/VendorDashboardPage";
 import VendorChangePasswordPage from "@/components/vendor/VendorChangePasswordPage";
 import WorkSamplePage from "@/components/pages/vendor/WorkSamplePage";
 import VendorWalletPage from "@/components/pages/vendor/VendorWalletPage";
 import VendorBookedServicesPage from "@/components/pages/vendor/VendorBookedServicePage";
 import VerifyAttendiesPage from "@/components/pages/vendor/VerifyAttendiesPage";
+import ChatPage from "@/components/pages/vendor/ChatPage";
 
 
 
@@ -42,11 +43,12 @@ export const VendorRoutes = () => {
       <Route path="services" element={<ListedServicePage/>}/>
       <Route path="/edit-service/:serviceId" element={<EditServicePage/>} />
       <Route path="/edit-event/:eventId" element={<EditEventPage/>}/>
-      <Route path="/dashboard" element={<VendorDashboard/>}/>
+      <Route path="/dashboard" element={<VendorAnalyticsDashboardPage/>}/>
       <Route path="/change-password" element={<VendorChangePasswordPage/>}/>
       <Route path="/work-sample" element={<WorkSamplePage/>}/>
       <Route path="/wallet-details" element={<VendorWalletPage/>}/>
       <Route path="/booked-services" element={<VendorBookedServicesPage/>}/>
+      <Route path="/chat" element={<ChatPage/>}/>
       </Route>
 
         <Route element={<ProtectedScanRoute />}>

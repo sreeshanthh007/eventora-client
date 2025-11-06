@@ -1,4 +1,4 @@
-import { Calendar, Home, Settings, User, LogOut, UserCheck, ChartAreaIcon, Lock, Wallet, Notebook } from "lucide-react"
+import { Calendar, Home, Settings, User, LogOut, UserCheck, ChartAreaIcon, Lock, Wallet, Notebook, MessageCircle } from "lucide-react"
 import {useSelector } from "react-redux"
 import { UseLogout } from "@/hooks/auth/Uselogout"
 import { VendorLogout } from "@/services/auth/authServices"
@@ -25,9 +25,9 @@ import { useResendVerificationMutation } from "@/hooks/vendor/auth/UseResendVeri
 
 const items = [
   {
-    title: "Dashboard",
-    url: "/dashboard",
-    icon: Home,
+    title:"Analytics",
+    url:'/vendor/dashboard',
+    icon:ChartAreaIcon
   },
   {
     title: "My Profile",
@@ -58,6 +58,11 @@ const items = [
     url: "/vendor/booked-services",
     icon: Notebook,
   },
+  {
+    title: "Chats",
+    url: "/vendor/chat",
+    icon: MessageCircle,
+  },
 
   {
     title: "Change Password",
@@ -65,11 +70,6 @@ const items = [
     icon: Lock,
   },
 
-  {
-    title:"Analytics",
-    url:'/vendor/dashboard',
-    icon:ChartAreaIcon
-  }
 ]
 
 export function VendorSidebar() {

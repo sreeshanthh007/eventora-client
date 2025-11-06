@@ -6,26 +6,26 @@ import { useAppDispatch } from "@/store/store"
 
 
 interface ConnectSocketProps {
-    user: IVendor
+    user: string
 }
 export const ConnectSocket = ({ user }: ConnectSocketProps) => {
   const dispatch = useAppDispatch();
   useEffect(() => {
-    if (!user || !user._id) {
+    if (!user) {
       return;
     }
     socket.connect();
-    socket.emit("joinVendorRoom", user._id);
+    socket.emit("joinVendorRoom", user);
 
     const handleVendorApproved = (payload: { _id: string, status: string }) => {
       console.log("from server",payload)
-    if(payload._id === user._id) {
+    if(payload._id === user) {
     dispatch(refreshVendorSessionThunk());
     }
     };
 
     const handleVendorRejected = (payload:{_id:string,status:string})=>{
-      if(payload._id == user._id){
+      if(payload._id == user){
         dispatch(refreshVendorSessionThunk())
       }
     }
@@ -37,6 +37,6 @@ export const ConnectSocket = ({ user }: ConnectSocketProps) => {
        socket.off("vendorRejected",handleVendorRejected)
       socket.disconnect();
     };
-  }, [user._id]);
+  }, [user]);
   return null;
 };

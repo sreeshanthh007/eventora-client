@@ -4,7 +4,7 @@ import {Socket} from "socket.io-client"
 import { socket } from "@/lib/socket/socket";
 
 
-const socketContext = createContext<Socket>(socket)
+export const socketContext = createContext<Socket>(socket)
 
 export const useSocket = ()=> useContext(socketContext)
 

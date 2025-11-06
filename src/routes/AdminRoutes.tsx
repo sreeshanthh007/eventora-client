@@ -12,7 +12,7 @@ import RequestedVendorsPage from "@/components/pages/admin/managementPages/Vendo
 import AdminWalletDetailsPage from "@/components/pages/admin/AdminWalletPage";
 
 
-const AdminDashboard = lazy(() => import("@/components/admin/Admindashboard"));
+const AdminDashboard = lazy(() => import("@/components/pages/admin/AdminDashboard"));
 const ClientManagementPage = lazy(() => import("@/components/pages/admin/managementPages/ClientManagement"));
 const VendorManagementPage = lazy(() => import("@/components/pages/admin/managementPages/VendorManagement"));
 

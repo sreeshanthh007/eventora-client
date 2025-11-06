@@ -19,7 +19,7 @@ type ChatContextType = {
   markChatAsRead: (chatRoomId: string) => void;
 };
 
-const ChatContext = createContext<ChatContextType | undefined>(undefined);
+export const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
 export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const { showToast } = useToast();
@@ -48,8 +48,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         if (!messagesRef.current.find(msg => msg.messageId === newMessage.messageId)) {
           setMessages(prev => [...prev, newMessage]);
         }
-      } else {
-        showToast(`New message from ${newMessage.senderId}: ${newMessage.content}`, "success");
       }
 
       // Update allChats lastMessage and unread count

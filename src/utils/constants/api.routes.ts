@@ -50,7 +50,8 @@ export const  ADMIN_ROUTES = {
     APPROVE_VENDOR:(vendorId:string)=> `${BASE_URL.ADMIN}/${vendorId}/approve-vendors`,
     REJECT_VENDOR:(vendorId:string)=>`${BASE_URL.ADMIN}/${vendorId}/reject_vendors`,
     GET_ADMIN_WALLET_DETAILS:`${BASE_URL.ADMIN}/wallet-details`,
-    GET_ADMIN_NOTIFICATION:`${BASE_URL.ADMIN}/admin-notification`
+    GET_ADMIN_NOTIFICATION:`${BASE_URL.ADMIN}/admin-notification`,
+    GET_ADMIN_ANALYTICS_DASHBOARD:`${BASE_URL.ADMIN}/admin-analytics`,
 }
 
 
@@ -89,6 +90,7 @@ export const VENDOR_ROUTES = {
     STOP_BOOKED_SERVICE:(bookingId:string) =>`${BASE_URL.VENDOR}/stop-service/${bookingId}`,
     GET_CHATS_OF_VENDOR:`${BASE_URL.VENDOR}/vendor/chats`,
     GET_VENDOR_CHAT_ID : `${BASE_URL.VENDOR}/vendor/chat`,
+    GET_VENDOR_ANALYTICS_DASHBOARD:`${BASE_URL.VENDOR}/vendor-analytics`
 }
 
 

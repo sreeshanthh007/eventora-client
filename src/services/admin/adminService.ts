@@ -183,6 +183,31 @@ export const getAdminWalletDetails = async()=>{
 }
 
 
+export const getAdminAnalyticsDashboard = async({
+  period="month",
+  startDate,
+  endDate
+}:{
+  period:string,
+  startDate?:string,
+  endDate?:string
+})=>{
+
+  const response = await axiosInstance.get(
+    ADMIN_ROUTES.GET_ADMIN_ANALYTICS_DASHBOARD,
+    {
+      params:{
+        period,
+        startDate,
+        endDate
+      }
+    }
+  );
+
+  return response.data
+}
+
+
 export const getAdminNotification = async()=>{
   const response = await axiosInstance.get(
     ADMIN_ROUTES.GET_ADMIN_NOTIFICATION
