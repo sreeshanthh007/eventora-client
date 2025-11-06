@@ -3,7 +3,7 @@ import { Star } from "lucide-react"
 import { Button } from "@/components/pages/ui/button"
 import { Card } from "@/components/pages/ui/card"
 import ServiceDescription from "@/components/client/serviceDetailsComponents/ServiceDescription"
-import SlotDisplayer from "@/components/client/serviceDetailsComponents/SlotDisplayer" // Updated import
+import SlotDisplayer from "@/components/client/serviceDetailsComponents/SlotDisplayer" 
 import ServiceBookingModal from "@/components/modals/ServiceBookingModal"
 import VendorCard from "@/components/client/serviceDetailsComponents/VendorCard"
 import ReviewsSection from "@/components/client/serviceDetailsComponents/ReviewsSection"
@@ -11,28 +11,72 @@ import TermsAndConditions from "@/components/client/serviceDetailsComponents/Ter
 import CancellationPolicies from "@/components/client/serviceDetailsComponents/CancellationPolicies"
 import { ClientLayout } from "@/components/layouts/ClientLayout"
 import { useGetServiceDetails } from "@/hooks/client/UseGetServiceDetails"
-import { useState, useCallback } from "react"
+import { useGetRatingsWithAverage } from "@/hooks/client/UseGetRatingsWithAverage"
+import { useSelector } from "react-redux" 
+import { useState, useCallback, useMemo } from "react"
+import ReviewModal from "@/components/modals/ReviewModal" // Adjust path as needed
+import type { RootState } from "@/store/store"
+import { useAddRatingMutation } from "@/hooks/client/UseAddRating"
+import type { IReviewData } from "@/types/service"
+import { useEditRatingMutation } from "@/hooks/client/UseEditRating"
+import { useToast } from "@/hooks/ui/UseToaster"
+import { useRemoveReviewMutation } from "@/hooks/client/UseRemoveReview"
 
 interface SelectedSlot {
   date: string
   time: string
 }
 
+interface BookingData {
+  selectedSlotTime: string
+  selectedDate: string
+  name: string
+  email: string
+  phone: string
+}
+
+interface Review {
+  reviewId:string
+  clientId: string
+  clientName: string
+  profileImage: string
+  rating: number
+  description: string
+  createdAt: string
+}
+
+
+
 export default function ServiceDetailsPage() {
   const params = useParams()
   const serviceId = params?.id as string
+  const {showToast} = useToast()
   const { data: serviceResponse, isLoading, error } = useGetServiceDetails(serviceId)
+  const { data: ratingsResponse } = useGetRatingsWithAverage(serviceId) 
+  const {mutate:addRating} = useAddRatingMutation()
+  const {mutate:editRating} = useEditRatingMutation()
+  const {mutate:removeReviewMutation} = useRemoveReviewMutation()
+  const currentClientId = useSelector((state:RootState)=>state.client.client?.clientId)
   const service =  serviceResponse?.service 
-  console.log("service details",service)
-
+console.log("service details are",service)
   const [selectedSlot, setSelectedSlot] = useState<SelectedSlot | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [bookingData, setBookingData] = useState<{
-    selectedSlot: string;
-    name: string;
-    email: string;
-    phone: string;
-  } | null>(null)
+  const [bookingData, setBookingData] = useState<BookingData | null>(null) 
+
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false) 
+
+  const currentReview = useMemo(() => 
+    ratingsResponse?.ratings?.reviews?.find((review: Review) => review.clientId === currentClientId),
+  [ratingsResponse?.ratings?.reviews, currentClientId]
+  )
+
+  const refactoredReview = {
+    ...currentReview,
+    serviceId:serviceId
+  }
+  console.log("refactored",refactoredReview)
+
+  const hasReviewed = !!currentReview
 
   const handleSlotSelect = useCallback((slot: SelectedSlot | null) => {
     setSelectedSlot(slot)
@@ -44,10 +88,34 @@ export default function ServiceDetailsPage() {
     }
   }, [selectedSlot])
 
-  const handleBookService = useCallback((bookingData: { selectedSlot: string; name: string; email: string; phone: string }) => {
-    console.log('booked data is',bookingData)
-    // setBookingData(bookingData)
+  const handleBookService = useCallback((bookingData: BookingData) => {
+  
+    setBookingData(bookingData)
   }, [])
+
+  const handleSubmitReview = (data:IReviewData,type:boolean,ratingId?:string) => {
+   if(type==false){
+    addRating(data)
+   }else if(type==true){
+    if(ratingId) editRating({ratingId:ratingId,data:data})
+   }else{
+    showToast("invalid method","error")
+  }
+    
+    setIsReviewModalOpen(false)
+  }
+
+  const handleAddReview = () => {
+    setIsReviewModalOpen(true)
+  }
+
+  const handleEditReview = () => {
+    setIsReviewModalOpen(true)
+  }
+  
+  const handleRemoveReview = (reviewId:string) => {
+    removeReviewMutation({reviewId})
+  }
 
   if (isLoading) {
     return (
@@ -69,11 +137,6 @@ export default function ServiceDetailsPage() {
     )
   }
 
-
-  const selectedSlotString = selectedSlot 
-    ? `${selectedSlot.date} ${selectedSlot.time.split(' - ')[0]}` 
-    : null
-
   return (
     <ClientLayout>
       <main className="min-h-screen bg-background">
@@ -93,11 +156,11 @@ export default function ServiceDetailsPage() {
                           <Star
                             key={i}
                             size={16}
-                            className={i < 4 ? "fill-accent text-accent" : "text-muted-foreground"}
+                            className={i < (ratingsResponse?.ratings?.averageRating || 0) ? "fill-yellow-500 text-yellow-500" : "text-muted-foreground"}
                           />
                         ))}
                       </div>
-                      <span className="text-sm text-muted-foreground">(128 reviews)</span>
+                      <span className="text-sm text-muted-foreground">({ratingsResponse?.ratings?.totalRatings || 0} reviews)</span>
                     </div>
                   </div>
                 </div>
@@ -112,7 +175,14 @@ export default function ServiceDetailsPage() {
                 onSlotSelect={handleSlotSelect}
               />
 
-              <ReviewsSection />
+              <ReviewsSection 
+                ratingsData={ratingsResponse}
+                currentClientId={currentClientId}
+                hasReviewed={hasReviewed}
+                onAddReview={handleAddReview}
+                onEditReview={handleEditReview}
+                onRemoveReview={handleRemoveReview}
+              />
 
               <TermsAndConditions terms={service.termsAndConditions} />
 
@@ -128,7 +198,7 @@ export default function ServiceDetailsPage() {
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">Price</p>
                     <p className="text-3xl font-bold text-foreground">{service.servicePrice}/-</p>
-                    <p className="text-m text-muted-foreground">{service.serviceDuration} hour{service.serviceDuration !== 1 ? 's' : ''}</p>
+                    <p className="text-sm text-muted-foreground">{service.serviceDuration} hour{service.serviceDuration !== 1 ? 's' : ''}</p>
                   </div>
                   <Button 
                     onClick={handleBookNow}
@@ -146,7 +216,7 @@ export default function ServiceDetailsPage() {
         <ServiceBookingModal
           open={isModalOpen}
           onOpenChange={setIsModalOpen}
-          selectedSlot={selectedSlotString}
+          selectedSlot={selectedSlot}
           serviceDuration={service.serviceDuration}
           onBook={handleBookService}
           bookingData={bookingData}
@@ -155,6 +225,14 @@ export default function ServiceDetailsPage() {
           serviceName={service.serviceTitle}
           amount={service.servicePrice}
           currency="INR" 
+        />
+
+        <ReviewModal
+          isOpen={isReviewModalOpen}
+          onClose={() => setIsReviewModalOpen(false)}
+          onSubmit={handleSubmitReview}
+          currentReview={refactoredReview}
+          isEdit={hasReviewed}
         />
       </main>
     </ClientLayout>

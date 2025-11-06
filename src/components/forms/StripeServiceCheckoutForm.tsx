@@ -11,8 +11,9 @@ interface ServiceBookingData {
   serviceName: string
   amount: number
   currency: string
-  slotStart: string
-  slotEnd: string
+  selectedSlotTime: string
+  selectedDate: string
+
   name: string
   email: string
   phone: string
@@ -44,8 +45,8 @@ const ServiceCheckoutFormInner: React.FC<ServiceCheckoutFormProps> = ({ bookingD
        vendorId: bookingData.vendorId,
        serviceId: bookingData.serviceId,
        bookingData:{
-        slotStart: bookingData.slotStart,
-        slotEnd: bookingData.slotEnd,
+        selectedSlotTime: bookingData.selectedSlotTime,
+        selectedDate: bookingData.selectedDate,
         name: bookingData.name,
         email: bookingData.email,
         phone: bookingData.phone,

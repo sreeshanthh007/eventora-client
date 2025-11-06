@@ -7,6 +7,8 @@ import { Pagination } from "@/components/pages/ui/pagination"
 import { Mail, Phone } from "lucide-react"
 import { Loader2 } from "lucide-react"
 import { getCloudinaryImageUrl } from "@/utils/helpers/GetCloudinaryImage"
+import { useState } from "react"
+import { ConfirmDialog } from "../common/popups/ConfirmationPopup"
 
 interface Booking {
   bookingId: string
@@ -14,16 +16,19 @@ interface Booking {
   email: string
  
   bookingSlot: {
-    startDateTIme: string
-    endDateTime: string
+    startDate: string
+    slotStartTime: string
+    slotEndTime: string
   }
   vendorId: {
+    _id:string
     name: string
     email: string
     profilePicture: string
      phone: string
   }
   serviceId: {
+    _id:string
     serviceTitle: string
   }
   status: string
@@ -37,10 +42,16 @@ interface Props {
   isLoading: boolean
   currentPage: number
   onPageChange: (page: number) => void
+  onCancelSubmit : (serviceId:string,vendorId:string,bookingId:string) =>void
   searchTerm: string
 }
 
-
+interface PendingCancel {
+  serviceId: string;
+  vendorId: string;
+  bookingId: string;
+  serviceTitle: string;
+}
 
 const getStatusColor = (status: string) => {
   switch (status.toLowerCase()) {
@@ -73,18 +84,34 @@ const getPaymentStatusColor = (status: string) => {
   }
 }
 
-const handleCancel = (bookingId: string) => {
-  // TODO: Implement cancel mutation or API call here
-  console.log("Cancel service:", bookingId)
-  // Example: await cancelBooking(bookingId)
-}
+export function ClientBookedServices({ bookings, totalPages, isLoading, currentPage, onPageChange, searchTerm , onCancelSubmit }: Props) {
+  console.log("bokings are",bookings)
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [pendingCancel, setPendingCancel] = useState<PendingCancel | null>(null);
 
-export function ClientBookedServices({ bookings, totalPages, isLoading, currentPage, onPageChange, searchTerm }: Props) {
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       onPageChange(page)
     }
   }
+
+  const handleCancel = (serviceId: string, vendorId: string, bookingId: string, serviceTitle: string) => {
+    setPendingCancel({ serviceId, vendorId, bookingId, serviceTitle });
+    setIsDialogOpen(true);
+  }
+
+  const handleConfirmCancel = () => {
+    if (pendingCancel) {
+      onCancelSubmit(pendingCancel.serviceId, pendingCancel.vendorId, pendingCancel.bookingId);
+    }
+    setIsDialogOpen(false);
+    setPendingCancel(null);
+  };
+
+  const handleDialogCancel = () => {
+    setIsDialogOpen(false);
+    setPendingCancel(null);
+  };
 
   return (
     <Card className="overflow-hidden">
@@ -126,10 +153,10 @@ export function ClientBookedServices({ bookings, totalPages, isLoading, currentP
                       const displayStatus = booking.status.charAt(0).toUpperCase() + booking.status.slice(1)
                       const displayPaymentStatus = booking.paymentStatus === "successfull" ? "Paid" : booking.paymentStatus
                       const vendorProfilePicture = booking.vendorId.profilePicture
-                        ?  getCloudinaryImageUrl( booking.vendorId.profilePicture) // Adjust to full URL if needed, e.g., `${process.env.NEXT_PUBLIC_BASE_URL}/${booking.vendorId.profilePicture}`
-                        : `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(booking.vendorId.name)}`
-                      const startDateTime = new Date(booking.bookingSlot.startDateTIme).toLocaleString()
-                      const endDateTime = new Date(booking.bookingSlot.endDateTime).toLocaleString()
+                        ?  getCloudinaryImageUrl( booking.vendorId.profilePicture) 
+                        : `${encodeURIComponent(booking.vendorId.name)}`
+                      const startDateTime = new Date(booking.bookingSlot.slotStartTime).toLocaleString()
+                      const endDateTime = new Date(booking.bookingSlot.slotEndTime).toLocaleString()
                       const service = {
                         id: booking.bookingId,
                         vendorName: booking.vendorId.name,
@@ -219,7 +246,7 @@ export function ClientBookedServices({ bookings, totalPages, isLoading, currentP
                               <Button
                                 variant="destructive"
                                 size="sm"
-                                onClick={() => handleCancel(service.bookingId)}
+                                onClick={() => handleCancel(booking.serviceId._id, booking.vendorId._id, booking.bookingId, booking.serviceId.serviceTitle)}
                               >
                                 Cancel Service
                               </Button>
@@ -243,6 +270,18 @@ export function ClientBookedServices({ bookings, totalPages, isLoading, currentP
               </div>
             )}
           </>
+        )}
+        {pendingCancel && (
+          <ConfirmDialog
+            open={isDialogOpen}
+            onCancel={handleDialogCancel}
+            onConfirm={handleConfirmCancel}
+            title="Cancel Service"
+           description={`Are you sure you want to cancel the service "${pendingCancel.serviceTitle}"? You will be credited only 20% when cancelling service. This action cannot be undone.`}
+            confirmLabel="Yes, Cancel"
+            cancelLabel="Keep Booking"
+            confirmColor="red"
+          />
         )}
       </CardContent>
     </Card>

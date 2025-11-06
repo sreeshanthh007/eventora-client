@@ -8,7 +8,6 @@ import { VENDOR_ROUTES } from "@/utils/constants/api.routes";
 import type { IUpdateVendorPersonalInformation } from "@/types/vendor";
 import type { TEditableEventFields } from "@/types/event";
 import type { IWorkSampleData } from "@/types/workSamples";
-import { number } from "yup";
 
 
 
@@ -171,17 +170,17 @@ export const getservicesById = async(serviceId:string)=>{
 
 export interface IServiceSchedule {
   frequency: "ONCE" | "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY";
-  startDate: string;       // ISO string
-  endDate: string;         // ISO string
-  startTime: string;       // "HH:mm"
-  endTime: string;         // "HH:mm"
-  workingDays?: number[];  // 0 = Sun ... 6 = Sat
-  holidays?: string[];     // ISO strings
-  duration: number;        // minutes per slot
+  startDate: string;      
+  endDate: string;        
+  startTime: string;      
+  endTime: string;       
+  workingDays?: number[];  
+  holidays?: string[];     
+  duration: number;        
   capacity: number;
 }
 
-// Editable service info
+
 export interface IEditServiceInformation {
   serviceTitle?: string;
   serviceDescription?: string;
@@ -362,3 +361,50 @@ export const getBookedServices = async({
   });
   return response.data
 } 
+
+export  const starBookedService = async(bookingId:string)=>{
+
+  const response = await axiosInstance.patch(
+    VENDOR_ROUTES.START_BOOKED_SERVICE(bookingId)
+  );
+    return response.data
+}
+
+export const stopBookedService = async(bookingId:string)=>{
+
+  const response = await axiosInstance.patch(
+    VENDOR_ROUTES.STOP_BOOKED_SERVICE(bookingId)
+  );
+
+  return response.data
+}
+
+
+export const getAllChatsOfVendor = async()=>{
+  const response = await axiosInstance.get(
+    VENDOR_ROUTES.GET_CHATS_OF_VENDOR
+  );
+
+  return response.data
+}
+
+
+export const getVendorChatByChatId = async({
+  userId,
+  chatId
+}:{
+  userId:string,
+  chatId:string
+})=>{
+  const response = await axiosInstance.get(
+    VENDOR_ROUTES.GET_VENDOR_CHAT_ID,
+
+    {
+      params:{
+        userId,
+        chatId
+      }
+    }
+  );
+  return response.data
+}

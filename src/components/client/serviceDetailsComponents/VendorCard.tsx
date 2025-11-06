@@ -1,13 +1,14 @@
 import { Card } from "@/components/pages/ui/card"
 import { Button } from "@/components/pages/ui/button"
-import {  MapPin, Award } from "lucide-react"
+import { MapPin, Award } from "lucide-react"
 import { getCloudinaryImageUrl } from "@/utils/helpers/GetCloudinaryImage"
 import { useState } from "react"
-import { VendorWorkSampleModal } from "../VendorWorkSample"// Adjust import path as needed
+import { useNavigate } from "react-router-dom"
+import { VendorWorkSampleModal } from "../VendorWorkSample"
 import { UsegetVendorWorkfolioForClient } from "@/hooks/client/UseGetVendorPortfolio"
 
 interface Vendor {
-  vendorId:string
+  vendorId: string
   name: string
   email: string
   place: string
@@ -20,9 +21,8 @@ interface VendorCardProps {
   yearsOfExperience: number
 }
 
-
-
 export default function VendorCard({ vendor, yearsOfExperience }: VendorCardProps) {
+  const navigate = useNavigate()
   
   const initials = vendor.name
     .split(' ')
@@ -50,6 +50,10 @@ export default function VendorCard({ vendor, yearsOfExperience }: VendorCardProp
 
   const handleCloseModal = () => {
     setIsModalOpen(false)
+  }
+
+  const handleMessageProvider = () => {
+    navigate(`/chat?userId=${vendor.vendorId}`)
   }
 
   return (
@@ -92,7 +96,6 @@ export default function VendorCard({ vendor, yearsOfExperience }: VendorCardProp
             </div>
           </div>
 
-    
           <p className="text-sm text-foreground/80">
             {vendor.description}
           </p>
@@ -106,7 +109,11 @@ export default function VendorCard({ vendor, yearsOfExperience }: VendorCardProp
             >
               {isLoading ? "Loading..." : "View Work Samples"}
             </Button>
-            <Button variant="outline" className="w-full bg-transparent">
+            <Button 
+              variant="outline" 
+              className="w-full bg-transparent"
+              onClick={handleMessageProvider}
+            >
               Message Provider
             </Button>
           </div>

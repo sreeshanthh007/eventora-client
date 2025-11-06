@@ -13,6 +13,7 @@ interface TicketItem {
 
 interface CheckoutFormProps {
   eventId: string
+  vendorId:string
   purchaseData: {
     email: string
     name: string
@@ -24,7 +25,7 @@ interface CheckoutFormProps {
 }
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISH_KEY)
-const CheckoutFormInner: React.FC<CheckoutFormProps> = ({ eventId, purchaseData, onClose }) => {
+const CheckoutFormInner: React.FC<CheckoutFormProps> = ({ vendorId,eventId, purchaseData, onClose }) => {
   console.log("checkout data",purchaseData)
   const {showToast} = useToast()
   const stripe = useStripe()
@@ -49,6 +50,7 @@ const CheckoutFormInner: React.FC<CheckoutFormProps> = ({ eventId, purchaseData,
 
       const res = await axiosInstance.post(CLIENT_ROUTES.CREATE_BOOKING, {
         eventId,
+        vendorId,
         tickets: selectedTickets.map(t => ({
           ticketType: t.ticketType,
           quantity: t.quantity,

@@ -1,6 +1,7 @@
 
 import { axiosInstance } from "@/api/interceptor";
 import type { IAxiosResponse } from "@/types/Response";
+import type { IReviewData } from "@/types/service";
 import type { ICategory, IEvent } from "@/types/User";
 import { CLIENT_ROUTES } from "@/utils/constants/api.routes";
 
@@ -208,6 +209,39 @@ export const getVendorWorkfolioForClient = async(vendorId:string) =>{
   return response.data
 }
 
+export const getAllRatingsWithAverage = async(serviceId:string)=>{
+  const response = await axiosInstance.get(
+    CLIENT_ROUTES.GET_ALL_RATINGS_WITH_AVERAGE(serviceId)
+  );
+  return response.data
+}
+
+
+export const addRating = async(data:IReviewData)=>{
+  const response = await axiosInstance.post(
+    CLIENT_ROUTES.ADD_RATING,
+    {data}
+  );
+  return response.data
+}
+
+export const editRating = async(ratingId:string,data:IReviewData)=>{
+
+  const response = await axiosInstance.patch(
+
+    CLIENT_ROUTES.EDIT_RATING(ratingId),
+    {data}
+  );
+  return response.data
+}
+
+export const removeReview = async(reviewId:string)=>{
+  const response = await axiosInstance.delete(
+    CLIENT_ROUTES.REMOVE_REVIEW(reviewId)
+  );
+  return response.data
+}
+
 export const getClientWalletDetails= async()=>{
   const response = await axiosInstance.get(
     CLIENT_ROUTES.GET_CLIENT_WALLET_DETAILS
@@ -242,6 +276,45 @@ export const cancelTicket = async(ticketId:string,eventId:string) =>{
   const response = await axiosInstance.patch(
     CLIENT_ROUTES.CANCEL_TICKET(ticketId,eventId),
   );
+  return response.data
+}
+
+export const cancelService = async(serviceId:string,vendorId:string,bookingId:string) =>{
+  const response = await axiosInstance.patch(
+    CLIENT_ROUTES.CANCEL_SERVICE(serviceId,vendorId,bookingId)
+  );
+
+  return response.data
+}
+
+
+export const getAllChatsOfClient = async()=>{
+  const response = await axiosInstance.get(
+    CLIENT_ROUTES.GET_CHATS_OF_CLIENT
+  );
+
+  return response.data
+}
+
+
+export const getClientChatbyChatId = async({
+  userId,
+  chatId
+}:{
+  userId:string,
+  chatId?:string
+})=>{
+
+  const response = await axiosInstance.get(
+    CLIENT_ROUTES.GET_CLIENT_CHAT_BY_ID,
+    {
+      params:{
+        userId,
+        chatId
+      }
+    }
+  );
+
   return response.data
 }
 export const clientRefreshSession = async() : Promise<ClientResponse> =>{

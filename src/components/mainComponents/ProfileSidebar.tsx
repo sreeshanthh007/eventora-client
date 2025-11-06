@@ -1,4 +1,4 @@
-import { User, Ticket, Bell, CreditCard, HelpCircle, LogOut, MessageCircle, Handshake, Lock } from "lucide-react"
+import { User, Ticket, Bell, CreditCard, HelpCircle, LogOut, MessageCircle, Handshake, Lock, MessageCircleCode } from "lucide-react"
 import { Card } from "@/components/pages/ui/card"
 import { Button } from "@/components/pages/ui/button"
 import { Link } from "react-router-dom" // Add this import
@@ -26,7 +26,7 @@ const menuItems = [
   {
     icon: MessageCircle,
     label: "Chats",
-    to: "/events", 
+    to: "/chat", 
     active: false,
     description: "Chat with Vendors",
   },

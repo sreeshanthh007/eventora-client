@@ -3,6 +3,8 @@ import type { UserRole } from "./UserRoles"
 
 
 export interface User{
+    _id:string
+    clientId:string
     name:string,
     email:string,
     phone:string,

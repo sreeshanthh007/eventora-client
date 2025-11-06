@@ -11,6 +11,8 @@ import { Skeleton } from "@/components/pages/ui/skeleton"
 import { Alert, AlertDescription } from "@/components/pages/ui/alert"
 import { AlertTriangle } from "lucide-react"
 import { type BookedService } from "@/components/vendor/VendorBookedServices"
+import { useStartBookingMutation } from "@/hooks/vendor/UseStartBooking"
+import { useStopBookingMutation } from "@/hooks/vendor/UseStopBooking"
 
 export default function VendorBookedServicesPage() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -23,10 +25,26 @@ export default function VendorBookedServicesPage() {
     limit: limit,
     search: debouncedSearchTerm
   });
-  const bookings : BookedService = data?.bookings || []
+  const bookings : BookedService[] = data?.bookings || []
   console.log("bookings from page",bookings[0])
   const total = data?.total || 0
   const totalPages = Math.ceil(total / limit)
+
+  const {mutate:startBookedService} = useStartBookingMutation();
+  const {mutate:stopBookedService} = useStopBookingMutation();
+
+  const handleStartBookedServiceSubmit = (bookingId: string) => {
+    if (bookingId) {
+      startBookedService({ bookingId });
+      console.log("booking id ss",bookingId)
+    }
+  };
+
+  const handleStopBookedServiceSubmit = (bookingId: string) => {
+    if (bookingId) {
+      stopBookedService({ bookingId });
+    }
+  };
 
   useEffect(() => {
     setCurrentPage(1)
@@ -165,7 +183,11 @@ export default function VendorBookedServicesPage() {
             <CardTitle>All Bookings</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <VendorBookedServicesTable bookings={bookings} />
+            <VendorBookedServicesTable 
+              bookings={bookings} 
+              onStartBookedServiceSubmit={handleStartBookedServiceSubmit}
+              onStopBookedServiceSubmit={handleStopBookedServiceSubmit}
+            />
             {totalPages > 1 && (
               <Pagination>
                 <PaginationContent>
