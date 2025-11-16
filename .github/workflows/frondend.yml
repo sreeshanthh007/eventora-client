@@ -1,4 +1,4 @@
-name: Deploy Frontend to S3 and CloudFront
+name: Deploy to S3 and CloudFront
 
 on:
   push:
@@ -10,26 +10,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Setup Node
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: "20"
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: |
-          cd eventora-client
-          npm ci
+          npm ci --legacy-peer-deps
 
-      - name: Build Frontend
+      - name: Build
         env:
           
-          VITE_API_URL: ${{ secrets.VITE_API_URL }}
           VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
 
-          
+
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
@@ -39,21 +37,20 @@ jobs:
           VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
 
         run: |
-          cd eventora-client
           npm run build
 
-      - name: Configure AWS Credentials
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Upload Build to S3
+      - name: Deploy to S3
         run: |
-          aws s3 sync eventora-client/dist s3://${{ secrets.S3_BUCKET }} --delete
+          aws s3 sync ./dist s3://${{ secrets.S3_BUCKET }} --delete
 
-      - name: Invalidate CloudFront Cache
+      - name: Invalidate CloudFront cache
         run: |
           aws cloudfront create-invalidation \
             --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
