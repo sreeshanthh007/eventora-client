@@ -1,12 +1,12 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/pages/ui/card"
-import { CreditCard, User } from "lucide-react"
+import { Card, CardContent, CardHeader } from "@/components/pages/ui/card"
+import {  User } from "lucide-react"
 
 interface WalletData {
   walletId: string
   balance: number
   userType: string
-  userId: string
-  transactions: any[] // Will be refined when transactions have structure
+
+  transactions: any[] 
 }
 
 interface VendorWalletCardProps {
@@ -23,8 +23,7 @@ export function VendorWalletCard({ walletData }: VendorWalletCardProps) {
   const displayData = walletData ? {
     ...defaultWalletData,
     balance: walletData.balance,
-    accountType: walletData.userType,
-    accountHolder: `Vendor (${walletData.userId})`, // Using userId as placeholder; fetch full name if available via separate hook
+    accountType: walletData.userType || "vendor",
   } : defaultWalletData
 
   return (

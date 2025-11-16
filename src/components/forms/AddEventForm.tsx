@@ -59,9 +59,13 @@ export function AddEventForm({ onSubmit }: { onSubmit: (data: IEventFormData) =>
       <EventImagesSection formik={formik} />
 
       <div className="flex justify-end gap-4">
-        <Button type="submit" className="bg-primary hover:bg-primary/90">
-          Create Event
-        </Button>
+       <Button
+      type="submit"
+      disabled={formik.isSubmitting}
+      className="bg-primary hover:bg-primary/90"
+    >
+      {formik.isSubmitting ? "Creating..." : "Create Event"}
+    </Button>
       </div>
     </form>
   )

@@ -8,7 +8,6 @@ import { VENDOR_ROUTES } from "@/utils/constants/api.routes";
 import type { IUpdateVendorPersonalInformation } from "@/types/vendor";
 import type { TEditableEventFields } from "@/types/event";
 import type { IWorkSampleData } from "@/types/workSamples";
-import { string } from "yup";
 
 
 
@@ -145,7 +144,7 @@ export const getCategoryForService = async()=>{
 
 export const getservices = async ({
   page = 1,
-  limit = 2,
+  limit = 3,
   search = "",
 }: {
   page: number
@@ -272,8 +271,26 @@ export const getVendorNotification = async()=>{
   return response.data
 }
 
-export const getVendorWalletDetails = async()=>{
-  const response = await axiosInstance.get(VENDOR_ROUTES.GET_VENDOR_WALLET_DETAILS);
+export const getVendorWalletDetails = async({
+  type="all",
+  page=1,
+  limit=6
+}:{
+  type:string,
+  page:number,
+  limit:number
+})=>{
+  const response = await axiosInstance.get(
+    VENDOR_ROUTES.GET_VENDOR_WALLET_DETAILS,
+    {
+      params:{
+        type,
+        page,
+        limit,
+
+      }
+    }
+  );
   return response.data
 }
 

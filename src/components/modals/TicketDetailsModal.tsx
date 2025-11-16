@@ -23,6 +23,7 @@ interface EventDetailsModalProps {
   email: string
   amount: number
   ticketStatus: string
+  paymentStatus: string
   onTicketCancelled?: () => void 
 }
 
@@ -36,13 +37,14 @@ export function TicketDetailsModal({
   email,
   amount,
   ticketStatus,
+  paymentStatus,
   onTicketCancelled,
 }: EventDetailsModalProps) {
   const [isCancellationOpen, setIsCancellationOpen] = useState(false)
   const [isCancelling, setIsCancelling] = useState(false)
   const {mutate:cancelSelectedTicket}  = useCancelTicketMutation()
 
-  const isCancellable = ticketStatus !== "refunded" && ticketStatus !== "used"
+  const isCancellable = ticketStatus !== "refunded" && ticketStatus !== "used" && paymentStatus !== "failed"
 
   const cancelTicket = async (ticketId: string, eventId: string) => {
     console.log("cancel ticket called",ticketId,eventId)
@@ -142,7 +144,8 @@ export function TicketDetailsModal({
               <div className="flex items-start gap-2">
                 <AlertCircle className="h-4 w-4 text-yellow-600 mt-0.5 flex-shrink-0" />
                 <p className="text-sm text-yellow-800">
-                  This ticket cannot be cancelled as it is {ticketStatus.toLowerCase()}.
+                  This ticket cannot be cancelled as its
+                  {paymentStatus === "failed" && "  is  failed."}
                 </p>
               </div>
             </div>

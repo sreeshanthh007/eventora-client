@@ -177,11 +177,27 @@ export const rejectVendor = async ({ vendorId, rejectReason }:{vendorId:string,r
 };
 
 
-export const getAdminWalletDetails = async()=>{
-  const response = await axiosInstance.get(ADMIN_ROUTES.GET_ADMIN_WALLET_DETAILS);
+export const getAdminWalletDetails = async({
+  type="all",
+  page=1,
+  limit=6
+}:{
+  type:string,
+  page:number,
+  limit:number
+})=>{
+  const response = await axiosInstance.get(
+    ADMIN_ROUTES.GET_ADMIN_WALLET_DETAILS,
+    {
+      params:{
+        type,
+        page,
+        limit
+      }
+    }
+  );
   return response.data
 }
-
 
 export const getAdminAnalyticsDashboard = async({
   period="month",
@@ -213,5 +229,57 @@ export const getAdminNotification = async()=>{
     ADMIN_ROUTES.GET_ADMIN_NOTIFICATION
   );
 
+  return response.data
+}
+
+
+export const getVendorEvents = async({
+  page=1,
+  limit=6,
+  search,
+  filterBy
+}:{
+  page:number,
+  limit:number,
+  search:string,
+  filterBy:string
+})=>{
+  const response = await axiosInstance.get(
+    ADMIN_ROUTES.GET_VENDORS_EVENTS,
+    {
+      params:{
+        page,
+        limit,
+        search,
+        filterBy
+      }
+    }
+  );
+  return response.data
+}
+
+
+export const getBookedServicesofVendors = async({
+  page=1,
+  limit=6,
+  search,
+  filterType
+}:{
+  page:number,
+  limit:number,
+  search:string,
+  filterType:string
+})=>{
+  const response = await axiosInstance.get(
+    ADMIN_ROUTES.GET_BOOKED_SERVICES_VENDORS,
+    {
+      params:{
+        page,
+        limit,
+        search,
+        filterType
+      }
+    }
+  );
   return response.data
 }

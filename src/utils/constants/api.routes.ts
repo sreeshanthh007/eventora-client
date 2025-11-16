@@ -49,6 +49,8 @@ export const  ADMIN_ROUTES = {
     ADD_CATEGORY:`${BASE_URL.ADMIN}/add-category`,
     APPROVE_VENDOR:(vendorId:string)=> `${BASE_URL.ADMIN}/${vendorId}/approve-vendors`,
     REJECT_VENDOR:(vendorId:string)=>`${BASE_URL.ADMIN}/${vendorId}/reject_vendors`,
+    GET_VENDORS_EVENTS:`${BASE_URL.ADMIN}/events-vendors`,
+    GET_BOOKED_SERVICES_VENDORS:`${BASE_URL.ADMIN}/booked-services-vendors`,
     GET_ADMIN_WALLET_DETAILS:`${BASE_URL.ADMIN}/wallet-details`,
     GET_ADMIN_NOTIFICATION:`${BASE_URL.ADMIN}/admin-notification`,
     GET_ADMIN_ANALYTICS_DASHBOARD:`${BASE_URL.ADMIN}/admin-analytics`,

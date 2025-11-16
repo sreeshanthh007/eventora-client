@@ -1,5 +1,4 @@
 
-// import { clientAxiosInstance } from "@/api/client.axios";
 import { axiosInstance } from "@/api/interceptor";
 import type { IClient } from "@/types/User";
 import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";

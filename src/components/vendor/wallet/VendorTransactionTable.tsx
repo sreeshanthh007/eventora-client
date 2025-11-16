@@ -1,115 +1,201 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/pages/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/pages/ui/table"
-import { Badge } from "@/components/pages/ui/badge"
-import { ArrowUpRight, ArrowDownLeft } from "lucide-react"
+// src/components/vendor/wallet/VendorTransactionTable.tsx
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/pages/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/pages/ui/table";
+import { ArrowUpRight, ArrowDownLeft } from "lucide-react";
+import { Button } from "@/components/pages/ui/button";
+import { Pagination } from "@/components/common/paginations/Pagination";
 
 interface Transaction {
-  id: string
-  date: string
-  description?: string 
-  amount: number
-  currency: string
-  paymentType: string
-  paymentFor: string
-  status: "completed" | "pending" | "partialRefund"
+  id?: string;
+  date: string;
+  description?: string;
+  amount: number;
+  currency: string;
+  paymentType: string;
+  paymentFor: string;
+  paymentStatus: "credit" | "debit";   
 }
 
 interface VendorTransactionTableProps {
-  transactions: Transaction[]
+  transactions: Transaction[];
+  totalPages: number;
+  currentPage: number;
+  onPageChange: (page: number) => void;
+  onFilterChange: (type: "all" | "credit" | "debit") => void;
+  selectedFilter: "all" | "credit" | "debit";
 }
 
-export function VendorTransactionTable({ transactions }: VendorTransactionTableProps) {
-  
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "completed":
-        return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Completed</Badge>
-      case "pending":
-        return <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">Pending</Badge>
-      case "failed":
-        return <Badge className="bg-red-100 text-red-800 hover:bg-red-100">Failed</Badge>
-      case "partialRefund":
-       return <Badge className="bg-red-100 text-red-800 hover:bg-red-100">refunded</Badge>
-      default:
-        return <Badge>{status}</Badge>
-    }
-  }
 
-  const getAmountColor = (amount: number) => {
-    return amount >= 0 ? "text-green-600" : "text-red-600"
-  }
+const getAmountColor = (amount: number) =>
+  amount >= 0 ? "text-green-600" : "text-red-600";
 
-  const getAmountIcon = (amount: number) => {
-    return amount >= 0 ? (
-      <ArrowDownLeft className="h-4 w-4 text-green-600" />
-    ) : (
-      <ArrowUpRight className="h-4 w-4 text-red-600" />
-    )
-  }
+const getAmountIcon = (amount: number) =>
+  amount >= 0 ? (
+    <ArrowDownLeft className="h-4 w-4 text-green-600" />
+  ) : (
+    <ArrowUpRight className="h-4 w-4 text-red-600" />
+  );
 
-  if (transactions.length === 0) {
+export function VendorTransactionTable({
+  transactions,
+  totalPages,
+  currentPage,
+  onPageChange,
+  onFilterChange,
+  selectedFilter,
+}: VendorTransactionTableProps) {
+  // ---------- 1. FILTER ----------
+  const filtered = transactions.filter((tx) => {
+    if (selectedFilter === "all") return true;
+    return tx.paymentStatus === selectedFilter;
+  });
+
+
+  if (filtered.length === 0) {
     return (
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">Recent Transactions</CardTitle>
         </CardHeader>
         <CardContent className="py-8 text-center text-muted-foreground">
-          No transactions yet. Your transaction history will appear here once payments are processed.
+          {selectedFilter === "all"
+            ? "No transactions yet. Your transaction history will appear here once payments are processed."
+            : `No ${selectedFilter} transactions yet.`}
         </CardContent>
       </Card>
-    )
+    );
   }
 
+ 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">Recent Transactions</CardTitle>
-      </CardHeader>
+   
+      <div className="flex items-center justify-between p-4 border-b border-primary-foreground/20 bg-primary/5">
+        <h2 className="text-xl font-semibold text-foreground">
+          Transaction History
+        </h2>
+
+        <div className="flex gap-2">
+          {(["all", "credit", "debit"] as const).map((opt) => (
+            <Button
+              key={opt}
+              variant={selectedFilter === opt ? "default" : "outline"}
+              size="sm"
+              onClick={() => onFilterChange(opt)}
+              className="capitalize"
+            >
+              {opt === "all" ? "All" : opt}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+ 
       <CardContent>
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow className="border-b">
-                <TableHead className="text-foreground font-semibold">Date</TableHead>
-                <TableHead className="text-foreground font-semibold">Description</TableHead>
-                <TableHead className="text-foreground font-semibold">Amount</TableHead>
-                <TableHead className="text-foreground font-semibold">Currency</TableHead>
-                <TableHead className="text-foreground font-semibold">Payment Type</TableHead>
-                <TableHead className="text-foreground font-semibold">Payment For</TableHead>
-                <TableHead className="text-foreground font-semibold">Status</TableHead>
+                <TableHead className="text-foreground font-semibold">
+                  Date
+                </TableHead>
+                <TableHead className="text-foreground font-semibold">
+                  Description
+                </TableHead>
+                <TableHead className="text-foreground font-semibold">
+                  Amount
+                </TableHead>
+                <TableHead className="text-foreground font-semibold">
+                  Currency
+                </TableHead>
+                <TableHead className="text-foreground font-semibold">
+                  Payment Type
+                </TableHead>
+                <TableHead className="text-foreground font-semibold">
+                  Payment For
+                </TableHead>
+                <TableHead className="text-foreground font-semibold">
+                  Status
+                </TableHead>
               </TableRow>
             </TableHeader>
+
             <TableBody>
-              {transactions.map((transaction) => (
-                <TableRow key={transaction.id} className="border-b hover:bg-muted/50">
+              {filtered.map((tx) => (
+                <TableRow
+                  key={tx.id ?? tx.date}
+                  className="border-b hover:bg-muted/50"
+                >
                   <TableCell className="text-sm text-muted-foreground">
-                    {new Date(transaction.date).toLocaleDateString("en-US", {
+                    {new Date(tx.date).toLocaleDateString("en-US", {
                       year: "numeric",
                       month: "short",
                       day: "numeric",
                     })}
                   </TableCell>
+
                   <TableCell className="text-sm font-medium text-foreground">
-                    {transaction.description || `${transaction.paymentFor} - ${transaction.paymentType}`}
+                    {tx.description ||
+                      `${tx.paymentFor} - ${tx.paymentType}`}
                   </TableCell>
-                  <TableCell className={`text-sm font-semibold ${getAmountColor(transaction.amount)}`}>
+
+                  <TableCell
+                    className={`text-sm font-semibold ${getAmountColor(
+                      tx.amount
+                    )}`}
+                  >
                     <div className="flex items-center gap-2">
-                      {getAmountIcon(transaction.amount)}
-                      {Math.abs(transaction.amount).toLocaleString("en-US", {
+                      {getAmountIcon(tx.amount)}
+                      {Math.abs(tx.amount).toLocaleString("en-US", {
                         minimumFractionDigits: 2,
                       })}
                     </div>
                   </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{transaction.currency}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{transaction.paymentType}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{transaction.paymentFor}</TableCell>
-                  <TableCell>{getStatusBadge(transaction.status)}</TableCell>
+
+                  <TableCell className="text-sm text-muted-foreground">
+                    {tx.currency}
+                  </TableCell>
+
+                  <TableCell className="text-sm text-muted-foreground">
+                    {tx.paymentType}
+                  </TableCell>
+
+                  <TableCell className="text-sm text-muted-foreground">
+                    {tx.paymentFor}
+                  </TableCell>
+
+                  <TableCell className="capitalize">
+                    {tx.paymentStatus}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </div>
       </CardContent>
+
+      {/* ----- Pagination ----- */}
+      {totalPages > 1 && (
+        <div className="flex justify-center p-4 border-t border-primary-foreground/20 bg-primary/5">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={onPageChange}
+          />
+        </div>
+      )}
     </Card>
-  )
+  );
 }

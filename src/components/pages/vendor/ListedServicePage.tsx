@@ -56,7 +56,7 @@ export default function ListedServicePage() {
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const limit = 2;
+  const limit = 3;
 
 
   const { data, isLoading, isError, error } = UseGeAllService({
@@ -88,7 +88,7 @@ export default function ListedServicePage() {
   }, [debouncedSearchTerm]);
 
   const totalPages = data?.total 
-
+console.log("service sare",data)
   const handleStatusToggle = (service: Service) => {
     const action = service.status === "active" ? "block" : "unblock";
     setConfirmDialog({
@@ -97,6 +97,8 @@ export default function ListedServicePage() {
       action,
     });
   };
+
+
 
   const handleConfirmAction = async () => {
     const { service, action } = confirmDialog;

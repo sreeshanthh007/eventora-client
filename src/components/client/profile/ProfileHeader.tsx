@@ -20,7 +20,6 @@ export const ProfileHeader: React.FC = () => {
   const [showCropper, setShowCropper] = useState(false)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const {showToast} = useToast()
-  console.log("profile", client)
   const {mutate : updateProfileImage} = useUpdateProfileImageMutation()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -60,7 +59,7 @@ export const ProfileHeader: React.FC = () => {
      }
 
      updateProfileImage(
-      uploadImageUrl 
+      uploadImageUrl! 
      );
 
     } catch (error) {
@@ -69,7 +68,7 @@ export const ProfileHeader: React.FC = () => {
   }
 
   if (!client) {
-    return null // or some loading state
+    return null 
   }
 
   return (
@@ -100,7 +99,7 @@ export const ProfileHeader: React.FC = () => {
           <div className="flex-1">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">{client.name}</h1>
             <Button className="bg-blue-600 hover:bg-blue-700">
-              <Edit className="h-4 w-4 mr-2" />
+              <Edit className="h-4 w-4 mr-2"/>
               Change Profile
             </Button>
           </div>

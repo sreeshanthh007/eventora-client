@@ -2,15 +2,14 @@ import { Card } from "@/components/pages/ui/card"
 import { CreditCard, Copy, Check } from "lucide-react"
 import { useState } from "react"
 
-interface WalletData {
-  walletId: string
+interface WalletDetails {
   balance: number
-  userType: string
   userId: string
+  // walletId?: string   // optional if backend adds it later
 }
 
 interface WalletCardProps {
-  walletData: WalletData | null
+  walletData: WalletDetails | null
   isLoading?: boolean
   isError?: boolean
 }
@@ -18,9 +17,13 @@ interface WalletCardProps {
 export function WalletCard({ walletData, isLoading, isError }: WalletCardProps) {
   const [copied, setCopied] = useState(false)
 
+  const walletId = walletData
+    ? `${walletData.userId.slice(0, 8).toUpperCase()}...${walletData.userId.slice(-4).toUpperCase()}`
+    : ""
+
   const handleCopyWalletId = () => {
-    if (!walletData?.walletId) return
-    navigator.clipboard.writeText(walletData.walletId)
+    if (!walletData) return
+    navigator.clipboard.writeText(walletData.userId)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -58,10 +61,10 @@ export function WalletCard({ walletData, isLoading, isError }: WalletCardProps) 
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="md:col-span-2 border-0 rounded-2xl shadow-lg p-8">
-          <div className="text-center">
-            <p className="text-red-500 text-lg">Error loading wallet</p>
+          <div className="text-center py-12">
+            <p className="text-red-500 text-lg font-medium">Failed to load wallet</p>
             <p className="text-muted-foreground/60 text-sm mt-2">
-              Please try refreshing the page
+              Please refresh the page or try again later
             </p>
           </div>
         </Card>
@@ -82,34 +85,47 @@ export function WalletCard({ walletData, isLoading, isError }: WalletCardProps) 
       <Card className="md:col-span-2 bg-gradient-to-br from-primary to-primary/80 border-0 text-primary-foreground p-8 rounded-2xl shadow-lg">
         <div className="flex items-start justify-between mb-12">
           <div>
-            <p className="text-primary-foreground/80 text-sm font-medium mb-2">Total Balance</p>
-            <h2 className="text-5xl font-bold tracking-tight">
-              {walletData.balance}
-            </h2>
+            <p className="text-primary-foreground/80 text-sm font-medium mb-2">
+              Total Balance
+            </p>
+            <div className="flex items-baseline gap-1">
+              <span className="text-5xl font-bold tracking-tight">₹</span>
+              <h2 className="text-5xl font-bold tracking-tight">
+                {walletData.balance.toLocaleString("en-IN")}
+              </h2>
+            </div>
           </div>
-          <CreditCard className="w-8 h-8 opacity-80" />
+          <CreditCard className="w-10 h-10 opacity-80" />
         </div>
 
         <div className="flex items-end justify-between">
           <div>
-            <p className="text-primary-foreground/70 text-xs uppercase tracking-widest mb-1">Wallet ID</p>
-            <p className="font-mono text-sm break-all">{walletData.walletId}</p>
+            <p className="text-primary-foreground/70 text-xs uppercase tracking-widest mb-1">
+              Wallet ID
+            </p>
+            <p className="font-mono text-lg break-all tracking-wider">
+              {walletId}
+            </p>
           </div>
           <button
             onClick={handleCopyWalletId}
-            className="p-2 hover:bg-primary-foreground/10 rounded-lg transition-colors flex-shrink-0"
+            className="p-3 hover:bg-primary-foreground/20 rounded-xl transition-all flex-shrink-0"
             aria-label="Copy wallet ID"
           >
-            {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
+            {copied ? (
+              <Check className="w-6 h-6 text-green-300" />
+            ) : (
+              <Copy className="w-6 h-6" />
+            )}
           </button>
         </div>
       </Card>
 
-      {/* User Info Cards */}
+      {/* Account Type / Info Card */}
       <div className="space-y-4">
         <Card className="p-6 rounded-xl border border-border/50 bg-card hover:shadow-md transition-shadow">
           <p className="text-muted-foreground text-sm font-medium mb-2">Account Type</p>
-          <p className="text-2xl font-bold text-foreground capitalize">{walletData.userType}</p>
+          <p className="text-2xl font-bold text-foreground capitalize">Client</p>
         </Card>
       </div>
     </div>
