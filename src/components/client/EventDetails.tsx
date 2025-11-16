@@ -50,7 +50,6 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
   const { data: event, isLoading, isError } = useGetEventDetails(eventId!)
 
   const vendorId = event?.event.vendor?.vendorId
-  console.log("vendor id is ",vendorId)
   const navigate = useNavigate()
   const [isStripeModalOpen, setIsStripeModalOpen] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -64,6 +63,11 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
     currency: "INR",
   })
 
+  // Determine if user can buy tickets
+  const canBuyTickets = event?.event?.status
+    ? ["ongoing", "upcoming"].includes(event.event.status.toLowerCase())
+    : false
+
   useEffect(() => {
     if (event) {
       const hasTicketTypes = event.event.tickets && event.event.tickets.length > 0
@@ -72,7 +76,7 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
         ticketItems.push(
           ...event.event.tickets.map((t) => ({
             id: t._id || t.id || "",
-            ticketType: t.ticketType ,
+            ticketType: t.ticketType,
             pricePerTicket: Number(t.pricePerTicket) || 0,
             quantity: 0,
             maxPerUser: t.maxTicketsPerUser,
@@ -86,7 +90,7 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
           quantity: 0,
           maxPerUser: event.event.maxTicketPerUser,
           available: event.event.totalTicket,
-          ticketType:"General"
+          ticketType: "General"
         })
       }
       setPurchaseData((prev) => ({
@@ -99,7 +103,6 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
     }
   }, [event])
 
-  
   useEffect(() => {
     console.log("Current purchaseData:", purchaseData)
   }, [purchaseData])
@@ -121,17 +124,16 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
   const totalQuantity = purchaseData.tickets.reduce((sum, t) => sum + t.quantity, 0)
 
   const handleBuyTickets = () => {
+    if (!canBuyTickets) return
     setIsModalOpen(true)
   }
 
   const handleCloseModal = () => {
     setIsModalOpen(false)
-    
   }
 
   const handleCloseStripeModal = () => {
     setIsStripeModalOpen(false)
-    
   }
 
   const handlePaymentSuccess = () => {
@@ -154,22 +156,14 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
 
       if (increment) {
         const newQuantityForThis = currentItem.quantity + 1
-        if (newQuantityForThis > currentItem.maxPerUser) {
-          return prev
-        }
-        if (newQuantityForThis > currentItem.available) {
-          return prev
-        }
+        if (newQuantityForThis > currentItem.maxPerUser) return prev
+        if (newQuantityForThis > currentItem.available) return prev
         const newTotalQuantity = currentTotalQuantity + 1
-        if (newTotalQuantity > maxTicketsPerUser) {
-          return prev
-        }
+        if (newTotalQuantity > maxTicketsPerUser) return prev
       }
 
       let newQuantity = increment ? currentItem.quantity + 1 : currentItem.quantity - 1
-      if (newQuantity < 0) {
-        newQuantity = 0
-      }
+      if (newQuantity < 0) newQuantity = 0
 
       newTickets[index] = { ...currentItem, quantity: newQuantity }
       const newTotalAmount = newTickets.reduce((sum, t) => {
@@ -196,7 +190,6 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
       return
     }
 
-
     let isValid = true
     purchaseData.tickets.forEach((t) => {
       if (t.quantity > t.maxPerUser || t.quantity > t.available) {
@@ -215,15 +208,14 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
     setIsStripeModalOpen(true)
   }
 
-
   const firstSchedule = event.event.eventSchedule[0]
   const ticketAnimationData = {
     title: event.event.title,
     date: firstSchedule ? formatDate(firstSchedule.date) : '',
     time: firstSchedule ? `${firstSchedule.startTime} - ${firstSchedule.endTime} pm` : '',
     venue: event.event.eventLocation || 'Kochi',
-    price:ticketPrice,
-    image:getCloudinaryImageUrl(event.event.images[0]),
+    price: ticketPrice,
+    image: getCloudinaryImageUrl(event.event.images[0]),
   }
 
   const handleViewTicket = () => {
@@ -360,59 +352,82 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
             </Card>
           </div>
 
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Event Host</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-3">
-                <Avatar className="h-12 w-12">
-                  <AvatarImage
-                    src={
-                      event.event.vendor?.profilePicture
-                        ? getCloudinaryImageUrl(event.event.vendor.profilePicture)
-                        : "/placeholder.svg"
-                    }
-                  />
-                  <AvatarFallback>{event.event.vendor?.name?.[0] || "B"}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <h3 className="font-semibold">{event.event.vendor?.name || "bro"}</h3>
-                  {event.event.vendor?.email && (
-                    <p className="text-sm text-muted-foreground">
-                      {event.event.vendor.email}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Right Column: Host + Tickets */}
+          <div className="space-y-6">
+            {/* Event Host */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Ticket className="h-5 w-5 text-accent" />
-                  Get Tickets
-                </CardTitle>
+                <CardTitle>Event Host</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="text-center">
-                  <p className="text-3xl font-bold text-black">₹{ticketPrice}</p>
-                  <p className="text-sm text-muted-foreground">per person</p>
+              <CardContent>
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-12 w-12">
+                    <AvatarImage
+                      src={
+                        event.event.vendor?.profilePicture
+                          ? getCloudinaryImageUrl(event.event.vendor.profilePicture)
+                          : "/placeholder.svg"
+                      }
+                    />
+                    <AvatarFallback>{event.event.vendor?.name?.[0] || "B"}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h3 className="font-semibold">{event.event.vendor?.name || "bro"}</h3>
+                    {event.event.vendor?.email && (
+                      <p className="text-sm text-muted-foreground">
+                        {event.event.vendor.email}
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <Button
-                  className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
-                  onClick={handleBuyTickets}
-                >
-                  Buy Tickets
-                </Button>
               </CardContent>
             </Card>
+
+            {/* Conditional Tickets Card */}
+            {canBuyTickets ? (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Ticket className="h-5 w-5 text-accent" />
+                    Get Tickets
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="text-center">
+                    <p className="text-3xl font-bold text-black">₹{ticketPrice}</p>
+                    <p className="text-sm text-muted-foreground">per person</p>
+                  </div>
+                  <Button
+                    className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
+                    onClick={handleBuyTickets}
+                  >
+                    Buy Tickets
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Ticket className="h-5 w-5 text-accent" />
+                    Tickets
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <p className="text-muted-foreground">
+                    {event.event.status?.toLowerCase() === "cancelled"
+                      ? "This event has been cancelled."
+                      : "Ticket sales are closed."}
+                  </p>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
       </div>
 
-      {isModalOpen && (
+      {/* Purchase Modal */}
+      {isModalOpen && canBuyTickets && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-6 border-b">
@@ -452,7 +467,9 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
                     <div key={item.id || index} className="flex justify-between items-center p-3 border rounded-lg">
                       <div>
                         <span className="font-medium block">{item.ticketType} - ₹{item.pricePerTicket}</span>
-                        <span className="text-sm text-muted-foreground">({item.available} available, max {item.maxPerUser} per user)</span>
+                        <span className="text-sm text-muted-foreground">
+                          ({item.available} available, max {item.maxPerUser} per user)
+                        </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Button
@@ -501,6 +518,7 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
         </div>
       )}
 
+      {/* Stripe Checkout Modal */}
       {isStripeModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg max-w-md w-full p-6">
@@ -511,15 +529,16 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
               </Button>
             </div>
             <CheckoutForm
-            vendorId={vendorId}
+              vendorId={vendorId}
               eventId={eventId!}
               purchaseData={purchaseData}
               onClose={handlePaymentSuccess}
             />
           </div>
         </div>
-      )}  
+      )}
 
+      {/* Success Animation */}
       {showAnimation && (
         <TicketBookedAnimation
           ticketData={ticketAnimationData}

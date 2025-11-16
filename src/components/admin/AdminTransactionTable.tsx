@@ -1,72 +1,115 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/pages/ui/table"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/pages/ui/card"
-import { Badge } from "@/components/pages/ui/badge"
-import { ArrowUpRight, ArrowDownLeft } from "lucide-react"
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/pages/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/pages/ui/table";
+import { Badge } from "@/components/pages/ui/badge";
+import { ArrowUpRight, ArrowDownLeft } from "lucide-react";
+import { Button } from "@/components/pages/ui/button";
+import { Pagination } from "@/components/common/paginations/Pagination";
 
 interface Transaction {
-  id: string
-  date: string
-  description?: string
-  amount: number
-  currency: string
-  paymentType: string
-  paymentFor: string
-  paymentStatus: "credit" | "debit"
+  id?: string;
+  date: string;
+  description?: string;
+  amount: number;
+  currency: string;
+  paymentType: string;
+  paymentFor: string;
+  paymentStatus: "credit" | "debit";   
 }
 
 interface AdminTransactionTableProps {
-  transactions: Transaction[]
+  transactions: Transaction[];
+  totalPages: number;
+  currentPage: number;
+  onPageChange: (page: number) => void;
+  onFilterChange: (type: "all" | "credit" | "debit") => void;
+  selectedFilter: "all" | "credit" | "debit";
 }
 
-function getStatusBadge(status: string) {
-  switch (status) {
-    case "credit":
-      return (
-        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-          credit
-        </Badge>
-      )
-    case "debit":
-      return (
-        <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
-          debit
-        </Badge>
-      )
-    default:
-      return <Badge variant="outline">{status}</Badge>
-  }
-}
+const getStatusBadge = (status: "credit" | "debit") => {
+  return status === "credit" ? (
+    <Badge className="bg-green-100 text-green-800 border border-green-200">
+      Credit
+    </Badge>
+  ) : (
+    <Badge className="bg-red-100 text-red-800 border border-red-200">
+      Debit
+    </Badge>
+  );
+};
 
-function formatCurrency(amount: number, currency: string) {
-  return new Intl.NumberFormat("en-US", {
+const formatCurrency = (amount: number, currency: string) =>
+  new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: currency,
-  }).format(amount)
-}
+    currency,
+  }).format(Math.abs(amount));
 
-export function AdminTransactionTable({ transactions }: AdminTransactionTableProps) {
-  if (transactions.length === 0) {
+export function AdminTransactionTable({
+  transactions,
+  totalPages,
+  currentPage,
+  onPageChange,
+  onFilterChange,
+  selectedFilter,
+}: AdminTransactionTableProps) {
+  // Filter by paymentStatus
+  const filtered = transactions.filter((tx) => {
+    return selectedFilter === "all" || tx.paymentStatus === selectedFilter;
+  });
+
+  if (filtered.length === 0) {
     return (
       <Card>
         <CardHeader>
           <CardTitle>Transaction History</CardTitle>
-          <CardDescription>View all your transactions and payment details</CardDescription>
+          <CardDescription>
+            {selectedFilter === "all"
+              ? "No transactions found."
+              : `No ${selectedFilter} transactions found.`}
+          </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-center h-32 text-muted-foreground">
-            <p>No transactions found.</p>
-          </div>
+        <CardContent className="py-12 text-center text-muted-foreground">
+          {selectedFilter === "all"
+            ? "Your transaction history will appear here."
+            : `No ${selectedFilter} transactions yet.`}
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Transaction History</CardTitle>
-        <CardDescription>View all your transactions and payment details</CardDescription>
-      </CardHeader>
+      {/* Header + Filter */}
+      <div className="flex items-center justify-between p-4 border-b bg-muted/30">
+        <h2 className="text-xl font-semibold">Transaction History</h2>
+        <div className="flex gap-2">
+          {(["all", "credit", "debit"] as const).map((opt) => (
+            <Button
+              key={opt}
+              variant={selectedFilter === opt ? "default" : "outline"}
+              size="sm"
+              onClick={() => onFilterChange(opt)}
+              className="capitalize"
+            >
+              {opt === "all" ? "All" : opt}
+            </Button>
+          ))}
+        </div>
+      </div>
+
       <CardContent>
         <div className="overflow-x-auto">
           <Table>
@@ -82,10 +125,10 @@ export function AdminTransactionTable({ transactions }: AdminTransactionTablePro
               </TableRow>
             </TableHeader>
             <TableBody>
-              {transactions.map((transaction) => (
-                <TableRow key={transaction.id}>
-                  <TableCell className="font-medium">
-                    {new Date(transaction.date).toLocaleDateString("en-US", {
+              {filtered.map((tx) => (
+                <TableRow key={tx.id ?? tx.date}>
+                  <TableCell className="text-sm text-muted-foreground">
+                    {new Date(tx.date).toLocaleDateString("en-US", {
                       year: "numeric",
                       month: "short",
                       day: "numeric",
@@ -93,30 +136,45 @@ export function AdminTransactionTable({ transactions }: AdminTransactionTablePro
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      {transaction.amount > 0 ? (
+                      {tx.paymentStatus === "credit" ? (
                         <ArrowDownLeft className="h-4 w-4 text-green-600" />
                       ) : (
                         <ArrowUpRight className="h-4 w-4 text-red-600" />
                       )}
-                      {transaction.description || 'Transaction'}
+                      {tx.description || `${tx.paymentFor} - ${tx.paymentType}`}
                     </div>
                   </TableCell>
                   <TableCell
-                    className={transaction.amount > 0 ? "text-green-600 font-semibold" : "text-red-600 font-semibold"}
+                    className={`font-semibold ${
+                      tx.paymentStatus === "credit" ? "text-green-600" : "text-red-600"
+                    }`}
                   >
-                    {transaction.amount > 0 ? "+" : ""}
-                    {formatCurrency(transaction.amount, transaction.currency)}
+                    {tx.paymentStatus === "credit" ? "+" : "-"}
+                    {formatCurrency(tx.amount, tx.currency)}
                   </TableCell>
-                  <TableCell>{transaction.currency}</TableCell>
-                  <TableCell>{transaction.paymentType}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{transaction.paymentFor}</TableCell>
-                  <TableCell>{getStatusBadge(transaction.paymentStatus)}</TableCell>
+                  <TableCell>{tx.currency}</TableCell>
+                  <TableCell>{tx.paymentType}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">
+                    {tx.paymentFor}
+                  </TableCell>
+                  <TableCell>{getStatusBadge(tx.paymentStatus)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </div>
       </CardContent>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center p-4 border-t bg-muted/30">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={onPageChange}
+          />
+        </div>
+      )}
     </Card>
-  )
+  );
 }

@@ -1,6 +1,6 @@
 
 import type * as React from "react"
-import { BarChart3, Building2, Home, Calendar, Settings, Tag, Users, Wallet, Bell } from "lucide-react"
+import { BarChart3, Building2, Home,  Tag, Users, Wallet, Bell, Calendar1, Settings } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -26,7 +26,7 @@ import { adminLogout } from "@/store/slices/adminSlice"
 import { AdminNotificationPopover } from "../common/card/AdminNotificationPopOver"
 import { useState } from "react"
 
-// Menu items
+
 const navData = {
   navMain: [
     {
@@ -50,6 +50,16 @@ const navData = {
       icon: Tag,
     },
     {
+      title: "Events",
+      url: "/admin/events-vendors",
+      icon: Calendar1,
+    },
+    {
+      title: "Services",
+      url: "/admin/services-vendors",
+      icon: Settings,
+    },
+    {
       title: "Wallet",
       url: "/admin/wallet-details",
       icon: Wallet,
@@ -58,7 +68,7 @@ const navData = {
       title: "Notifications",
       url: "#", // Changed to # since it's now a popover trigger
       icon: Bell,
-      isNotification: true, // Flag to identify notification item
+      isNotification: true, 
     },
   ],
 }

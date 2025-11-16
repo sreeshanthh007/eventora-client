@@ -10,16 +10,18 @@ import { UpcomingEvents } from "@/components/vendor/analyticsDashboard/UpcomingE
 import { useState } from "react"
 import { VendorLayout } from "@/components/layouts/VendorLayout"
 import { useGetVenodorAnalyticsDashboard } from "@/hooks/vendor/UseGetVendorAnalyticsDashboard"
-import type { AnalyticsData } from "@/types/analytics" // Adjust import path as needed
+import type { AnalyticsData } from "@/types/analytics" 
+import { DownloadAnalyticsPDFButton } from "@/utils/helpers/DownloadAnalyticsAsPDF"
 
 export function VendorAnalyticsDashboardPage() {
   const [dateRange, setDateRange] = useState({ period: "month", start: "", end: "" })
 
-  const { data: analyticsResponse, isLoading } = useGetVenodorAnalyticsDashboard({
+  const params = {
     period: dateRange.period,
-    startDate: dateRange.start,
-    endDate: dateRange.end,
-  })
+    ...(dateRange.period !== "today" && { startDate: dateRange.start, endDate: dateRange.end }),
+  }
+
+  const { data: analyticsResponse, isLoading } = useGetVenodorAnalyticsDashboard(params)
 
   const analytics: AnalyticsData | undefined = analyticsResponse?.analytics?.data
 
@@ -48,19 +50,22 @@ export function VendorAnalyticsDashboardPage() {
     <VendorLayout>
       <div className="bg-gradient-to-br from-slate-50 via-white to-blue-50">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="border-b border-slate-200 bg-white/80 backdrop-blur-sm"
-        >
-          <div className="max-w-7xl mx-auto px-6 py-6">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="border-b border-slate-200 bg-white/80 backdrop-blur-sm"
+      >
+        <div className="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
+          <div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
               Vendor Analytics Dashboard
             </h1>
             <p className="text-slate-600 mt-1">Track your business performance and insights</p>
           </div>
-        </motion.div>
+          <DownloadAnalyticsPDFButton analytics={analytics} dateRange={dateRange} dashboardType="vendor" />
+        </div>
+      </motion.div>
 
         {/* Main Content */}
         <motion.main

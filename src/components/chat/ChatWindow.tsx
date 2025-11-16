@@ -93,7 +93,7 @@ export default function ChatWindow({ chat, message }: ChatWindowProps) {
           content: "",
           mediaUrl: publicId,
           messageId: generateUniqueId("direct-message"),
-          messageType: isImage ? "image" : "video",
+          messageType: isImage ? "image" : "text",
           receiverId: chat.id,
           senderId: senderId!,
           status: "sent",
@@ -118,6 +118,12 @@ export default function ChatWindow({ chat, message }: ChatWindowProps) {
   useEffect(() => {
     setMessages([...message]);
   }, [message]);
+
+  useEffect(()=>{
+    socketio.on("online-users",(users)=>{
+      console.log("online usrs are",users)
+    })
+  })
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {

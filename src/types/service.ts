@@ -5,3 +5,5 @@ export interface IReviewData{
   rating:number
   serviceId:string
 }
+
+export type PaymentStatus = 'successfull'  | 'failed';

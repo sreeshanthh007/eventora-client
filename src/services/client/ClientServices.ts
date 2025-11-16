@@ -242,10 +242,26 @@ export const removeReview = async(reviewId:string)=>{
   return response.data
 }
 
-export const getClientWalletDetails= async()=>{
-  const response = await axiosInstance.get(
-    CLIENT_ROUTES.GET_CLIENT_WALLET_DETAILS
+export const getClientWalletDetails= async({
+  type="all",
+  page=1,
+  limit=6
+}:{
+  type:string,
+  page:number,
+  limit:number
+})=>{
+  const response  = await axiosInstance.get(
+    CLIENT_ROUTES.GET_CLIENT_WALLET_DETAILS,
+    {
+      params:{
+        type,
+        page,
+        limit
+      }
+    }
   );
+
   return response.data
 }
 

@@ -1,6 +1,6 @@
 import type React from "react"
 import { useState } from "react"
-import { Calendar, Users, CreditCard, Download, Share2, QrCode, Search, Loader2, Clock } from "lucide-react"
+import { Calendar, Users, CreditCard, Download, QrCode, Search, Loader2, Clock } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/pages/ui/card"
 import { Badge } from "@/components/pages/ui/badge"
 import { Button } from "@/components/pages/ui/button"
@@ -11,7 +11,9 @@ import { getStatusColor } from "@/utils/helpers/GetStatusColor"
 import { getTicketTypeColor } from "@/utils/helpers/GetTicketTypeColor"
 import { getCloudinaryImageUrl } from "@/utils/helpers/GetCloudinaryImage"
 import { formatDateForInput } from "@/utils/helpers/FormatDate"
-import { TicketDetailsModal } from "../modals/TicketDetailsModal" 
+import { TicketDetailsModal } from "../modals/TicketDetailsModal"
+import { downloadTicketPDF } from "@/utils/helpers/DownloadTicketasPDF"
+import { useToast } from "@/hooks/ui/UseToaster"
 
 interface EventSchedule {
   date: string
@@ -68,6 +70,11 @@ export const BookedEvents: React.FC<BookedEventsProps> = ({
   onPageChange,
 }) => {
   const [selectedTicket, setSelectedTicket] = useState<BookedEvent | null>(null)
+  const [downloadingTicketId, setDownloadingTicketId] = useState<string | null>(null)
+
+
+
+  const { showToast } = useToast()
 
   const handleViewDetails = (ticket: BookedEvent) => {
     setSelectedTicket(ticket)
@@ -77,9 +84,24 @@ export const BookedEvents: React.FC<BookedEventsProps> = ({
     setSelectedTicket(null)
   }
 
+  const handleDownloadTicket = async (ticket: BookedEvent) => {
+    try {
+  
+      setDownloadingTicketId(ticket.ticketId)
+      showToast('Generating your ticket PDF...', 'loading')
+      await downloadTicketPDF(ticket)
+
+      showToast('Ticket downloaded successfully!', 'success')
+    } catch (error) {
+      console.error('Error downloading ticket:', error)
+      showToast('Failed to download ticket. Please try again.', 'error')
+    } finally {
+      setDownloadingTicketId(null)
+    }
+  }
 
   console.log("booked events ", bookedEvents)
-  // Always render header and search bar
+  
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
@@ -87,7 +109,6 @@ export const BookedEvents: React.FC<BookedEventsProps> = ({
         <p className="text-gray-600">View and manage your event tickets</p>
       </div>
 
-      {/* Search Bar - Always visible */}
       <div className="mb-6">
         <div className="relative max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -103,7 +124,6 @@ export const BookedEvents: React.FC<BookedEventsProps> = ({
 
       <div className="space-y-6">
         {isError ? (
-          // Error state - Show below search
           <Card className="text-center py-12">
             <CardContent>
               <p className="text-xl text-red-600 mb-4">Error loading booked events. Please try again later.</p>
@@ -117,7 +137,6 @@ export const BookedEvents: React.FC<BookedEventsProps> = ({
             </CardContent>
           </Card>
         ) : bookedEvents.length === 0 ? (
-          // Empty state
           <Card className="text-center py-12">
             <CardContent>
               <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
@@ -130,55 +149,73 @@ export const BookedEvents: React.FC<BookedEventsProps> = ({
           <>
             <div className="grid gap-6">
               {bookedEvents.map((ticket) => (
-                <Card key={ticket.ticketId} className="overflow-hidden hover:shadow-lg transition-shadow">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
-                    {/* Image Section - More responsive */}
-                    <div className="md:col-span-1 h-48 md:h-auto min-h-64 overflow-hidden bg-gray-100 flex items-center justify-center">
+              <Card
+                key={ticket.ticketId}
+                className="overflow-hidden hover:shadow-lg transition-shadow"
+                style={{ height: "100%" }}              
+              >
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-0 h-full">
+           
+                  <div className="relative md:col-span-1 bg-gray-100">
+                    <div className="absolute inset-0">
                       <img
-                        src={ticket.Images ? getCloudinaryImageUrl(ticket.Images[0]) : "/community-event.png"}
+                        src={
+                          ticket.Images
+                            ? getCloudinaryImageUrl(ticket.Images[0])
+                            : "/community-event.png"
+                        }
                         alt="Event image"
                         className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                       />
                     </div>
-
-                    {/* Ticket Details */}
-                    <div className="md:col-span-2 p-6">
-                      <CardHeader className="p-0 mb-4">
-                        <div className="flex flex-col sm:flex-row justify-between items-start gap-2 mb-2">
-                          <CardTitle className="text-xl font-bold text-gray-900">{ticket.title}</CardTitle>
-                          <div className="flex gap-2 flex-wrap">
-                            <Badge className={getStatusColor(ticket.ticketStatus)}>{ticket.ticketStatus}</Badge>
-                            {ticket.ticketType && (
-                              <Badge className={getTicketTypeColor(ticket.ticketType)}>{ticket.ticketType}</Badge>
-                            )}
-                          </div>
+                  </div>
+                    <div className="md:col-span-2 p-6 flex flex-col">
+                    <CardHeader className="p-0 mb-4">
+                      <div className="flex flex-col sm:flex-row justify-between items-start gap-2 mb-2">
+                        <CardTitle className="text-xl font-bold text-gray-900">
+                          {ticket.title}
+                        </CardTitle>
+                        <div className="flex gap-2 flex-wrap">
+                          <Badge className={getStatusColor(ticket.ticketStatus)}>
+                            {ticket.ticketStatus}
+                          </Badge>
+                          {ticket.ticketType && (
+                            <Badge className={getTicketTypeColor(ticket.ticketType)}>
+                              {ticket.ticketType}
+                            </Badge>
+                          )}
                         </div>
-                      </CardHeader>
-                      <CardContent className="p-0">
-                        {ticket.eventSchedule && ticket.eventSchedule.length > 0 && (
-                          <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
-                            <div className="flex items-center gap-2 mb-3">
-                              <Clock className="w-4 h-4 text-blue-600" />
-                              <h4 className="font-semibold text-gray-900">Event Schedule</h4>
+                      </div>
+                    </CardHeader>
+                      <CardContent className="p-0 flex-1">
+                    {ticket.eventSchedule && ticket.eventSchedule.length > 0 && (
+                      <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Clock className="w-4 h-4 text-blue-600" />
+                          <h4 className="font-semibold text-gray-900">
+                            Event Schedule
+                          </h4>
+                        </div>
+                        <div className="space-y-2">
+                          {ticket.eventSchedule.map((event, idx) => (
+                            <div
+                              key={idx}
+                              className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-sm text-gray-700"
+                            >
+                              <span className="font-medium text-gray-900">
+                                {formatDateForInput(event.date)}
+                              </span>
+                              <span className="hidden sm:inline text-gray-400">•</span>
+                              <span>
+                                {formatTime(event.startTime)} -{" "}
+                                {formatTime(event.endTime)}
+                              </span>
                             </div>
-                            <div className="space-y-2">
-                              {ticket.eventSchedule.map((event, idx) => (
-                                <div
-                                  key={idx}
-                                  className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-sm text-gray-700"
-                                >
-                                  <span className="font-medium text-gray-900">{formatDateForInput(event.date)}</span>
-                                  <span className="hidden sm:inline text-gray-400">•</span>
-                                  <span>
-                                    {formatTime(event.startTime)} - {formatTime(event.endTime)}
-                                  </span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
-                        {/* Ticket Info */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                           <div className="space-y-3">
                             <div className="flex items-center text-gray-600">
@@ -208,34 +245,62 @@ export const BookedEvents: React.FC<BookedEventsProps> = ({
                           </div>
                         </div>
                         <Separator className="my-4" />
-                        {/* QR Code and Actions */}
+                        
                         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                           <div className="flex items-center gap-4">
                             <div className="flex items-center gap-2">
                               <QrCode className="w-4 h-4 text-gray-600" />
                               <span className="text-sm text-gray-600">QR Code:</span>
                             </div>
+                           {ticket.qrCodeLink ? (
                             <img
-                              src={ticket.qrCodeLink || "/placeholder.svg"}
+                              src={ticket.qrCodeLink}
                               alt={`QR Code for ${ticket.ticketId}`}
                               className="w-16 h-16 border border-gray-200 rounded"
                             />
+                          ) : (
+                            <div className="w-16 h-16 flex items-center justify-center text-xs text-red-600 border border-gray-300 rounded bg-gray-50">
+                              QR not available
+                            </div>
+                          )}
                           </div>
-                          <div className="flex gap-2 flex-wrap">
-                            <Button variant="outline" size="sm">
-                              <Download className="w-4 h-4 mr-1" />
-                              Download
-                            </Button>
-                            <Button variant="outline" size="sm">
-                              <Share2 className="w-4 h-4 mr-1" />
-                              Share
-                            </Button>
-                            <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={() => handleViewDetails(ticket)}>
-                              View Details
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
+                        <div className="flex gap-2 flex-wrap">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDownloadTicket(ticket)}
+                          disabled={
+                            downloadingTicketId === ticket.ticketId ||
+                            ticket.paymentStatus === "failed"
+                          }
+                          className={
+                            ticket.paymentStatus === "failed"
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
+                          }
+                        >
+                          {downloadingTicketId === ticket.ticketId ? (
+                            <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                          ) : (
+                            <Download className="w-4 h-4 mr-1" />
+                          )}
+                          {ticket.paymentStatus === "failed"
+                            ? "Payment Failed"
+                            : downloadingTicketId === ticket.ticketId
+                            ? "Downloading..."
+                            : "Download"}
+                        </Button>
+
+                        <Button
+                          size="sm"
+                          className="bg-blue-600 hover:bg-blue-700"
+                          onClick={() => handleViewDetails(ticket)}
+                        >
+                          View Details
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
                     </div>
                   </div>
                 </Card>
@@ -266,6 +331,7 @@ export const BookedEvents: React.FC<BookedEventsProps> = ({
           email={selectedTicket.email}
           amount={selectedTicket.amount}
           ticketStatus={selectedTicket.ticketStatus}
+          paymentStatus={selectedTicket.paymentStatus}
         />
       )}
     </div>

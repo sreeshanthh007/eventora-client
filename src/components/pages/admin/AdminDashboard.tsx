@@ -1,5 +1,3 @@
-
-
 import { useState, useRef } from "react"
 import { motion } from "framer-motion"
 import BackToTop from "../ui/back-to-top"
@@ -12,6 +10,7 @@ import GlobalFilters from "@/components/admin/adminDashboard/Globalfilters"
 import { AppSidebar } from "@/components/mainComponents/AdminSidebar"
 import { SidebarProvider } from "../ui/sidebar"
 import { UsegetAdminAnalyticsDashboard } from "@/hooks/admin/UseGetAdminAnalyticsDashboard"
+import { DownloadAnalyticsPDFButton } from "@/utils/helpers/DownloadAnalyticsAsPDF"
 
 export default function AdminDashboard() {
   const [activeSection, setActiveSection] = useState("summary")
@@ -64,6 +63,12 @@ export default function AdminDashboard() {
     )
   }
 
+  const dateRange = {
+    period: filterData.period,
+    start: filterData.startDate ? new Date(filterData.startDate).toISOString().split('T')[0] : '',
+    end: filterData.endDate ? new Date(filterData.endDate).toISOString().split('T')[0] : '',
+  }
+
   return (
     <div className="flex min-h-screen bg-gradient-to-b from-white via-blue-50 to-white">
       <SidebarProvider>
@@ -81,7 +86,14 @@ export default function AdminDashboard() {
           >
             <div className="px-6 py-6 lg:px-8">
               <h1 className="text-3xl font-bold text-slate-900 mb-4">Admin Analytics Dashboard</h1>
-              <GlobalFilters onFilterApply={handleFilterApply} />
+              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                <GlobalFilters onFilterApply={handleFilterApply} />
+                <DownloadAnalyticsPDFButton
+                  analytics={analyticsData}
+                  dateRange={dateRange}
+                  dashboardType="admin"
+                />
+              </div>
             </div>
           </motion.header>
 
