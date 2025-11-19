@@ -26,7 +26,7 @@ interface CheckoutFormProps {
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISH_KEY)
 const CheckoutFormInner: React.FC<CheckoutFormProps> = ({ vendorId,eventId, purchaseData, onClose }) => {
-  console.log("checkout data",purchaseData)
+
   const {showToast} = useToast()
   const stripe = useStripe()
   const elements = useElements()

@@ -8,16 +8,16 @@ import { useNavigate } from "react-router-dom";
 import { useVerifyTicketMutation } from "@/hooks/vendor/UseVerifyTicket";
 
 interface QRScannerProps {
-  eventId?: string;               // ← now optional
+  eventId?: string;
   isOpen: boolean;
   onClose: () => void;
   onSuccess: (message: string) => void;
   onError: (message: string) => void;
-  scanningType: string;           // "scan-event" | "verify-ticket"
+  scanningType: string;       
 }
 
 export default function QRScanner({
-  eventId: _eventIdFromRow,       // ignore – we will read it from the QR payload
+  eventId: _eventIdFromRow,    
   isOpen,
   onClose,
   onSuccess,
