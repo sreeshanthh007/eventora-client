@@ -77,7 +77,7 @@ const {mutate:forgotPasswordClient} = useClientForgotPasswordMutation()
         }
 
 const handler =  forgotPasswordClient 
-console.log("in handler",handler)
+
 await new Promise((resolve, reject) => {
   handler(resetPasswordData, {
     onSuccess: (response) => {
