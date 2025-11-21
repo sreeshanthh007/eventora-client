@@ -11,7 +11,7 @@ import type { CredentialResponse } from "@react-oauth/google";
 import { useToast } from "@/hooks/ui/UseToaster";
 import { requestNotificationPermission } from "@/services/firebase/notification";
 import { UseSaveFcmTokenMutation } from "@/hooks/auth/UseSaveFcmToken";
-import { useState } from "react";
+
 
 
 
@@ -32,7 +32,6 @@ import { useState } from "react";
             
             toast.success(data.message)
             dispatch(vendorLogin(data.user))
-            console.log("vendr",data.user)
             const fcmToken = await requestNotificationPermission()
             if(fcmToken){
               saveFcmToken({
@@ -43,7 +42,6 @@ import { useState } from "react";
             }
           },
           onError:(err)=>{
-            console.log(err)
             toast.error(err.response?.data?.message)
           }
         }

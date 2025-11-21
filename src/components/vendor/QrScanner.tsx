@@ -54,7 +54,7 @@ export default function QRScanner({
     scannerRef.current = scanner;
 
     const onScanSuccess = (decodedText: string) => {
-      console.log("decoded text", decodedText);
+     
       if (!decodedText) {
         showToast("QR scanned but didn't catch!", "error");
         return;
@@ -108,7 +108,7 @@ export default function QRScanner({
 
     const onScanError = (err: any) => {
       if (err && err !== "No MultiFormat Readers were able to detect the code.") {
-        console.error("Scan error:", err);
+        showToast(`Scan error: ${err}`, "error");
       }
     };
 

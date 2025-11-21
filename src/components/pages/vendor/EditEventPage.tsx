@@ -18,10 +18,9 @@ export default function EditEventPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
 
-  // Fetch event data
   const { data: eventResponse, isLoading, isError, error } = UseGetEventsById(eventId!);
   const {mutateAsync:editEvent} = useEditEventMutation()
-  console.log("data in edit event", eventResponse);
+
 
 
 
@@ -54,20 +53,21 @@ const event: IEventFormData | undefined = eventResponse?.events
 
   useEffect(() => {
     if (isError) {
-      console.log("Error fetching event:", error);
+   
       showToast(error?.message || "Failed to fetch event details", "error");
     }
   }, [isError, error, showToast]);
 
 
 
-  // Handle form submission
-  const handleSubmit = async (data: IEventFormData) => {
-    setIsSubmitting(true);
-    try {
-      console.log("data before submit", data);
-      
-          let uploadedImageIds: string[] = [];
+ 
+const handleSubmit = async (data: IEventFormData) => {
+  setIsSubmitting(true);
+  try {
+
+
+    let uploadedImageIds: string[] = [];
+
     if (data.Images?.length) {
       const results = await Promise.all(
         data.Images.map((file) =>
@@ -76,28 +76,33 @@ const event: IEventFormData | undefined = eventResponse?.events
             : Promise.resolve(file) 
         )
       );
-      uploadedImageIds = results.filter(Boolean) as string[];
+
+      
+      uploadedImageIds = results.filter((v) => typeof v === "string") as string[];
     }
 
-   const formattedData = {
-     ...data,
-    location: data.location
-    ? { type: "Point" as const, coordinates: data.location } 
-    : undefined,
+    const formattedData = {
+      ...data,
+      location: data.location
+        ? { type: "Point" as const, coordinates: data.location }
+        : undefined,
+
+      Images: uploadedImageIds, 
+    };
+
+    await editEvent({ eventId: eventId!, data: formattedData });
+  } finally {
+    setIsSubmitting(false);
+  }
 };
-    await editEvent({eventId:eventId!,data:formattedData})
 
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
-  // Handle cancel action
+
   const handleCancel = () => {
     navigate("/vendor/events");
   };
 
-  // Loading state
+
   if (isLoading) {
     return (
       <VendorLayout>

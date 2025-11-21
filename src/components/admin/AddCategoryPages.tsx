@@ -8,7 +8,6 @@ import ImageCropper from "@/utils/helpers/ImageCropper"
 import { useFormik } from "formik"
 import { addCategorySchema } from "@/utils/validations/categoryValidator"
 import { useToast } from "@/hooks/ui/UseToaster"
-import { useNavigate } from "react-router-dom"
 
 export function AddCategoryForm({onSubmit}) {
 
@@ -18,7 +17,6 @@ export function AddCategoryForm({onSubmit}) {
   const [showCropper, setShowCropper] = React.useState(false)
   const [imageError, setImageError] = React.useState<string | null>(null)
   const {showToast} = useToast()
-  const navigate = useNavigate()
 
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {

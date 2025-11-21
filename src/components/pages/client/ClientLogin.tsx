@@ -60,12 +60,10 @@ export const ClientLogin = () => {
       {
         onSuccess:(data)=>{
           showToast(data.message,"success")
-          console.log("google user",data.user)
           dispatch(clientLogin(data.user))
 
         },
-        onError:(err:any)=>{
-          console.log(err)
+        onError:(err:Error)=>{
           showToast(err.response?.data?.message,"error")
         }
       }

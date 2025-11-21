@@ -26,7 +26,7 @@ export default function VendorBookedServicesPage() {
     search: debouncedSearchTerm
   });
   const bookings : BookedService[] = data?.bookings || []
-  console.log("bookings from page",bookings[0])
+  
   const total = data?.total || 0
   const totalPages = Math.ceil(total / limit)
 
@@ -36,7 +36,7 @@ export default function VendorBookedServicesPage() {
   const handleStartBookedServiceSubmit = (bookingId: string) => {
     if (bookingId) {
       startBookedService({ bookingId });
-      console.log("booking id ss",bookingId)
+      
     }
   };
 

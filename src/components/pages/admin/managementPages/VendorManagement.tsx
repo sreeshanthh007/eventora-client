@@ -89,7 +89,7 @@ import { useNavigate } from "react-router-dom"
         )
       }
     } catch (err) {
-      console.error(err)
+      showToast("Failed to update vendor status", "error")
     }
     }
 

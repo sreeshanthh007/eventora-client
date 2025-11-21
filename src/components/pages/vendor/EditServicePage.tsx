@@ -38,8 +38,8 @@ export default function EditServicePage() {
     try {
    
 
-      console.log("eited esrvicce",data)
-      await editService({serviceId:serviceId,data:data})
+
+      await editService({serviceId:serviceId!,data:data})
 
       navigate("/vendor/services")
     } catch (error) {

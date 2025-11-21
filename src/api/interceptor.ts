@@ -105,13 +105,12 @@ axiosInstance.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    // Handle explicit login required scenarios
     if (
       error.response?.status === StatusCodes.UNAUTHORIZED &&
       message.includes("Unauthorized access") && 
       message.includes("please login")
     ) {
-      toast.info(message || "Please log in again");
+      // toast.info(message || "Please log in again");
       handleLogout(role);
       return Promise.reject(error);
     }

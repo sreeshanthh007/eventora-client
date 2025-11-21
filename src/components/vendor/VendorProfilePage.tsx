@@ -18,7 +18,7 @@ import { useUpdateVendorProfileImageMutation } from "@/hooks/vendor/UseUpdatePro
 import { getCloudinaryImageUrl } from "@/utils/helpers/GetCloudinaryImage"
 import { EditProfileModal, type EditProfileData } from "../modals/EditProfileModal"
 import { useUpdateVendorPersonalInformationMutation } from "@/hooks/vendor/UseUpdateVendorPersonal-information"
-import { Navigate, useNavigate } from "react-router-dom"
+import {  useNavigate } from "react-router-dom"
 
 export default function VendorProfilePage() {
   const [showCropper, setShowCropper] = useState(false)

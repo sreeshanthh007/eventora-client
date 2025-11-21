@@ -8,7 +8,7 @@ import { useState } from "react";
 export default function VendorWalletPage() {
   const [page, setPage] = useState(1);
   const [filter, setFilter] = useState<"all" | "credit" | "debit">("all");
-  const limit = 6; // same as client side
+  const limit = 6; 
 
   const { data: walletResp, isError, isLoading } = UseGetVendorWalletDetails({
     page,

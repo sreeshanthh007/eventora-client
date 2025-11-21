@@ -5,6 +5,7 @@ import { Button } from "@/components/pages/ui/button"
 import { ArrowLeft } from "lucide-react"
 import { Link, useNavigate } from "react-router-dom"
 import { useAddServiceMutation } from "@/hooks/vendor/service/UseAddService"
+import { useToast } from "@/hooks/ui/UseToaster"
 
 
 const dayToNumber: Record<string, number> = {
@@ -20,6 +21,7 @@ const dayToNumber: Record<string, number> = {
 export default function AddServicePage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const navigate = useNavigate()
+  const {showToast} = useToast()
   const { mutateAsync: addService } = useAddServiceMutation()
 
   const handleSubmit = async (formData: ServiceFormData) => {
@@ -52,11 +54,11 @@ export default function AddServicePage() {
         holidays: scheduleConfig.holidays,
       }
 
-      console.log("data for submit", payload)
+   
       await addService(payload)
       navigate("/vendor/services")
-    } catch (error) {
-      console.log("error to add service ", error)
+    } catch (error:Error) {
+      showToast(error?.message || "Failed to add service","error")
     } finally {
       setIsSubmitting(false)
     }

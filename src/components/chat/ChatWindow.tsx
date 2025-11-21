@@ -1,3 +1,4 @@
+// components/chat/ChatWindow.tsx
 import type React from "react";
 import { useContext, useEffect, useState, useRef } from "react";
 import { Button } from "@/components/pages/ui/button";
@@ -50,24 +51,70 @@ export default function ChatWindow({ chat, message }: ChatWindowProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  // Load initial messages
+  useEffect(() => {
+    setMessages([...message]);
+  }, [message]);
+
+  // Join room & listen for new messages
+  useEffect(() => {
+    socketio.emit("direct-chat:join-room", chat.roomId);
+
+    const handleNewMessage = (data: Message) => {
+      setMessages((prev) => [...prev, data]);
+    };
+
+    socketio.on("direct-chat:receive-message", handleNewMessage);
+
+    return () => {
+      socketio.off("direct-chat:receive-message", handleNewMessage);
+      socketio.emit("direct-chat:leave-room", chat.roomId);
+    };
+  }, [chat.roomId, socketio]);
+
+
+  useEffect(() => {
+  const handler = (onlineUsers: string[]) => {
+    console.log("online users in sidebar", onlineUsers);
+  };
+
+  socketio.on("online-users", handler);
+
+  return () => {
+    socketio.off("online-users", handler);
+  };
+}, []);
+
 
   const handleSend = () => {
-    if (inputValue.trim()) {
-      const message: Message = {
-        chatRoomId: chat.roomId,
-        content: inputValue,
-        mediaUrl: "",
-        messageId: generateUniqueId("direct-message"),
-        messageType: "text",
-        receiverId: chat.id,
-        senderId: senderId!,
-        status: "sent",
-        timestamp: new Date(),
-      };
-      socketio.emit("direct-chat:send-message", message);
-      setMessages((prev) => [...prev, message]);
-      setInputValue("");
-    }
+    if (!inputValue.trim()) return;
+
+    const newMessage: Message = {
+      chatRoomId: chat.roomId,
+      content: inputValue,
+      mediaUrl: "",
+      messageId: generateUniqueId("direct-message"),
+      messageType: "text",
+      receiverId: chat.id,
+      senderId: senderId!,
+      status: "sent",
+      timestamp: new Date(),
+    };
+
+    socketio.emit("direct-chat:send-message", newMessage);
+    setMessages((prev) => [...prev, newMessage]);
+    setInputValue("");
   };
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,19 +135,20 @@ export default function ChatWindow({ chat, message }: ChatWindowProps) {
       const publicId = await uploadImageToCloudinarySigned(file, folder);
 
       if (publicId) {
-        const message: Message = {
+        const newMessage: Message = {
           chatRoomId: chat.roomId,
           content: "",
           mediaUrl: publicId,
           messageId: generateUniqueId("direct-message"),
-          messageType: isImage ? "image" : "text",
+          messageType: isImage ? "image" : "video",
           receiverId: chat.id,
           senderId: senderId!,
           status: "sent",
           timestamp: new Date(),
         };
-        socketio.emit("direct-chat:send-message", message);
-        setMessages((prev) => [...prev, message]);
+
+        socketio.emit("direct-chat:send-message", newMessage);
+        setMessages((prev) => [...prev, newMessage]);
       } else {
         alert("Failed to upload file");
       }
@@ -109,21 +157,9 @@ export default function ChatWindow({ chat, message }: ChatWindowProps) {
       alert("Error uploading file");
     } finally {
       setUploading(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
-
-  useEffect(() => {
-    setMessages([...message]);
-  }, [message]);
-
-  useEffect(()=>{
-    socketio.on("online-users",(users)=>{
-      console.log("online usrs are",users)
-    })
-  })
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -132,37 +168,34 @@ export default function ChatWindow({ chat, message }: ChatWindowProps) {
     }
   };
 
-  useEffect(() => {
-    socketio.emit("direct-chat:join-room", chat.roomId);
-    socketio.on("direct-chat:receive-message", (data: Message) => {
-      console.log(data);
-      setMessages((prev) => [...prev, data]);
-    });
-  }, []);
-
   return (
-    <div className="flex-1 flex flex-col bg-background overflow-scroll sm:flex">
-      {/* Header */}
-      <ChatWindowHeader chat={chat} />
-      {/* Messages */}
-      <ScrollArea className="flex-1 p-4">
-        <div className="flex flex-col gap-4">
-          {messages.map((message, index) => (
+    <div className="flex flex-col h-full bg-background">
+      {/* Sticky Header */}
+      <div className="sticky top-0 z-10 bg-background border-b border-border">
+        <ChatWindowHeader chat={chat} />
+      </div>
+
+      {/* Scrollable Messages */}
+      <ScrollArea className="flex-1 px-4 py-6">
+        <div className="flex flex-col gap-4 max-w-4xl mx-auto w-full">
+          {messages.map((msg) => (
             <motion.div
-              key={message.messageId}
-              initial={{ opacity: 0, y: 10 }}
+              key={msg.messageId}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
+              transition={{ duration: 0.3 }}
             >
-              <MessageBubble message={message} />
+              <MessageBubble message={msg} />
             </motion.div>
           ))}
+          {/* Anchor for auto-scroll */}
+          <div ref={messagesEndRef} />
         </div>
       </ScrollArea>
 
       {/* Input Area */}
-      <div className="p-4 border-t border-border">
-        <div className="flex items-center gap-3">
+      <div className="border-t border-border bg-background p-4">
+        <div className="flex items-center gap-3 max-w-4xl mx-auto">
           <input
             ref={fileInputRef}
             type="file"
@@ -174,21 +207,28 @@ export default function ChatWindow({ chat, message }: ChatWindowProps) {
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
             variant="outline"
-            className="rounded-full w-10 h-10 p-0 flex items-center justify-center"
+            size="icon"
+            className="rounded-full shrink-0"
           >
-            {uploading ? "..." : "+"}
+            {uploading ? (
+              <span className="text-xs">...</span>
+            ) : (
+              <span className="text-2xl">+</span>
+            )}
           </Button>
+
           <Input
             placeholder="Type a message..."
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={handleKeyPress}
-            className="flex-1 rounded-full bg-muted text-foreground placeholder:text-muted-foreground"
+            onKeyDown={handleKeyPress}
+            className="flex-1 rounded-full bg-muted"
           />
+
           <Button
             onClick={handleSend}
-            disabled={!inputValue.trim()}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-6 font-semibold transition-colors"
+            disabled={!inputValue.trim() || uploading}
+            className="rounded-full px-6 font-semibold"
           >
             Send
           </Button>

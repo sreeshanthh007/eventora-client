@@ -182,8 +182,7 @@ export function Filters({
                           setLng(pos.coords.longitude)
                         },
                         (err) => {
-                          console.error("Error getting location:", err)
-                          alert("Unable to get your location. Please enable location access.")
+                          alert("Unable to get your location. Please enable location access.",err)
                         },
                       )
                     } else {

@@ -27,7 +27,7 @@ interface ServiceCheckoutFormProps {
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISH_KEY)
 
 const ServiceCheckoutFormInner: React.FC<ServiceCheckoutFormProps> = ({ bookingData, onClose }) => {
-    console.log("checkot data",bookingData)
+
   const { showToast } = useToast()
   const stripe = useStripe()
   const elements = useElements()
@@ -76,8 +76,8 @@ const ServiceCheckoutFormInner: React.FC<ServiceCheckoutFormProps> = ({ bookingD
         showToast("Payment Successful", "success")
         onClose()
       }
-    } catch (err: any) {
-      console.error("Payment error:", err)
+    } catch (err) {
+  
       if (err.response?.data?.message) {
         showToast(err.response?.data?.message, "error")
       }

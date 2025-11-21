@@ -96,7 +96,7 @@ const RequestedVendorsPage = () => {
   }
 
   const handleRejectVendor = async(vendorId: string,rejectReason:string) => {
-    console.log("rejecteed reason",rejectReason)
+ 
    const res = await rejectVendor(
    {
     vendorId,
@@ -136,7 +136,6 @@ const RequestedVendorsPage = () => {
               
               size="sm"
               onClick={(e) => {
-                console.log("Button clicked for vendor:", item.name) // Debug log
                 e.stopPropagation()
               }}
             >

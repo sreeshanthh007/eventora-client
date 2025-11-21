@@ -76,18 +76,15 @@ const {mutate:forgotPasswordClient} = useClientForgotPasswordMutation()
         }
 
 const handler = forgotPasswordClient
-console.log("in handler",handler)
 await new Promise((resolve, reject) => {
   handler(resetPasswordData, {
     onSuccess: (response) => {
-      console.log("Password reset successful:", response)
       setIsLoading(false)
       onSuccess()
       handleClose()
       resolve(response)
     },
     onError: (error) => {
-      console.error("Password reset failed:", error)
       setIsLoading(false)
       setErrors(prev => ({
         ...prev,
@@ -100,7 +97,6 @@ await new Promise((resolve, reject) => {
 
     } catch (error) {
       setIsLoading(false)
-      console.error("Password reset failed:", error)
     }
   }
 

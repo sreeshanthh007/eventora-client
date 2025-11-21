@@ -45,7 +45,7 @@ export default function VerifyAttendiesPage() {
     search: debouncedSearchTerm,
   });
 
-  console.log("ticket detals are",data)
+
   useEffect(() => {
     if (data?.tickets) {
       setTickets(data.tickets);

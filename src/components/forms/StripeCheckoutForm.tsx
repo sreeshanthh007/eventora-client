@@ -74,14 +74,12 @@ const CheckoutFormInner: React.FC<CheckoutFormProps> = ({ vendorId,eventId, purc
       })
 
       if (result.error) {
-        console.log("result error",result.error)
         showToast(result.error.message || "Payment failed", "error")
       } else if (result.paymentIntent?.status === "succeeded") {
         showToast("Payment Successful", "success")
         onClose()
       }
-    } catch (err: any) {
-      console.error("Payment error:", err)
+    } catch (err) {
       if(err.response?.data?.message){
         showToast(err.response?.data?.message, "error");
        onClose()

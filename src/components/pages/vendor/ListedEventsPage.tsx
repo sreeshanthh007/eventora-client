@@ -53,7 +53,7 @@ export default function ListedEventsPage() {
         isOpen={showVerificationModal}
         onClose={() => setShowVerificationModal(false)}
         status={vendor?.vendorStatus}
-        rejectReason={vendor?.rejectionReason}
+        rejectReason={vendor?.rejectionReason!}
         userName={vendor?.name}
         submissionDate={vendor?.createdAt}
       />

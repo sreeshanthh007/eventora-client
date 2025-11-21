@@ -43,6 +43,8 @@ jobs:
           VITE_CLOUDINARY_IMAGE_UPLOAD_PRESET: ${{ secrets.VITE_CLOUDINARY_IMAGE_UPLOAD_PRESET }}
           CLOUDINARY_BASE_URL : ${{ secrets.CLOUDINARY_BASE_URL }}
 
+          VITE_STRIPE_PUBLISH_KEY : ${{ secrets.VITE_STRIPE_PUBLISH_KEY }}
+
 
         run: |
           npm run build

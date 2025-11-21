@@ -20,7 +20,7 @@ import { NotificationPopover } from "../common/card/NotificationPopOver"
 export const ClientHeader: React.FC = () => {
   const client = useSelector((state: RootState) => state.client.client)
   const navigate = useNavigate()
-console.log("client slice is",client)
+
   const sidebarMenuItems = [
     { icon: User, label: "My Profile", to: "/profile" },
     { icon: Ticket, label: "My Events", to: "/booked-events" },

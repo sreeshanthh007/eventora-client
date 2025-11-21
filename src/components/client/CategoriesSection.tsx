@@ -11,7 +11,6 @@ export const CategoriesSection: React.FC = () => {
 
 
   const { data, isLoading, error } = UseGetAllCategories();
-  console.log("data", data);
 
 
   const categories = data?.categories || [];
