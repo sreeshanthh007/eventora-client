@@ -27,7 +27,6 @@ export function useEventsPage() {
     limit,
     search: debouncedSearchTerm,
   });
-console.log("data for the tble",data)
   const toggleEventMutation = useToggleEventMutation();
   const {mutateAsync:updateEventStatusMutation} = useUpdateEventStatusMutation()
 
@@ -66,12 +65,11 @@ console.log("data for the tble",data)
         );
         
       }
-    } catch (error: any) {
+    } catch (error) {
       showToast(
         error?.message || "Failed to update event status", 
         "error"
       );
-      console.error("Error toggling event status:", error);
     }
   };
 
@@ -94,7 +92,7 @@ console.log("data for the tble",data)
   };
 
   const handleEdit = (eventId: string) => {
-    console.log("event id", eventId);
+
     navigate(`/vendor/edit-event/${eventId}`);
   };
 

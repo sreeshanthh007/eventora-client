@@ -88,7 +88,7 @@ export default function ListedServicePage() {
   }, [debouncedSearchTerm]);
 
   const totalPages = data?.total 
-console.log("service sare",data)
+
   const handleStatusToggle = (service: Service) => {
     const action = service.status === "active" ? "block" : "unblock";
     setConfirmDialog({

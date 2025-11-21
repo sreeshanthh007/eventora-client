@@ -31,7 +31,6 @@ export function WorkSampleForm({ onSubmit,editSubmit }: WorkSampleFormProps) {
   const worksample = data?.data
 
 
-
   
   useEffect(() => {
     if (data) {
@@ -238,12 +237,12 @@ export function WorkSampleForm({ onSubmit,editSubmit }: WorkSampleFormProps) {
               )}
             </div>
             <div className="pt-2">
-             { worksample?.length > 0 ?
+             { worksample?.images?.length > 0 ?
              <Button type="submit" className="w-full md:w-auto" disabled={formik.isSubmitting}>
-                Save Work Sample
+                edit Work Sample
               </Button> 
            :  <Button type="submit"   className="w-full md:w-auto bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4" disabled={formik.isSubmitting}>
-                Edit Work Sample
+                save Work Sample
               </Button> }
             </div>
           </form>

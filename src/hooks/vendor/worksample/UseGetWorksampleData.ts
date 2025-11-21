@@ -8,5 +8,6 @@ export const UseGetWorksampleData = () => {
     return useQuery({
         queryKey:["worksampledata"],
         queryFn:getWorkSampleDetailsByVendors,
+        staleTime:5 * 60 * 1000,
     })
 }

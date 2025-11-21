@@ -65,7 +65,7 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
         await onSave(category._id, updatedData)
         handleClose()
       } catch (error) {
-        console.error("Error saving category:", error)
+        showToast("Failed to save category changes","error")
       }
     },
   })

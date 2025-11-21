@@ -2,7 +2,7 @@ import * as yup from "yup";
 
 
 const FILE_SIZE = 10 * 1024 * 1024;
-const SUPPORTED_FORMATS = ["image/jpeg", "image/png", "image/gif"];
+const SUPPORTED_FORMATS = ["image/jpeg", "image/png", "image/gif","image/webp"];
 
 
 
@@ -82,26 +82,28 @@ export const eventSchema = yup.object().shape({
     .min(5, "min 5 characters required")
     .required("event location is required"),
 
- Images: yup
+Images: yup
   .array()
   .of(
     yup
       .mixed()
-      .test("fileSize", "File too large", (file) => {
-        if (!file) return true; // empty allowed
-        if (file instanceof File) {
-          return file.size <= FILE_SIZE;
-        }
-        return true; // existing image strings pass
-      })
       .test("fileType", "Unsupported file type", (file) => {
+        if (typeof file === "string") return true; // existing image
+        if (!file) return false; // no file → fail
+        return SUPPORTED_FORMATS.includes(file.type);
+      })
+      .test("fileSize", "File too large", (file) => {
+        if (typeof file === "string") return true;
         if (!file) return true;
-        if (file instanceof File) {
-          return SUPPORTED_FORMATS.includes(file.type);
-        }
-        return true;
+        return file.size <= FILE_SIZE;
       })
   )
-  .required("Event images are required"),
-});
+  .test("requiredImages", "At least one image is required", (images) => {
+    // No array OR empty array
+    if (!images || images.length === 0) return false;
 
+    // Check if at least one item is File or URL string
+    return images.some((img) => img && (typeof img === "string" || img instanceof File));
+  }),
+
+});

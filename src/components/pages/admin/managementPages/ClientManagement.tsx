@@ -62,10 +62,9 @@ const ClientManagementPage = () => {
   }, [debouncedSearchTerm])
 
   const handleBlockUserClick = (client: IClient) => {
-    // Fixed: More explicit action determination
+ 
     const action = client.status === "active" ? "block" : "unblock"
-    
-    console.log(`Client status: ${client.status}, Action: ${action}`) // Debug log
+
     
     setConfirmDialog({
       isOpen: true,
@@ -101,7 +100,6 @@ const ClientManagementPage = () => {
       }
     } catch (error) {
       showToast("Failed to update client status", "error")
-      console.error("Error updating client status:", error)
     }
   }
 

@@ -64,7 +64,6 @@ export function EditServiceForm({ service, onSubmit, onCancel, isSubmitting = fa
   const { data: response, isLoading, isError, error } = useGetCategoriesForService();
   const categories = response?.data ? response.data : [];
 
-  console.log("service for edit", service);
 
   const NUMBER_TO_DAY: { [key: number]: string } = {
     0: "Sunday",
@@ -159,7 +158,7 @@ export function EditServiceForm({ service, onSubmit, onCancel, isSubmitting = fa
 
         resetForm();
       } catch (error) {
-        console.error("Failed to update service:", error);
+
         toast.error("Failed to update service");
       }
     },

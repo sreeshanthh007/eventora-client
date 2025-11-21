@@ -1,12 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useSearchParams } from "react-router-dom";
 import { getCloudinaryImageUrl } from "@/utils/helpers/GetCloudinaryImage";
 import ChatSidebar from "@/components/chat/ChatSideBar";
 import ChatWindow, { type Message } from "@/components/chat/ChatWindow";
 import { Breadcrumbs } from "@/components/common/breadCrumbs/BreadCrumbs";
-// import { GetAllChatsOfClients } from "@/hooks/client/UseGetChatsOfClient"
 import { useGetClientChatByChatId } from "@/hooks/client/UseGetClientChatByChatId";
 import type { UserRole } from "@/types/UserRoles";
+import { socketContext } from "@/contexts/SocketContext";
 
 interface ChatProps {
   queryData: any;
@@ -18,7 +18,7 @@ export default function Chat({ queryData, chatsIsLoading, role }: ChatProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-
+  const socketio = useContext(socketContext)
   const [messages, setMessages] = useState<Message[]>([]);
   console.log("query data ", queryData);
 
@@ -68,30 +68,46 @@ export default function Chat({ queryData, chatsIsLoading, role }: ChatProps) {
     chat.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+      useEffect(() => {
+      const handler = (onlineUsers: string[]) => {
+        console.log("online users in sidebar", onlineUsers);
+      };
+    
+      socketio.on("online-users", handler);
+    
+      return () => {
+        socketio.off("online-users", handler);
+      };
+    }, []);
+
   const handleSelectChat = (id: string) => {
     setSelectedChatId(id);
     setSearchParams({ userId: id });
   };
 
- return (
-    <div className="flex flex-col h-full bg-background"> 
-      <div className="px-6 py-4 border-b border-border flex-shrink-0">
-        <Breadcrumbs role={role} />
-      </div>
-      <div className="flex flex-1 overflow-hidden">
-        <ChatSidebar
-          chats={chatsIsLoading ? [] : filteredChats}
-          selectedChatId={selectedChatId}
-          onSelectChat={handleSelectChat}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-        />
-        {selectedChat && (
-          <div className="flex-1 flex flex-col overflow-hidden">
-            <ChatWindow chat={selectedChat} message={messages} />
-          </div>
-        )}
-      </div>
+  
+
+return (
+  <div className="flex flex-col h-screen bg-background">
+    <div className="px-6 py-4 border-b border-border flex-shrink-0">
+      <Breadcrumbs role={role} />
     </div>
-  );
+
+    <div className="flex flex-1 overflow-hidden">
+      <ChatSidebar
+        chats={chatsIsLoading ? [] : filteredChats}
+        selectedChatId={selectedChatId}
+        onSelectChat={handleSelectChat}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+      />
+
+      {selectedChat && (
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <ChatWindow chat={selectedChat} message={messages} />
+        </div>
+      )}
+    </div>
+  </div>
+);
 }

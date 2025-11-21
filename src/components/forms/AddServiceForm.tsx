@@ -12,7 +12,7 @@ import { useGetCategoriesForService } from "@/hooks/vendor/service/UseGetCategor
 import { ScheduleSlotConfig, type ScheduleSlotConfig as ScheduleSlotConfigType } from "./ScheduleSlotConfg"
 import { useState } from "react"
 
-interface ServiceFormData {
+export interface ServiceFormData {
   serviceTitle: string
   yearsOfExperience: number
   serviceDescription: string

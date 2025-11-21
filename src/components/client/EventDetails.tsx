@@ -104,7 +104,7 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
   }, [event])
 
   useEffect(() => {
-    console.log("Current purchaseData:", purchaseData)
+
   }, [purchaseData])
 
   if (isLoading) {

@@ -93,14 +93,11 @@ export const BookedEvents: React.FC<BookedEventsProps> = ({
 
       showToast('Ticket downloaded successfully!', 'success')
     } catch (error) {
-      console.error('Error downloading ticket:', error)
       showToast('Failed to download ticket. Please try again.', 'error')
     } finally {
       setDownloadingTicketId(null)
     }
   }
-
-  console.log("booked events ", bookedEvents)
   
   return (
     <div className="container mx-auto px-4 py-8">

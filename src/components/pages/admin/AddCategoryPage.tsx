@@ -20,7 +20,7 @@
     const { mutate: categoryAdd } = UseAddCategoryMutation();
 
     const addCategory = async (data: ICategory) => {
-      console.log("data is",data)
+
       let uploadImageUrl: string | null = null;
 
       if (data.image instanceof File) {
@@ -28,7 +28,7 @@
           data.image as File,
           "category-images"
         );
-        console.log("after upload",uploadImageUrl)
+
         if (!uploadImageUrl) {
           showToast("failed to upload", "error");
           return;

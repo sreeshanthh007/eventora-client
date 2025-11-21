@@ -1,24 +1,28 @@
-import { Input } from "@/components/pages/ui/input"
-import { ScrollArea } from "@/components/pages/ui/scroll-area"
-import ChatListItem from "./ChatListItem"
-import { motion } from "framer-motion"
+import { useContext, useEffect, useState } from "react";
+import { Input } from "@/components/pages/ui/input";
+import { ScrollArea } from "@/components/pages/ui/scroll-area";
+import ChatListItem from "./ChatListItem";
+import { motion } from "framer-motion";
+import { socketContext } from "@/contexts/SocketContext";
 
+// Define the types (you already have this somewhere, just make sure it's imported or defined)
 interface Chat {
-  id: string // Updated to string to match vendorId
-  name: string
-  avatar: string
-  lastMessage: string
-  timestamp: string
-  unread: number
-  online: boolean
+  roomId?: string;
+  id: string;
+  name: string;
+  avatar: string;
+  lastMessage: string;
+  timestamp: string;
+  unread: number;
+  online: boolean;
 }
 
 interface ChatSidebarProps {
-  chats: Chat[]
-  selectedChatId: string | null
-  onSelectChat: (id: string) => void
-  searchQuery: string
-  onSearchChange: (query: string) => void
+  chats: Chat[];
+  selectedChatId: string | null;
+  onSelectChat: (id: string) => void;
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
 }
 
 export default function ChatSidebar({
@@ -28,6 +32,22 @@ export default function ChatSidebar({
   searchQuery,
   onSearchChange,
 }: ChatSidebarProps) {
+  const socketio = useContext(socketContext);
+  const [onlineUserIds, setOnlineUserIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    const handler = (users: string[][]) => {
+      const ids = new Set(users.map(([userId]) => userId));
+      setOnlineUserIds(ids);
+    };
+
+    socketio.on("online-users", handler);
+
+    return () => {
+      socketio.off("online-users", handler);
+    };
+  }, [socketio]);
+
   return (
     <div className="w-full sm:w-80 md:w-96 flex flex-col bg-background border-r border-border">
       {/* Header */}
@@ -41,7 +61,6 @@ export default function ChatSidebar({
         />
       </div>
 
-      {/* Chat List */}
       <ScrollArea className="flex-1">
         <div className="p-2">
           {chats.length > 0 ? (
@@ -53,17 +72,22 @@ export default function ChatSidebar({
                 transition={{ delay: index * 0.05 }}
               >
                 <ChatListItem
-                  chat={chat}
+                  chat={{
+                    ...chat,
+                    online: onlineUserIds.has(chat.id), // Real-time online status
+                  }}
                   isSelected={chat.id === selectedChatId}
                   onSelect={() => onSelectChat(chat.id)}
                 />
               </motion.div>
             ))
           ) : (
-            <div className="text-center text-muted-foreground py-8">No conversations found</div>
+            <div className="text-center text-muted-foreground py-8">
+              No conversations found
+            </div>
           )}
         </div>
       </ScrollArea>
     </div>
-  )
+  );
 }

@@ -47,7 +47,7 @@ export function TicketDetailsModal({
   const isCancellable = ticketStatus !== "refunded" && ticketStatus !== "used" && paymentStatus !== "failed"
 
   const cancelTicket = async (ticketId: string, eventId: string) => {
-    console.log("cancel ticket called",ticketId,eventId)
+
     setIsCancelling(true)
     try {
         cancelSelectedTicket({ticketId:ticketId,eventId:eventId})
@@ -56,9 +56,7 @@ export function TicketDetailsModal({
       }
       onClose()
     } catch (error) {
-      console.error('Error cancelling ticket:', error)
-      // TODO: Show error toast or alert to user
-      alert('Failed to cancel ticket. Please try again.')
+      // Handle error if needed
     } finally {
       setIsCancelling(false)
     }

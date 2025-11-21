@@ -65,7 +65,7 @@ export function ClientBookedServices({
   searchTerm,
   onCancelSubmit,
 }: Props) {
-  console.log("bokings are", bookings)
+
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [pendingCancel, setPendingCancel] = useState<PendingCancel | null>(null)
   const navigate = useNavigate()
@@ -155,7 +155,6 @@ export function ClientBookedServices({
                         paymentStatus: displayPaymentStatus,
                       }
 
-                      console.log("service are",service)
 
                       return (
                         <TableRow key={service.id} className="hover:bg-gray-50">

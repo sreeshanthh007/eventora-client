@@ -66,7 +66,6 @@ const CategoryManagementPage = () => {
   useEffect(() => {
     if (data?.categories) {
       setCategories(data.categories)
-      console.log(data)
     }
   }, [data])
 

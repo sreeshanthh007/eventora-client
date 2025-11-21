@@ -28,7 +28,7 @@ export const refreshVendorSessionThunk = createAsyncThunk<
 >("vendor/refreshSession", async (_, { rejectWithValue }) => {
   try {
     const {data} = await axiosInstance.get<IVendorResponse>("/api_v1/_ve/refresh_session");
-    console.log("data from slice",data)
+    
     return data.user;
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || err.message || "Failed to refresh session");

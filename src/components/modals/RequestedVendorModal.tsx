@@ -108,10 +108,8 @@ export function VendorDetailsModal({ vendor, vendorStatus, onApprove, onReject, 
                   alt={`ID Proof for ${vendor.name}`}
                   className="rounded-md object-cover border w-[300px] h-[200px]"
                   onError={(e) => {
-                    console.log("Image failed to load:", imageUrl)
                     e.currentTarget.src = "/placeholder.svg?height=200&width=300"
                   }}
-                  onLoad={() => console.log("Image loaded successfully:", imageUrl)}
                 />
               </div>
             </div>

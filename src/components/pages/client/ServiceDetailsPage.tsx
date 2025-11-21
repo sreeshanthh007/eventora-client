@@ -58,7 +58,7 @@ export default function ServiceDetailsPage() {
   const {mutate:removeReviewMutation} = useRemoveReviewMutation()
   const currentClientId = useSelector((state:RootState)=>state.client.client?.clientId)
   const service =  serviceResponse?.service 
-console.log("service details are",service)
+
   const [selectedSlot, setSelectedSlot] = useState<SelectedSlot | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [bookingData, setBookingData] = useState<BookingData | null>(null) 
@@ -74,7 +74,7 @@ console.log("service details are",service)
     ...currentReview,
     serviceId:serviceId
   }
-  console.log("refactored",refactoredReview)
+
 
   const hasReviewed = !!currentReview
 

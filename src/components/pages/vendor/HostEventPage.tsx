@@ -11,7 +11,7 @@ export default function HostEventPage() {
   const {mutate:addEvent} = useAddEventMutation()
 
   const handleCreateEvent = async(data)=>{
-    console.log("data after creating evet",data)
+    
     let uploadImageUrl : string [] = []
 
 
@@ -34,7 +34,6 @@ export default function HostEventPage() {
           coordinates: [data.coordinates[0], data.coordinates[1]],
           },
         }
-        console.log("procressed data",processedData)
         addEvent(processedData)
       
    

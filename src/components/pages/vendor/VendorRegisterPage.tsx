@@ -6,18 +6,19 @@ import { useRegisterMutation } from "@/hooks/auth/userRegister";
 import type { IVendor, } from '@/types/User'
 import { toast } from "sonner";
 import { uploadImageToCloudinarySigned } from "@/services/cloudinary/cloudinary";
+import { useToast } from "@/hooks/ui/UseToaster";
 
 
 export const VendorRegisterPage = () => {
    const {mutate:registerUser} = useRegisterMutation()
-
+  const {showToast} = useToast()
   const handleSignupSubmit = async(data:Omit<IVendor,"role">)=>{
     
    let uploadedImageUrl: string | null = null;
    
    if(data.idProof instanceof File){  
     uploadedImageUrl = await uploadImageToCloudinarySigned(data.idProof as File,"vendor-id-proofs")
-    console.log("image url",uploadedImageUrl)
+    
     if(!uploadedImageUrl){
     toast.error("failed to upload")
     return
@@ -31,8 +32,8 @@ export const VendorRegisterPage = () => {
         },
 
         onError:((err)=>{
-          console.log(err)
-
+          
+          showToast(err.response?.data?.message,"error")
         })
 
       }
