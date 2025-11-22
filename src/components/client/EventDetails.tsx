@@ -63,14 +63,14 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
     currency: "INR",
   })
 
-  // Determine if user can buy tickets
+
   const canBuyTickets = event?.event?.status
     ? ["ongoing", "upcoming"].includes(event.event.status.toLowerCase())
     : false
 
   useEffect(() => {
     if (event) {
-      const hasTicketTypes = event.event.tickets && event.event.tickets.length > 0
+      const hasTicketTypes = event.event.tickets && event.event.tickets.length > 0;
       const ticketItems: TicketItem[] = []
       if (hasTicketTypes) {
         ticketItems.push(
@@ -80,7 +80,7 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
             pricePerTicket: Number(t.pricePerTicket) || 0,
             quantity: 0,
             maxPerUser: t.maxTicketsPerUser,
-            available: Math.max(0, (Number(t.totalTickets) || 0) - (Number(t.bookedTickets) || 0)),
+            available: t.totalTickets,
           }))
         )
       } else {
@@ -122,7 +122,7 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
   const maxTicketsPerUser = event.event.maxTicketPerUser
 
   const totalQuantity = purchaseData.tickets.reduce((sum, t) => sum + t.quantity, 0)
-
+  console.log("total quantity", event.event)
   const handleBuyTickets = () => {
     if (!canBuyTickets) return
     setIsModalOpen(true)
