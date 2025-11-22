@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/pages/ui/button"
 import { CheckCircle2, Sparkles, Calendar, Clock, Ticket,  QrCodeIcon } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 
 
 interface TicketData {
@@ -20,11 +21,11 @@ interface TicketData {
 
 interface TicketBookingAnimationProps {
   ticketData: TicketData
-  onBackToEvent: () => void
 }
 
-export function TicketBookedAnimation({ ticketData, onBackToEvent }: TicketBookingAnimationProps) {
+export function TicketBookedAnimation({ ticketData }: TicketBookingAnimationProps) {
   const [showModal, setShowModal] = useState(false)
+  const navigate = useNavigate()
   const [showConfetti, setShowConfetti] = useState(false)
   const ticketRef = useRef<HTMLDivElement>(null)
 
@@ -37,6 +38,9 @@ export function TicketBookedAnimation({ ticketData, onBackToEvent }: TicketBooki
     return () => clearTimeout(timer)
   }, [])
 
+  const onBackToEvent = () => {
+    navigate("/events")
+  }
   return (
     <>
      
