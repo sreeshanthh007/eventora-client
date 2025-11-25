@@ -3,17 +3,24 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-interface LocationPickerReadOnlyProps {
-  initialLocation: [number, number]; // Required prop for event location
-}
+// --- FIX MARKER ICON FOR ALL ENVIRONMENTS ---
+const DefaultIcon = L.icon({
+  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+});
 
-export default function LocationPickerReadOnly({ initialLocation }: LocationPickerReadOnlyProps) {
-  const mapRef = useRef<L.Map | null>(null);
+L.Marker.prototype.options.icon = DefaultIcon;
+// --------------------------------------------
+
+export default function LocationPickerReadOnly({ initialLocation }) {
+
+  const mapRef = useRef(null);
 
   useEffect(() => {
     if (!mapRef.current) return;
-
-    // Center the map on the initial location
     mapRef.current.setView(initialLocation, 15);
   }, [initialLocation]);
 
@@ -22,23 +29,16 @@ export default function LocationPickerReadOnly({ initialLocation }: LocationPick
       center={initialLocation}
       zoom={15}
       style={{ height: "400px", width: "100%" }}
-      whenReady={(e) => {
-        mapRef.current = e.target;
-      }}
-      // Disable all interactions
+      whenReady={(e) => (mapRef.current = e.target)}
       dragging={false}
       touchZoom={false}
-      doubleClickZoom={false}
       scrollWheelZoom={false}
-      boxZoom={false}
-      keyboard={false}
+      doubleClickZoom={false}
       zoomControl={false}
     >
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-      <Marker position={initialLocation} interactive={false}>
-        <Popup autoClose={false} closeOnClick={false} closeButton={false}>
-          Event Location
-        </Popup>
+      <Marker position={initialLocation}>
+        <Popup>Event Location</Popup>
       </Marker>
     </MapContainer>
   );

@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaf
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-control-geocoder/dist/Control.Geocoder.css";
-import "leaflet-control-geocoder"; // ✅ important
+import "leaflet-control-geocoder";
 
 interface LocationPickerProps {
   onLocationSelect: (lat: number, lng: number) => void;

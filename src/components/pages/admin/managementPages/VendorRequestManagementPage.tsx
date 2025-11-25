@@ -10,14 +10,14 @@ import type { ColumnDefinition } from "@/components/common/tables/ReusableTable"
 import { SidebarProvider } from "../../ui/sidebar"
 import { UseGetAllRequestedVendors } from "@/hooks/admin/UseGetRequestedVendors"
 import { Button } from "@/components/pages/ui/button"
-import { VendorDetailsModal } from "@/components/modals/RequestedVendorModal" // Adjust the import path as needed
+import { VendorDetailsModal } from "@/components/modals/RequestedVendorModal" 
 import { useApproveVendorMutation } from "@/hooks/admin/UseApproveVendor"
 import { useDispatch, useSelector } from "react-redux"
 import type { RootState } from "@/store/store"
 import { useRejectVendorMutation } from "@/hooks/admin/UseRejectVendor"
 
 interface RequestedVendor {
-  _id: string
+  vendorId: string
   name: string
   email: string
   vendorStatus: string

@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useState, useEffect } from "react"
 import { Calendar, Clock, MapPin, Users, Ticket, Plus, Minus, X } from "lucide-react"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/pages/ui/card"
@@ -63,6 +65,28 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
     currency: "INR",
   })
 
+  useEffect(() => {
+    if (isModalOpen || isStripeModalOpen) {
+      document.body.style.overflow = "hidden"
+      const mapElement = document.querySelector(".leaflet-container")
+      if (mapElement) {
+        ;(mapElement as HTMLElement).style.pointerEvents = "none"
+      }
+    } else {
+      document.body.style.overflow = "unset"
+      const mapElement = document.querySelector(".leaflet-container")
+      if (mapElement) {
+        ;(mapElement as HTMLElement).style.pointerEvents = "auto"
+      }
+    }
+    return () => {
+      document.body.style.overflow = "unset"
+      const mapElement = document.querySelector(".leaflet-container")
+      if (mapElement) {
+        ;(mapElement as HTMLElement).style.pointerEvents = "auto"
+      }
+    }
+  }, [isModalOpen, isStripeModalOpen])
 
   const canBuyTickets = event?.event?.status
     ? ["ongoing", "upcoming"].includes(event.event.status.toLowerCase())
@@ -70,7 +94,7 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
 
   useEffect(() => {
     if (event) {
-      const hasTicketTypes = event.event.tickets && event.event.tickets.length > 0;
+      const hasTicketTypes = event.event.tickets && event.event.tickets.length > 0
       const ticketItems: TicketItem[] = []
       if (hasTicketTypes) {
         ticketItems.push(
@@ -81,7 +105,7 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
             quantity: 0,
             maxPerUser: t.maxTicketsPerUser,
             available: t.totalTickets,
-          }))
+          })),
         )
       } else {
         ticketItems.push({
@@ -90,7 +114,7 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
           quantity: 0,
           maxPerUser: event.event.maxTicketPerUser,
           available: event.event.totalTicket,
-          ticketType: "General"
+          ticketType: "General",
         })
       }
       setPurchaseData((prev) => ({
@@ -98,14 +122,12 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
         tickets: ticketItems,
         totalAmount: 0,
         currency: "INR",
-        title: event.event?.title || ""
+        title: event.event?.title || "",
       }))
     }
   }, [event])
 
-  useEffect(() => {
-
-  }, [purchaseData])
+  useEffect(() => {}, [purchaseData])
 
   if (isLoading) {
     return <div className="min-h-screen bg-background flex items-center justify-center">Loading...</div>
@@ -118,7 +140,9 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
   }
 
   const ticketPrice =
-    event.event.tickets?.length > 0 ? Number(event.event.tickets[0].pricePerTicket) || 0 : Number(event.event.pricePerTicket) || 0
+    event.event.tickets?.length > 0
+      ? Number(event.event.tickets[0].pricePerTicket) || 0
+      : Number(event.event.pricePerTicket) || 0
   const maxTicketsPerUser = event.event.maxTicketPerUser
 
   const totalQuantity = purchaseData.tickets.reduce((sum, t) => sum + t.quantity, 0)
@@ -137,12 +161,12 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
   }
 
   const handlePaymentSuccess = () => {
-    setPurchaseData(prev => ({
+    setPurchaseData((prev) => ({
       ...prev,
       email: "",
       name: "",
-      tickets: prev.tickets.map(t => ({ ...t, quantity: 0 })),
-      totalAmount: 0
+      tickets: prev.tickets.map((t) => ({ ...t, quantity: 0 })),
+      totalAmount: 0,
     }))
     handleCloseStripeModal()
     setShowAnimation(true)
@@ -169,7 +193,7 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
       const newTotalAmount = newTickets.reduce((sum, t) => {
         const price = Number(t.pricePerTicket) || 0
         const qty = Number(t.quantity) || 0
-        return sum + (price * qty)
+        return sum + price * qty
       }, 0)
 
       return {
@@ -211,9 +235,9 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
   const firstSchedule = event.event.eventSchedule[0]
   const ticketAnimationData = {
     title: event.event.title,
-    date: firstSchedule ? formatDate(firstSchedule.date) : '',
-    time: firstSchedule ? `${firstSchedule.startTime} - ${firstSchedule.endTime} pm` : '',
-    venue: event.event.eventLocation || 'Kochi',
+    date: firstSchedule ? formatDate(firstSchedule.date) : "",
+    time: firstSchedule ? `${firstSchedule.startTime} - ${firstSchedule.endTime} pm` : "",
+    venue: event.event.eventLocation || "Kochi",
     price: ticketPrice,
     image: getCloudinaryImageUrl(event.event.images[0]),
   }
@@ -344,9 +368,11 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <LocationPickerReadOnly
-                  initialLocation={[event.event.location.coordinates[1], event.event.location.coordinates[0]]}
-                />
+                <div className="relative z-0">
+                  <LocationPickerReadOnly
+                    initialLocation={[event.event.location.coordinates[1], event.event.location.coordinates[0]]}
+                  />
+                </div>
                 <p className="text-sm text-muted-foreground mt-2">{event.event.eventLocation || "kochi"}</p>
               </CardContent>
             </Card>
@@ -374,9 +400,7 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
                   <div>
                     <h3 className="font-semibold">{event.event.vendor?.name || "bro"}</h3>
                     {event.event.vendor?.email && (
-                      <p className="text-sm text-muted-foreground">
-                        {event.event.vendor.email}
-                      </p>
+                      <p className="text-sm text-muted-foreground">{event.event.vendor.email}</p>
                     )}
                   </div>
                 </div>
@@ -428,59 +452,79 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
 
       {/* Purchase Modal */}
       {isModalOpen && canBuyTickets && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-6 border-b">
-              <h2 className="text-xl font-semibold">Purchase Tickets</h2>
-              <Button variant="ghost" size="sm" onClick={handleCloseModal}>
-                <X className="h-4 w-4" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-md z-40"></div>
+
+          {/* Modal Content */}
+          <div className="bg-gradient-to-br from-white via-white to-slate-50 rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto relative z-50 shadow-2xl border border-white/80">
+            <div className="flex items-center justify-between p-6 border-b border-slate-200/50 sticky top-0 bg-white/95 backdrop-blur-sm z-50 rounded-t-2xl">
+              <div>
+                <h2 className="text-2xl font-bold text-foreground">Get Tickets</h2>
+                <p className="text-sm text-muted-foreground mt-1">Secure your spot today</p>
+              </div>
+              <Button variant="ghost" size="sm" onClick={handleCloseModal} className="hover:bg-slate-100">
+                <X className="h-5 w-5" />
               </Button>
             </div>
 
-            <div className="p-6 space-y-4">
+            <div className="p-6 space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-sm font-semibold text-foreground">
+                  Email Address
+                </Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder="you@example.com"
+                  className="bg-slate-50 border-slate-200 rounded-lg focus:ring-2 focus:ring-accent/50 focus:border-accent"
                   value={purchaseData.email}
                   onChange={(e) => setPurchaseData((prev) => ({ ...prev, email: e.target.value }))}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
+                <Label htmlFor="name" className="text-sm font-semibold text-foreground">
+                  Full Name
+                </Label>
                 <Input
                   id="name"
                   type="text"
-                  placeholder="Enter your name"
+                  placeholder="John Doe"
+                  className="bg-slate-50 border-slate-200 rounded-lg focus:ring-2 focus:ring-accent/50 focus:border-accent"
                   value={purchaseData.name}
                   onChange={(e) => setPurchaseData((prev) => ({ ...prev, name: e.target.value }))}
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label>Select Tickets</Label>
-                <div className="space-y-3">
+              <div className="space-y-3">
+                <Label className="text-sm font-semibold text-foreground">Select Tickets</Label>
+                <div className="space-y-3 max-h-48 overflow-y-auto pr-2">
                   {purchaseData.tickets.map((item, index) => (
-                    <div key={item.id || index} className="flex justify-between items-center p-3 border rounded-lg">
+                    <div
+                      key={item.id || index}
+                      className="flex justify-between items-center p-4 border border-slate-200/60 rounded-lg bg-white/60 hover:bg-white/80 transition-colors"
+                    >
                       <div>
-                        <span className="font-medium block">{item.ticketType} - ₹{item.pricePerTicket}</span>
-                        <span className="text-sm text-muted-foreground">
-                          ({item.available} available, max {item.maxPerUser} per user)
+                        <span className="font-semibold text-foreground block text-sm">{item.ticketType}</span>
+                        <span className="text-xl font-bold text-accent mt-1">₹{item.pricePerTicket}</span>
+                        <span className="text-xs text-muted-foreground block mt-1">
+                          {item.available} available, max {item.maxPerUser} per user
                         </span>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 bg-slate-100 rounded-lg p-1">
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => handleQuantityChange(index, false)}
                           disabled={item.quantity <= 0}
+                          className="h-8 w-8 p-0 bg-white hover:bg-slate-50 border-slate-200"
                         >
-                          <Minus className="h-4 w-4" />
+                          <Minus className="h-3 w-3" />
                         </Button>
-                        <span className="text-lg font-medium min-w-[2rem] text-center">{item.quantity}</span>
+                        <span className="text-sm font-bold min-w-[2rem] text-center text-foreground">
+                          {item.quantity}
+                        </span>
                         <Button
                           variant="outline"
                           size="sm"
@@ -490,8 +534,9 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
                             item.quantity >= item.available ||
                             totalQuantity >= maxTicketsPerUser
                           }
+                          className="h-8 w-8 p-0 bg-white hover:bg-slate-50 border-slate-200"
                         >
-                          <Plus className="h-4 w-4" />
+                          <Plus className="h-3 w-3" />
                         </Button>
                       </div>
                     </div>
@@ -499,16 +544,22 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
                 </div>
               </div>
 
-              <div className="border-t pt-4">
+              <div className="border-t border-slate-200/50 pt-4 bg-gradient-to-r from-slate-50/50 to-transparent rounded-lg p-4 -mx-2">
                 <div className="flex justify-between items-center mb-4">
-                  <span className="font-medium">Total ({totalQuantity} tickets):</span>
-                  <span className="text-xl font-bold">₹{purchaseData.totalAmount}</span>
+                  <span className="font-semibold text-foreground">Total ({totalQuantity} tickets):</span>
+                  <span className="text-2xl font-bold text-accent">₹{purchaseData.totalAmount}</span>
                 </div>
 
                 <Button
-                  className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
+                  className="w-full bg-gradient-to-r from-accent to-accent/90 hover:from-accent/90 hover:to-accent text-accent-foreground font-semibold rounded-lg h-11 transition-all shadow-md hover:shadow-lg"
                   onClick={handleSubmitPurchase}
-                  disabled={!purchaseData.email || !purchaseData.name || totalQuantity === 0 || isNaN(purchaseData.totalAmount) || purchaseData.totalAmount <= 0}
+                  disabled={
+                    !purchaseData.email ||
+                    !purchaseData.name ||
+                    totalQuantity === 0 ||
+                    isNaN(purchaseData.totalAmount) ||
+                    purchaseData.totalAmount <= 0
+                  }
                 >
                   Proceed to Payment
                 </Button>
@@ -520,12 +571,16 @@ export const EventDetails: React.FC<EventDetailsProps> = () => {
 
       {/* Stripe Checkout Modal */}
       {isStripeModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
-            <div className="flex items-center justify-between border-b pb-4 mb-4">
-              <h2 className="text-xl font-semibold">Complete Payment</h2>
-              <Button variant="ghost" size="sm" onClick={handleCloseStripeModal}>
-                <X className="h-4 w-4" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-md z-40"></div>
+
+          {/* Modal Content */}
+          <div className="bg-gradient-to-br from-white via-white to-slate-50 rounded-2xl max-w-md w-full p-6 relative z-50 shadow-2xl border border-white/80">
+            <div className="flex items-center justify-between border-b border-slate-200/50 pb-4 mb-6">
+              <h2 className="text-xl font-bold text-foreground">Complete Payment</h2>
+              <Button variant="ghost" size="sm" onClick={handleCloseStripeModal} className="hover:bg-slate-100">
+                <X className="h-5 w-5" />
               </Button>
             </div>
             <CheckoutForm

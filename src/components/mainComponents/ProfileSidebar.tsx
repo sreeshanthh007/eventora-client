@@ -1,7 +1,6 @@
-import { User, Ticket, Bell, CreditCard, HelpCircle, LogOut, MessageCircle, Handshake, Lock, MessageCircleCode } from "lucide-react"
+import { User, Ticket, CreditCard, LogOut, MessageCircle, Handshake, Lock } from "lucide-react"
 import { Card } from "@/components/pages/ui/card"
-import { Button } from "@/components/pages/ui/button"
-import { Link } from "react-router-dom" // Add this import
+import { Link, useLocation } from "react-router-dom" 
 import { UseLogout } from "@/hooks/auth/Uselogout"
 import { logOutClient } from "@/services/auth/authServices"
 import { clientLogout } from "@/store/slices/clientSlice"
@@ -38,13 +37,6 @@ const menuItems = [
     description: "View your booked services",
   },
   {
-    icon: Bell,
-    label: "Notifications",
-    to: "/notifications", 
-    active: false,
-    description: "Alerts and updates",
-  },
-  {
     icon: CreditCard,
     label: "Wallet",
     to: "/client/wallet", 
@@ -67,25 +59,25 @@ const menuItems = [
 ]
 
 export function ProfileSidebar() {
-  const dispatch = useAppDispatch()
+const dispatch = useAppDispatch()
   const { mutate: logoutReq } = UseLogout(logOutClient)
   const { showToast } = useToast()
-  
+  const location = useLocation() // This gets the current path
+
   const handleLogout = () => {
     logoutReq(undefined, {
       onSuccess: (data) => {
         dispatch(clientLogout())
-        showToast(data.message, "success")
+        showToast(data.message || "Logged out successfully", "success")
       },
       onError: (err: any) => {
-        showToast(err.response?.data?.message, "error")
+        showToast(err.response?.data?.message || "Logout failed", "error")
       }
     })
   }
 
   return (
     <div className="space-y-4">
-      {/* Main Navigation */}
       <Card className="p-4">
         <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
           <User className="h-5 w-5 text-blue-600" />
@@ -93,7 +85,9 @@ export function ProfileSidebar() {
         </h3>
         <nav className="space-y-1">
           {menuItems.map((item, index) => {
-            // Check if it's the logout item (no 'to' property)
+            const isActive = item.to ? location.pathname === item.to : false
+
+            // Logout item (no 'to')
             if (item.label === "Log out") {
               return (
                 <button
@@ -101,75 +95,45 @@ export function ProfileSidebar() {
                   onClick={handleLogout}
                   className={`
                     flex items-start gap-3 p-3 rounded-lg transition-all duration-200 group w-full text-left
-                    ${
-                      item.active
-                        ? "bg-blue-50 text-blue-700 border border-blue-200"
-                        : "hover:bg-gray-50 text-gray-700 hover:text-gray-900"
-                    }
+                    hover:bg-gray-50 text-gray-700 hover:text-gray-900
                   `}
                 >
-                  <item.icon
-                    className={`
-                      h-5 w-5 mt-0.5 transition-colors
-                      ${item.active ? "text-blue-600" : "text-gray-500 group-hover:text-gray-700"}
-                    `}
-                  />
+                  <item.icon className="h-5 w-5 mt-0.5 text-gray-500 group-hover:text-gray-700" />
                   <div className="flex-1 min-w-0">
-                    <p
-                      className={`
-                        font-medium text-sm
-                        ${item.active ? "text-blue-900" : "text-gray-900"}
-                      `}
-                    >
-                      {item.label}
-                    </p>
-                    <p
-                      className={`
-                        text-xs mt-0.5
-                        ${item.active ? "text-blue-600" : "text-gray-500"}
-                      `}
-                    >
-                      {item.description}
-                    </p>
+                    <p className="font-medium text-sm text-gray-900">{item.label}</p>
+                    <p className="text-xs mt-0.5 text-gray-500">{item.description}</p>
                   </div>
                 </button>
               )
             }
 
-            // Regular navigation items with Link
+            // Regular navigation items
             return (
               <Link
                 key={index}
-                to={item.to}
+                to={item.to!}
                 className={`
                   flex items-start gap-3 p-3 rounded-lg transition-all duration-200 group block
-                  ${
-                    item.active
-                      ? "bg-blue-50 text-blue-700 border border-blue-200"
-                      : "hover:bg-gray-50 text-gray-700 hover:text-gray-900"
+                  ${isActive
+                    ? "bg-blue-50 text-blue-700 border border-blue-200"
+                    : "hover:bg-gray-50 text-gray-700 hover:text-gray-900"
                   }
                 `}
               >
                 <item.icon
                   className={`
                     h-5 w-5 mt-0.5 transition-colors
-                    ${item.active ? "text-blue-600" : "text-gray-500 group-hover:text-gray-700"}
+                    ${isActive ? "text-blue-600" : "text-gray-500 group-hover:text-gray-700"}
                   `}
                 />
                 <div className="flex-1 min-w-0">
                   <p
-                    className={`
-                      font-medium text-sm
-                      ${item.active ? "text-blue-900" : "text-gray-900"}
-                    `}
+                    className={`font-medium text-sm ${isActive ? "text-blue-900" : "text-gray-900"}`}
                   >
                     {item.label}
                   </p>
                   <p
-                    className={`
-                      text-xs mt-0.5
-                      ${item.active ? "text-blue-600" : "text-gray-500"}
-                    `}
+                    className={`text-xs mt-0.5 ${isActive ? "text-blue-600" : "text-gray-500"}`}
                   >
                     {item.description}
                   </p>
@@ -181,7 +145,7 @@ export function ProfileSidebar() {
       </Card>
 
       {/* Support */}
-      <Card className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+      {/* <Card className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
         <div className="text-center">
           <HelpCircle className="h-8 w-8 text-blue-600 mx-auto mb-2" />
           <h4 className="font-semibold text-gray-900 mb-1">Need Help?</h4>
@@ -190,7 +154,7 @@ export function ProfileSidebar() {
             Contact Support
           </Button>
         </div>
-      </Card>
+      </Card> */}
     </div>
   )
 }
