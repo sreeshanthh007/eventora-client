@@ -13,15 +13,14 @@ interface BreadcrumbsProps {
   role?: UserRole
 }
 
-
 const HIDDEN_SEGMENTS = ["client", "vendor", "admin"]
 
 export function Breadcrumbs({ role }: BreadcrumbsProps) {
   const location = useLocation()
   const pathSegments = location.pathname.split("/").filter(Boolean)
 
-
-  const filteredSegments = pathSegments.filter((seg) => {
+  // Filter out hidden role prefixes and numbers (like IDs)
+  const visibleSegments = pathSegments.filter((seg) => {
     const isNumber = !isNaN(Number(seg))
     const isHidden = HIDDEN_SEGMENTS.includes(seg.toLowerCase())
     return !isNumber && !isHidden
@@ -31,12 +30,23 @@ export function Breadcrumbs({ role }: BreadcrumbsProps) {
     seg
       .replace(/-/g, " ")
       .replace(/\b\w/g, (c) => c.toUpperCase())
-      .replace(/^\w/, (c) => c.toUpperCase()) 
 
-  const showHome = role !== "vendor"
+  // Determine where "Home" should link to
+  const getHomePath = () => {
+    if (role === "vendor" && pathSegments.includes("vendor")) {
+      return "/vendor"
+    }
+    if (role === "client" && pathSegments.includes("client")) {
+      return "/client"
+    }
+    return "/" 
+  }
 
+  const homePath = getHomePath()
 
-  if (filteredSegments.length === 0 && !showHome) {
+  const showHome = role !== "vendor" || visibleSegments.length > 0
+
+  if (visibleSegments.length === 0 && !showHome) {
     return null
   }
 
@@ -46,26 +56,19 @@ export function Breadcrumbs({ role }: BreadcrumbsProps) {
         {showHome && (
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link to="/">Home</Link>
+              <Link to={homePath}>Home</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
         )}
 
-        {filteredSegments.map((segment, index) => {
-          const href =
-            "/" +
-            pathSegments
-              .slice(0, pathSegments.indexOf(segment))
-              .concat(filteredSegments.slice(0, index + 1))
-              .filter((s) => !HIDDEN_SEGMENTS.includes(s.toLowerCase()))
-              .join("/")
-
-          const isLast = index === filteredSegments.length - 1
-          const isFirst = index === 0
+        {visibleSegments.map((segment, index) => {
+          const isLast = index === visibleSegments.length - 1
+     
+          const href = "/" + visibleSegments.slice(0, index + 1).join("/")
 
           return (
             <BreadcrumbItem key={segment + index}>
-              {(showHome || !isFirst) && <BreadcrumbSeparator />}
+              {(showHome || index > 0) && <BreadcrumbSeparator />}
               {isLast ? (
                 <BreadcrumbPage>{formatSegment(segment)}</BreadcrumbPage>
               ) : (

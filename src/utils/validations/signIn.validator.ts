@@ -7,7 +7,7 @@ export const signInschema = Yup.object().shape({
     password:Yup.string()
     .min(8,"Password must be atleast 8 charaters")
     .matches(
-         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])[A-Za-z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{8,}$/,
       "Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character"
     )
     .required("Password is Required")
