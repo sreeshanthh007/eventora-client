@@ -189,7 +189,6 @@ export function ServiceDetails({ service, onBookService }: ServiceDetailsProps) 
                           selected={formik.values.date}
                           onSelect={(date) => formik.setFieldValue("date", date)}
                           disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                          initialFocus
                         />
                       </PopoverContent>
                     </Popover>

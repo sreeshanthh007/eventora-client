@@ -56,21 +56,21 @@ export default function Chat({ queryData, chatsIsLoading, role }: ChatProps) {
   useEffect(() => {
     if (userIdFromUrl && userIdFromUrl !== selectedChatId) {
       setSelectedChatId(userIdFromUrl);
-      console.log("useeffect", data);
+  
     }
   }, [userIdFromUrl, selectedChatId]);
 
   const selectedChat = chats.find((chat) => chat.id === selectedChatId);
-  console.log("selcted", selectedChat);
 
-  console.log("user chat data", data);
+
+
   const filteredChats = chats.filter((chat) =>
     chat.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
       useEffect(() => {
       const handler = (onlineUsers: string[]) => {
-        console.log("online users in sidebar", onlineUsers);
+      
       };
     
       socketio.on("online-users", handler);

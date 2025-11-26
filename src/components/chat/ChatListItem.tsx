@@ -1,9 +1,11 @@
 import { motion } from "framer-motion"
+import { User } from "lucide-react"
+import { useState } from "react"
 
 interface Chat {
   id: string
   name: string
-  avatar: string
+  avatar?: string | null
   lastMessage: string
   timestamp: string
   unread: number
@@ -17,44 +19,75 @@ interface ChatListItemProps {
 }
 
 export default function ChatListItem({ chat, isSelected, onSelect }: ChatListItemProps) {
+  const [imgError, setImgError] = useState(false)
+
+  const hasValidAvatar = chat.avatar && !imgError
+
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase()
+  }
+
   return (
     <motion.button
       onClick={onSelect}
-      className={`w-full p-3 rounded-lg mb-1 transition-colors text-left ${
-        isSelected ? "bg-blue-50 hover:bg-blue-100" : "hover:bg-muted"
+      className={`w-full p-3 rounded-lg mb-1 transition-all text-left flex items-center gap-3 ${
+        isSelected 
+          ? "bg-blue-50 hover:bg-blue-100 border border-blue-200" 
+          : "hover:bg-muted border border-transparent"
       }`}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
+      layout
     >
-      <div className="flex items-center gap-3">
-        {/* Avatar with online indicator */}
-        <div className="relative flex-shrink-0">
-          <img 
-            src={chat.avatar} 
+   
+      <div className="relative flex-shrink-0">
+        {hasValidAvatar ? (
+          <img
+            src={chat.avatar}
             alt={chat.name}
-            className="w-10 h-10 rounded-full object-cover"
+            className="w-12 h-12 rounded-full object-cover ring-2 ring-background"
+            onError={() => setImgError(true)}
           />
-          {chat.online && (
-            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background" />
-          )}
-        </div>
-
-        {/* Chat info */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between mb-1">
-            <h3 className="font-semibold text-foreground truncate">{chat.name}</h3>
-            <span className="text-xs text-muted-foreground ml-2 flex-shrink-0">{chat.timestamp}</span>
+        ) : (
+    
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm ring-2 ring-background shadow-md">
+            {getInitials(chat.name)}
           </div>
-          <p className="text-sm text-muted-foreground truncate">{chat.lastMessage}</p>
-        </div>
 
-        {/* Unread badge */}
-        {chat.unread > 0 && (
-          <div className="w-5 h-5 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">
-            {chat.unread}
-          </div>
+ 
+        )}
+
+        {chat.online && (
+          <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-3 border-background shadow-lg" />
         )}
       </div>
+
+      {/* Chat Info */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold text-foreground truncate pr-2">
+            {chat.name}
+          </h3>
+          <span className="text-xs text-muted-foreground flex-shrink-0">
+            {chat.timestamp}
+          </span>
+        </div>
+        <p className="text-sm text-muted-foreground truncate mt-0.5">
+          {chat.lastMessage}
+        </p>
+      </div>
+
+      {/* Unread Count Badge */}
+      {chat.unread > 0 && (
+        <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 shadow-md">
+          {chat.unread > 99 ? "99+" : chat.unread}
+        </div>
+      )}
     </motion.button>
   )
 }

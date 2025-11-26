@@ -78,7 +78,7 @@ export default function BookingModal({
   }) : ''
   const slotTime = selectedSlot ? selectedSlot.time : ''
 
-  // Determine if we are in payment step
+
   const isPaymentStep = !!bookingData
 
   if (isPaymentStep) {

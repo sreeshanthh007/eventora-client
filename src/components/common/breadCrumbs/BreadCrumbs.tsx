@@ -19,7 +19,6 @@ export function Breadcrumbs({ role }: BreadcrumbsProps) {
   const location = useLocation()
   const pathSegments = location.pathname.split("/").filter(Boolean)
 
-  // Filter out hidden role prefixes and numbers (like IDs)
   const visibleSegments = pathSegments.filter((seg) => {
     const isNumber = !isNaN(Number(seg))
     const isHidden = HIDDEN_SEGMENTS.includes(seg.toLowerCase())
@@ -31,7 +30,7 @@ export function Breadcrumbs({ role }: BreadcrumbsProps) {
       .replace(/-/g, " ")
       .replace(/\b\w/g, (c) => c.toUpperCase())
 
-  // Determine where "Home" should link to
+
   const getHomePath = () => {
     if (role === "vendor" && pathSegments.includes("vendor")) {
       return "/vendor"
