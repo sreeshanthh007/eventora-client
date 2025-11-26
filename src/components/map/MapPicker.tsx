@@ -5,13 +5,24 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-control-geocoder/dist/Control.Geocoder.css";
 import "leaflet-control-geocoder";
 
+// --- FIX DEFAULT MARKER ICON (WORKS IN DEV + PROD) ---
+const DefaultIcon = L.icon({
+  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+});
+
+L.Marker.prototype.options.icon = DefaultIcon;
+// -----------------------------------------------------
+
 interface LocationPickerProps {
   onLocationSelect: (lat: number, lng: number) => void;
-   initialLocation?: [number, number] 
+  initialLocation?: [number, number];
 }
 
 function LocationMarker({ position, setPosition, onLocationSelect }: any) {
-  // capture map click
   useMapEvents({
     click(e) {
       const { lat, lng } = e.latlng;
@@ -29,12 +40,11 @@ function LocationMarker({ position, setPosition, onLocationSelect }: any) {
 
 export default function LocationPicker({ onLocationSelect }: LocationPickerProps) {
   const mapRef = useRef<L.Map | null>(null);
-  const [position, setPosition] = useState<[number, number]>([20.5937, 78.9629]); // default India
+  const [position, setPosition] = useState<[number, number]>([20.5937, 78.9629]); // Default India
 
   useEffect(() => {
     if (!mapRef.current) return;
 
-    // ✅ add geocoder search box
     const geocoder = (L.Control as any).geocoder({
       defaultMarkGeocode: false,
     })
@@ -54,14 +64,12 @@ export default function LocationPicker({ onLocationSelect }: LocationPickerProps
   return (
     <MapContainer
       center={position}
-      zoom={5}  
+      zoom={5}
       style={{ height: "400px", width: "100%" }}
-      whenReady={(e) => {
-        mapRef.current = e.target;
-      }}
+      whenReady={(e) => (mapRef.current = e.target)}
     >
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-      {/* Marker updates on both search + click */}
+
       <LocationMarker
         position={position}
         setPosition={setPosition}

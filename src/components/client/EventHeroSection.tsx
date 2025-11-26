@@ -6,6 +6,7 @@ import landingPageCarosel1 from "../../assets/common/landingPageCarosel 1-wendyw
 import landingPageCarosel2 from "../../assets/common/landingPage Carosel 2-44912-167636.jpg"
 import landingPageCarosel3 from  "../../assets/common/landing Page Carosel 3 37502588.jpg"
 import { Button } from "../pages/ui/button"
+import { useNavigate } from "react-router-dom"
 
 const heroImages = [
   landingPageCarosel1,
@@ -15,7 +16,7 @@ const heroImages = [
 ]
 const EventHeroSection: React.FC = () => {
   const [currentImage, setCurrentImage] = useState(0)
-
+  const navigate = useNavigate()
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentImage((prev) => (prev + 1) % heroImages.length)
@@ -29,6 +30,10 @@ const EventHeroSection: React.FC = () => {
 
   const prevImage = () => {
     setCurrentImage((prev) => (prev - 1 + heroImages.length) % heroImages.length)
+  }
+
+  const navigateToEvents = () => {
+    navigate("/events")
   }
 
   return (
@@ -65,7 +70,7 @@ const EventHeroSection: React.FC = () => {
               size="lg"
               className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 font-semibold text-lg rounded-lg shadow-lg transition-all duration-300"
             >
-              <Play className="w-5 h-5 mr-2" />
+              <Play className="w-5 h-5 mr-2"  onClick={navigateToEvents}/>
               Explore Events
             </Button>
           </div>

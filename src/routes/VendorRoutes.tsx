@@ -15,7 +15,7 @@ import EditServicePage from "@/components/pages/vendor/EditServicePage";
 import EditEventPage from "@/components/pages/vendor/EditEventPage";
 import { VendorAnalyticsDashboardPage } from "@/components/pages/vendor/VendorDashboardPage";
 import VendorChangePasswordPage from "@/components/vendor/VendorChangePasswordPage";
-import WorkSamplePage from "@/components/pages/vendor/WorkSamplePage";
+import WorkSamplePage from "@/components/pages/vendor/VendorWorkSamplePage";
 import VendorWalletPage from "@/components/pages/vendor/VendorWalletPage";
 import VendorBookedServicesPage from "@/components/pages/vendor/VendorBookedServicePage";
 import VerifyAttendiesPage from "@/components/pages/vendor/VerifyAttendiesPage";

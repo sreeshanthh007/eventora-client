@@ -80,7 +80,7 @@ export const CategoriesSection: React.FC = () => {
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl mb-6 text-gray-900">Popular Categories</h2>
           <div className="w-24 h-1 bg-blue-600 mx-auto rounded-full"></div>
-          <p className="text-gray-600 mt-4 text-lg">Discover amazing events across different categories</p>
+          <p className="text-gray-600 mt-4 text-lg">Discover amazing services across different categories</p>
         </div>
 
         <div className="relative max-w-7xl mx-auto">
