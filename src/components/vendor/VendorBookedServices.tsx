@@ -78,25 +78,34 @@ export function VendorBookedServicesTable({ bookings , onStartBookedServiceSubmi
                 hour: "2-digit",
                 minute: "2-digit",
                 hour12: true,
-                timeZone: "UTC",
+           
               })
 
               const formattedEndTime = endTime.toLocaleTimeString("en-US", {
                 hour: "2-digit",
                 minute: "2-digit",
                 hour12: true,
-                timeZone: "UTC",
+           
               })
-
               const now = new Date()
-              const serviceStartTime = new Date(booking.bookingSlot.slotStartTime)
-              const serviceEndTime = new Date(booking.bookingSlot.slotEndTime)
-              const isReadyToStart = now >= serviceStartTime
-              const hasServiceEnded = now >= serviceEndTime
-
+              const nowUTC = new Date(
+              Date.UTC(
+                now.getUTCFullYear(),
+                now.getUTCMonth(),
+                now.getUTCDate(),
+                now.getUTCHours(),
+                now.getUTCMinutes(),
+                now.getUTCSeconds()
+              )
+            )
+              const serviceStartTimeUTC = new Date(booking.bookingSlot.slotStartTime) 
+              const serviceEndTimeUTC = new Date(booking.bookingSlot.slotEndTime) 
+              const isReadyToStart = nowUTC >= serviceStartTimeUTC
+              const hasServiceEnded = nowUTC >= serviceEndTimeUTC
+            console.log("isReadyToStart:", isReadyToStart, "hasServiceEnded:", hasServiceEnded, "nowUTC:", nowUTC, "serviceStartTimeUTC:", serviceStartTimeUTC, "serviceEndTimeUTC:", serviceEndTimeUTC);
               const canStart = booking.status === "pending" && isReadyToStart
               const canStop = booking.status === "ongoing" && hasServiceEnded
-
+              
               return (
                 <TableRow key={booking.bookingId} className="hover:bg-muted/50">
                   <TableCell className="font-medium text-primary">{booking.bookingId}</TableCell>
