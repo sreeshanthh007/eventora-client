@@ -29,7 +29,7 @@ interface BookedServicesTableProps {
 }
 
 export function VendorBookedServicesTable({ bookings , onStartBookedServiceSubmit , onStopBookedServiceSubmit}: BookedServicesTableProps) {
-
+  console.log("Bookings in Table:", bookings);
   const handleStartBookedService = (bookingId:string)=>{
 
     if(bookingId){
