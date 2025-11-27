@@ -74,8 +74,19 @@ export function VendorBookedServicesTable({ bookings , onStartBookedServiceSubmi
               const startTime = new Date(booking.bookingSlot.slotStartTime)
               const endTime = new Date(booking.bookingSlot.slotEndTime)
               const formattedDate = date.toLocaleDateString()
-              const formattedStartTime = startTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-              const formattedEndTime = endTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+              const formattedStartTime = startTime.toLocaleTimeString("en-US", {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true,
+                timeZone: "UTC",
+              })
+
+              const formattedEndTime = endTime.toLocaleTimeString("en-US", {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true,
+                timeZone: "UTC",
+              })
 
               const now = new Date()
               const serviceStartTime = new Date(booking.bookingSlot.slotStartTime)
