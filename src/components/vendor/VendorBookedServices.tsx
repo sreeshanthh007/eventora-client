@@ -1,7 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/pages/ui/table"
 import { Badge } from "@/components/pages/ui/badge"
 import { Button } from "@/components/pages/ui/button"
-import { Download } from "lucide-react"
 
 export interface BookedService {
   bookingId: string
@@ -170,10 +169,6 @@ export function VendorBookedServicesTable({ bookings , onStartBookedServiceSubmi
                         title="Stop Service"
                       >
                         Stop Service
-                      </Button>
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        <Download className="h-4 w-4" />
-                        <span className="sr-only">Download invoice</span>
                       </Button>
                     </div>
                   </TableCell>
