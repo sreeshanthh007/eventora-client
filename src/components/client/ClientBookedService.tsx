@@ -11,6 +11,8 @@ import { getCloudinaryImageUrl } from "@/utils/helpers/GetCloudinaryImage"
 import { useState } from "react"
 import { ConfirmDialog } from "../common/popups/ConfirmationPopup"
 import { useNavigate } from "react-router-dom"
+import { getServiceStatusColor } from "@/utils/helpers/GetServiceStatusColor"
+import { getPaymentStatusColor } from "@/utils/helpers/PaymentStatusColor"
 
 interface Booking {
   bookingId: string
@@ -211,7 +213,7 @@ export function ClientBookedServices({
 
                           {/* Service Status */}
                           <TableCell className="whitespace-nowrap">
-                            <Badge className={`${getStatusColor(service.serviceStatus)} border-0`}>
+                            <Badge className={`${getServiceStatusColor(service.serviceStatus)} border-0`}>
                               {service.serviceStatus}
                             </Badge>
                           </TableCell>
@@ -292,33 +294,6 @@ export function ClientBookedServices({
   )
 }
 
-const getStatusColor = (status: string) => {
-  switch (status.toLowerCase()) {
-    case "completed":
-      return "bg-green-100 text-green-800"
-    case "upcoming":
-      return "bg-blue-100 text-blue-800"
-    case "in progress":
-      return "bg-yellow-100 text-yellow-800"
-    case "pending":
-      return "bg-orange-100 text-orange-800"
-    case "cancelled":
-      return "bg-red-100 text-red-800"
-    default:
-      return "bg-gray-100 text-gray-800"
-  }
-}
 
-const getPaymentStatusColor = (status: string) => {
-  switch (status.toLowerCase()) {
-    case "paid":
-    case "successfull":
-      return "bg-green-100 text-green-800"
-    case "pending":
-      return "bg-orange-100 text-orange-800"
-    case "failed":
-      return "bg-red-100 text-red-800"
-    default:
-      return "bg-gray-100 text-gray-800"
-  }
-}
+
+
