@@ -10,7 +10,7 @@ import type { TransactionType } from "@/types/wallet";
 export default function AdminWalletDetailsPage() {
   const [page, setPage] = useState(1);
   const [filter, setFilter] = useState<TransactionType>("all");
-  const limit = 6;
+  const limit = 5;
 
   const { data: walletResp, isLoading, isError } = useAdminWalletDetails({
     page,
@@ -20,7 +20,7 @@ export default function AdminWalletDetailsPage() {
 
   const wallet = walletResp?.wallet?.walletDetails;
   const total = walletResp?.wallet?.total ?? 0;
-  const totalPages = total ? Math.ceil(total / limit) : 0;
+  const totalPages = total 
 
   if (isLoading) {
     return (

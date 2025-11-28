@@ -180,7 +180,7 @@ export const rejectVendor = async ({ vendorId, rejectReason }:{vendorId:string,r
 export const getAdminWalletDetails = async({
   type="all",
   page=1,
-  limit=6
+  limit=5
 }:{
   type:string,
   page:number,

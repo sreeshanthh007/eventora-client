@@ -179,7 +179,7 @@ export const getCategoryForFilter = async() =>{
 
 export const getBookedEvents = async({
   page = 1,
-  limit = 6,
+  limit = 2,
   search = "",
 }:{
   page:number,
