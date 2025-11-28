@@ -107,9 +107,7 @@ export default function QRScanner({
     };
 
     const onScanError = (err: any) => {
-      if (err && err !== "No MultiFormat Readers were able to detect the code.") {
-        showToast(`Scan error: ${err}`, "error");
-      }
+       if (err === "No MultiFormat Readers were able to detect the code.") return;
     };
 
     scanner.render(onScanSuccess, onScanError);
