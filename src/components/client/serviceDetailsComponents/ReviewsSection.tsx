@@ -93,7 +93,7 @@ export default function ReviewsSection({
   }
 
   const currentReview = reviews.find((review) => review.clientId === currentClientId)
-  console.log("current review",currentReview)
+
   return (
     <Card className="p-8 bg-card border border-border">
       <div className="space-y-6">

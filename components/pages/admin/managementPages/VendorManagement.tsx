@@ -68,13 +68,7 @@ const VendorManagementPage = () => {
 
   const fetchVendors = async () => {
     setLoading(true)
-    try {
-      console.log('Fetching vendors with params:', {
-        page: currentPage,
-        limit,
-        search: debouncedSearchTerm
-      })
-      
+    try { 
       const response = await getAllVendors({
         page: currentPage,
         limit: limit,

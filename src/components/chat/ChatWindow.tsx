@@ -86,7 +86,7 @@ export default function ChatWindow({ chat, message }: ChatWindowProps) {
 
   useEffect(() => {
   const handler = (onlineUsers: string[]) => {
-    console.log("online users in sidebar", onlineUsers);
+  
   };
 
   socketio.on("online-users", handler);

@@ -75,7 +75,7 @@ const ClientManagementPage = () => {
         limit,
         search: debouncedSearchTerm // Use debounced search term
       })
-      console.log(response)
+  
       setClients(response.clients) 
       setTotalPages(response.totalPages)
     } catch (error) {

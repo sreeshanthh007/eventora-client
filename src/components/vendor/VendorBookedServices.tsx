@@ -29,7 +29,7 @@ interface BookedServicesTableProps {
 }
 
 export function VendorBookedServicesTable({ bookings , onStartBookedServiceSubmit , onStopBookedServiceSubmit}: BookedServicesTableProps) {
-  console.log("Bookings in Table:", bookings);
+
   const handleStartBookedService = (bookingId:string)=>{
 
     if(bookingId){
@@ -102,7 +102,6 @@ export function VendorBookedServicesTable({ bookings , onStartBookedServiceSubmi
               const serviceEndTimeUTC = new Date(booking.bookingSlot.slotEndTime) 
               const isReadyToStart = nowUTC >= serviceStartTimeUTC
               const hasServiceEnded = nowUTC >= serviceEndTimeUTC
-            console.log("isReadyToStart:", isReadyToStart, "hasServiceEnded:", hasServiceEnded, "nowUTC:", nowUTC, "serviceStartTimeUTC:", serviceStartTimeUTC, "serviceEndTimeUTC:", serviceEndTimeUTC);
               const canStart = booking.status === "pending" && isReadyToStart
               const canStop = booking.status === "ongoing" && hasServiceEnded
               

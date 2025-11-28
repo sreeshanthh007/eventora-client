@@ -14,7 +14,7 @@ export const requestNotificationPermission = async (): Promise<string | null> =>
       }
         const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
         const swRegistration = await navigator.serviceWorker.ready; 
-    console.log("✅ Service Worker ready:", registration);
+
   
     const permission = await Notification.requestPermission();
     if (permission !== "granted") {
@@ -28,7 +28,7 @@ export const requestNotificationPermission = async (): Promise<string | null> =>
     });
 
     if (currentToken) {
-      console.log("✅ FCM token:", currentToken);
+
       return currentToken;
     } else {
       console.warn("⚠️ No registration token available.");
@@ -46,7 +46,7 @@ export const requestNotificationPermission = async (): Promise<string | null> =>
 
 export const listenToForegroundMessages = () => {
   onMessage(messaging, (payload) => {
-    console.log("📩 Foreground message received:", payload);
+
     toast.success(payload.notification?.title + " - " + payload.notification?.body);
   }); 
 };

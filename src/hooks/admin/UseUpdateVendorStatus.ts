@@ -14,7 +14,7 @@ export const useUpdateVendorMutation = ()=>{
             return data
         },
         onError:(err)=>{
-            console.log("failed to update vendor status",err)
+            showToast(err.response?.data?.message || "Something went wrong","error")
         }
     })
 } 
