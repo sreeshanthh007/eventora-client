@@ -18,7 +18,7 @@ export const ConnectSocket = ({ user }: ConnectSocketProps) => {
     socket.emit("joinVendorRoom", user);
 
     const handleVendorApproved = (payload: { _id: string, status: string }) => {
-      console.log("from server",payload)
+
     if(payload._id === user) {
     dispatch(refreshVendorSessionThunk());
     }

@@ -31,7 +31,7 @@ export const ContactInfoCard: React.FC<ContactInfoCardProps> = ({ onUpdateClient
       onUpdateClient(updatedClient);
     }
     
-    console.log("After submitting", updatedClient);
+
     setIsOpen(false);
   };
 

@@ -20,7 +20,7 @@ export default function Chat({ queryData, chatsIsLoading, role }: ChatProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const socketio = useContext(socketContext)
   const [messages, setMessages] = useState<Message[]>([]);
-  console.log("query data ", queryData);
+
 
   const chats =
     !chatsIsLoading && queryData?.success && queryData.chats

@@ -10,7 +10,7 @@ interface Slot {
 }
 
 interface AvailableSlotsProps {
-  slots?: Slot[] // Allow undefined
+  slots?: Slot[] 
   duration: number
   onSlotSelect?: (selectedStartTime: string | null) => void  
 }
@@ -18,7 +18,7 @@ interface AvailableSlotsProps {
 export default function AvailableSlots({ slots, onSlotSelect }: AvailableSlotsProps) {
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null)  
-  console.log(selectedDate,selectedSlotId)
+
   const dates = (slots || []).reduce((acc: { date: string; day: string }[], slot) => {
     const startDate = new Date(slot.startDateTime)
     const dateStr = startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
