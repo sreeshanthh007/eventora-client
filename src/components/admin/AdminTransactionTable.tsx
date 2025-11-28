@@ -65,7 +65,7 @@ export function AdminTransactionTable({
   onFilterChange,
   selectedFilter,
 }: AdminTransactionTableProps) {
-  // Filter by paymentStatus
+
   const filtered = transactions.filter((tx) => {
     return selectedFilter === "all" || tx.paymentStatus === selectedFilter;
   });

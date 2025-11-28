@@ -8,7 +8,7 @@ export const vendorProfileSchema = Yup.object().shape({
     name:Yup.string()
     .required("Name is required")
     .max(20,"maximumm 20 charaters are allowed")
-    .min(4,"minimum 5 charaters are required"),
+    .min(3,"minimum 5 charaters are required"),
     phone:Yup.string()
     .required("phone Number is required")
      .matches(/^\d{10}$/, "Invalid phone number"),

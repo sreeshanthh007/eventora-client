@@ -133,9 +133,9 @@ export default function VendorProfilePage() {
                   </Button>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge variant={vendor?.status === "verified" ? "default" : "secondary"}>
+                  <Badge variant={vendor?.status === "approved" ? "default" : "secondary"}>
                     <Shield className="h-3 w-3 mr-1" />
-                    {vendor?.status === "verified" ? "Verified" : "Pending"}
+                    {vendor?.status === "approved" ? "Verified" : "Pending"}
                   </Badge>
                 </div>
               </div>

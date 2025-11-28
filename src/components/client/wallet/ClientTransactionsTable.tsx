@@ -70,7 +70,6 @@ export function TransactionTable({
     );
   }
 
-
   if (isError) {
     return (
       <Card className="border border-border/50 rounded-xl overflow-hidden bg-card p-12">
@@ -80,10 +79,33 @@ export function TransactionTable({
   }
 
 
+  const Header = (
+    <div className="flex items-center justify-between p-4 border-b border-border/30 bg-muted/30">
+      <h2 className="text-xl font-semibold text-foreground">Transaction History</h2>
+
+      <div className="flex gap-2">
+        {(["all", "credit", "debit"] as const).map((opt) => (
+          <Button
+            key={opt}
+            variant={selectedFilter === opt ? "default" : "outline"}
+            size="sm"
+            onClick={() => onFilterChange(opt)}
+            className="capitalize"
+          >
+            {opt === "all" ? "All" : opt}
+          </Button>
+        ))}
+      </div>
+    </div>
+  );
+
+
   if (filteredTransactions.length === 0) {
     return (
-      <Card className="border border-border/50 rounded-xl overflow-hidden bg-card p-12">
-        <div className="text-center">
+      <Card className="border border-border/50 rounded-xl overflow-hidden bg-card">
+        {Header}
+
+        <div className="p-12 text-center">
           <p className="text-muted-foreground text-lg">
             {selectedFilter === "all"
               ? "No transactions yet"
@@ -99,28 +121,11 @@ export function TransactionTable({
     );
   }
 
+
   return (
     <Card className="border border-border/50 rounded-xl overflow-hidden bg-card">
+      {Header}
 
-      <div className="flex items-center justify-between p-4 border-b border-border/30 bg-muted/30">
-        <h2 className="text-xl font-semibold text-foreground">Transaction History</h2>
-
-        <div className="flex gap-2">
-          {(["all", "credit", "debit"] as const).map((opt) => (
-            <Button
-              key={opt}
-              variant={selectedFilter === opt ? "default" : "outline"}
-              size="sm"
-              onClick={() => onFilterChange(opt)}
-              className="capitalize"
-            >
-              {opt === "all" ? "All" : opt}
-            </Button>
-          ))}
-        </div>
-      </div>
-
-     
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
@@ -182,7 +187,6 @@ export function TransactionTable({
           </tbody>
         </table>
       </div>
-
 
       {totalPages > 1 && (
         <div className="flex justify-center p-4 border-t border-border/30 bg-muted/30">
