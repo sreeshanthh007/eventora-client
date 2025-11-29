@@ -120,7 +120,7 @@ export default function QRScanner({
     };
   }, [isOpen, mutate, onClose, onSuccess, onError, scanningType, navigate, showToast, scanAndVerifyTicket]);
 
-  // cleanup when modal closes
+
   useEffect(() => {
     if (!isOpen && scannerRef.current) {
       scannerRef.current.clear().catch(() => {});

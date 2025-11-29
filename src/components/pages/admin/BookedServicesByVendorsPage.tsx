@@ -108,7 +108,7 @@ export default function BookedservicesByVendorPage() {
             {!isLoading && !error && bookings.length > 0 && (
               <>
                 <BookedServicesByVendorsTable services={bookings} />
-                {totalPages > 1 && (
+                {totalPages  && (
                   <div className="mt-6 flex justify-center">
                     <Pagination
                       currentPage={page}
