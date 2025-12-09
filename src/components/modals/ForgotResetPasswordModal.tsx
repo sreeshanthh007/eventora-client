@@ -4,35 +4,37 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../pages/ui/di
 import { Button } from "../pages/ui/button"
 import { Label } from "../pages/ui/label"
 import { Input } from "../pages/ui/input"
-import { Lock, Eye, EyeOff, X, CheckCircle } from "lucide-react"
+import { Lock, Eye, EyeOff, X, CheckCircle, } from "lucide-react"
 import { useClientForgotPasswordMutation } from "@/hooks/client/UseClientForgotPassword"
 import { usePasswordValidation } from "@/hooks/services/Usepasswordvalidation"
+
 interface ResetPasswordModalProps {
   isOpen: boolean
   onClose: () => void
   onSuccess: () => void
   email: string
-  role:string
-  
+  role: string
 }
-export const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({ isOpen, onClose, onSuccess, email , role }) => {
 
+export const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({
+  isOpen,
+  onClose,
+  onSuccess,
+  email,
+  role,
+}) => {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<{ password?: string; confirmPassword?: string; api?: string }>({})
-  
-const {mutate:forgotPasswordClient} = useClientForgotPasswordMutation()
 
-
-
+  const { mutate: forgotPasswordClient } = useClientForgotPasswordMutation()
   const passwordValidation = usePasswordValidation(password)
-  
 
   const validatePassword = (pwd: string): string | undefined => {
-    if (!pwd) return "Password is required" 
+    if (!pwd) return "Password is required"
     if (pwd.length < 8) return "Password must be at least 8 characters"
     if (!/[A-Z]/.test(pwd)) return "Password must contain at least one uppercase letter"
     if (!/[a-z]/.test(pwd)) return "Password must contain at least one lowercase letter"
@@ -50,51 +52,38 @@ const {mutate:forgotPasswordClient} = useClientForgotPasswordMutation()
   const handleSubmit = async () => {
     const newErrors: { password?: string; confirmPassword?: string; api?: string } = {}
 
-
     const passwordError = validatePassword(password)
-    if (passwordError) {
-      newErrors.password = passwordError
-    }
+    if (passwordError) newErrors.password = passwordError
 
-  
     const confirmPasswordError = validateConfirmPassword(password, confirmPassword)
-    if (confirmPasswordError) {
-      newErrors.confirmPassword = confirmPasswordError
-    }
+    if (confirmPasswordError) newErrors.confirmPassword = confirmPasswordError
 
     setErrors(newErrors)
-
     if (Object.keys(newErrors).length > 0) return
 
     setIsLoading(true)
-    
+
     try {
-          const resetPasswordData = {
-          email,
-          password,
-          role
-        }
+      const resetPasswordData = { email, password, role }
 
-const handler = forgotPasswordClient
-await new Promise((resolve, reject) => {
-  handler(resetPasswordData, {
-    onSuccess: (response) => {
-      setIsLoading(false)
-      onSuccess()
-      handleClose()
-      resolve(response)
-    },
-    onError: (error) => {
-      setIsLoading(false)
-      setErrors(prev => ({
-        ...prev,
-        api: error?.response?.data?.message || "Failed to reset password. Please try again."
-      }))
-      reject(error)
-    }
-  })
-})
-
+      await new Promise((resolve, reject) => {
+        forgotPasswordClient(resetPasswordData, {
+          onSuccess: (response) => {
+            setIsLoading(false)
+            onSuccess()
+            handleClose()
+            resolve(response)
+          },
+          onError: (error: any) => {
+            setIsLoading(false)
+            setErrors(prev => ({
+              ...prev,
+              api: error?.response?.data?.message || "Failed to reset password. Please try again."
+            }))
+            reject(error)
+          }
+        })
+      })
     } catch (error) {
       setIsLoading(false)
     }
@@ -109,7 +98,6 @@ await new Promise((resolve, reject) => {
     onClose()
   }
 
- 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     setPassword(value)
@@ -128,32 +116,31 @@ await new Promise((resolve, reject) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md bg-gradient-to-br from-white to-purple-50 border-0 shadow-2xl">
+      <DialogContent className="sm:max-w-md bg-white border-gray-300 shadow-2xl">
         <DialogHeader className="relative">
+     
           <button
             onClick={handleClose}
-            className="absolute right-0 top-0 p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
           >
-            <X className="w-4 h-4 text-gray-500" />
           </button>
 
-          <div className="flex flex-col items-center space-y-4 pt-4">
-            <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
+          <div className="flex flex-col items-center space-y-4 pt-8">
+            <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center">
               <Lock className="w-8 h-8 text-white" />
             </div>
 
-            <DialogTitle className="text-2xl font-bold text-center">
-              <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                Reset Password
-              </span>
+            <DialogTitle className="text-2xl font-bold text-center text-black">
+              Reset Password
             </DialogTitle>
 
-            <p className="text-gray-600 text-center text-sm">Create a new secure password for your account</p>
+            <p className="text-gray-600 text-center text-sm max-w-xs">
+              Create a new secure password for your account
+            </p>
           </div>
         </DialogHeader>
 
-        <div className="space-y-6 pt-4">
-          {/* API Error Display */}
+        <div className="space-y-6 pt-6">
+          {/* API Error */}
           {errors.api && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-3">
               <p className="text-red-600 text-sm font-medium">{errors.api}</p>
@@ -172,56 +159,43 @@ await new Promise((resolve, reject) => {
                 placeholder="Enter new password"
                 value={password}
                 onChange={handlePasswordChange}
-                className={`w-full px-4 py-3 pr-12 border-2 rounded-lg transition-colors duration-200 ${
-                  errors.password ? "border-red-400 focus:border-red-400" : "border-gray-200 focus:border-purple-400"
+                className={`w-full px-4 py-3 pr-12 border-2 rounded-lg transition-all duration-200 ${
+                  errors.password
+                    ? "border-red-400 focus:border-red-400"
+                    : "border-gray-300 focus:border-black"
                 }`}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors duration-200"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-black transition-colors"
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
-            {errors.password && <p className="text-red-500 text-xs">{errors.password}</p>}
+            {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
           </div>
 
           {/* Password Requirements */}
           {password && (
-            <div className="space-y-2">
-              <p className="text-xs font-semibold text-gray-700">Password Requirements:</p>
-              <div className="grid grid-cols-1 gap-1 text-xs">
-                <div
-                  className={`flex items-center space-x-2 ${passwordValidation.minLength ? "text-green-600" : "text-gray-400"}`}
-                >
-                  <CheckCircle className="w-3 h-3" />
-                  <span>At least 8 characters</span>
-                </div>
-                <div
-                  className={`flex items-center space-x-2 ${passwordValidation.hasUpper ? "text-green-600" : "text-gray-400"}`}
-                >
-                  <CheckCircle className="w-3 h-3" />
-                  <span>One uppercase letter</span>
-                </div>
-                <div
-                  className={`flex items-center space-x-2 ${passwordValidation.hasLower ? "text-green-600" : "text-gray-400"}`}
-                >
-                  <CheckCircle className="w-3 h-3" />
-                  <span>One lowercase letter</span>
-                </div>
-                <div
-                  className={`flex items-center space-x-2 ${passwordValidation.hasNumber ? "text-green-600" : "text-gray-400"}`}
-                >
-                  <CheckCircle className="w-3 h-3" />
-                  <span>One number</span>
-                </div>
-                <div
-                  className={`flex items-center space-x-2 ${passwordValidation.hasSpecial ? "text-green-600" : "text-gray-400"}`}
-                >
-                  <CheckCircle className="w-3 h-3" />
-                  <span>One special character (!@#$%^&*)</span>
-                </div>
+            <div className="space-y-2 text-xs">
+              <p className="font-semibold text-gray-700">Password must contain:</p>
+              <div className="grid grid-cols-1 gap-1">
+                {[
+                  { valid: passwordValidation.minLength, text: "At least 8 characters" },
+                  { valid: passwordValidation.hasUpper, text: "One uppercase letter" },
+                  { valid: passwordValidation.hasLower, text: "One lowercase letter" },
+                  { valid: passwordValidation.hasNumber, text: "One number" },
+                  { valid: passwordValidation.hasSpecial, text: "One special character (!@#$%^&*)" },
+                ].map((item, i) => (
+                  <div
+                    key={i}
+                    className={`flex items-center space-x-2 ${item.valid ? "text-green-600" : "text-gray-400"}`}
+                  >
+                    <CheckCircle className="w-3.5 h-3.5" />
+                    <span>{item.text}</span>
+                  </div>
+                ))}
               </div>
             </div>
           )}
@@ -238,30 +212,32 @@ await new Promise((resolve, reject) => {
                 placeholder="Confirm new password"
                 value={confirmPassword}
                 onChange={handleConfirmPasswordChange}
-                className={`w-full px-4 py-3 pr-12 border-2 rounded-lg transition-colors duration-200 ${
+                className={`w-full px-4 py-3 pr-12 border-2 rounded-lg transition-all duration-200 ${
                   errors.confirmPassword
                     ? "border-red-400 focus:border-red-400"
-                    : "border-gray-200 focus:border-purple-400"
+                    : "border-gray-300 focus:border-black"
                 }`}
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors duration-200"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-black transition-colors"
               >
                 {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
-            {errors.confirmPassword && <p className="text-red-500 text-xs">{errors.confirmPassword}</p>}
+            {errors.confirmPassword && (
+              <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>
+            )}
             {confirmPassword && password === confirmPassword && passwordValidation.isValid && (
-              <p className="text-green-600 text-xs flex items-center space-x-1">
-                <CheckCircle className="w-3 h-3" />
-                <span>Passwords match</span>
+              <p className="text-green-600 text-xs flex items-center space-x-1 mt-1">
+                <CheckCircle className="w-3.5 h-3.5" />
+                <span>Passwords match perfectly</span>
               </p>
             )}
           </div>
 
-          {/* Action Buttons */}
+          {/* Buttons */}
           <div className="flex space-x-3 pt-4">
             <Button
               variant="outline"
@@ -273,7 +249,7 @@ await new Promise((resolve, reject) => {
             <Button
               onClick={handleSubmit}
               disabled={!passwordValidation.isValid || password !== confirmPassword || isLoading}
-              className="flex-1 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-semibold py-3 rounded-lg transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
+              className="flex-1 bg-black hover:bg-gray-900 text-white font-semibold py-3 rounded-lg transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <div className="flex items-center space-x-2">
