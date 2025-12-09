@@ -28,7 +28,6 @@ export default function ClientWalletPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Breadcrumb with border - consistent across all client pages */}
       <div className="border-b border-gray-200 bg-white">
         <div className="container mx-auto px-4 py-4">
           <Breadcrumbs role="client" />
