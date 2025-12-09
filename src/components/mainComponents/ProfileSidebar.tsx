@@ -39,7 +39,7 @@ const menuItems = [
   {
     icon: CreditCard,
     label: "Wallet",
-    to: "/client/wallet", 
+    to: "/wallet", 
     active: false,
     description: "Wallet details and history",
   },
@@ -62,7 +62,7 @@ export function ProfileSidebar() {
 const dispatch = useAppDispatch()
   const { mutate: logoutReq } = UseLogout(logOutClient)
   const { showToast } = useToast()
-  const location = useLocation() // This gets the current path
+  const location = useLocation() 
 
   const handleLogout = () => {
     logoutReq(undefined, {

@@ -39,7 +39,7 @@ const ClientRoutes = () => {
       <Route path="/service/:id" element={<ServiceDetailsPage/>}/>
       <Route path="/booked-events" element={<BookedEventsPage/>}/>
       <Route path="/change-password" element={<ChangePasswordPage/>}/>
-      <Route path="/client/wallet" element={<ClientWalletPage/>}/>
+      <Route path="/wallet" element={<ClientWalletPage/>}/>
       <Route path="/booked-services" element={<ClientBookedServicesPage/>}/>
       <Route path="/chat"  element={<ChatPage/>}/>
       </Route>

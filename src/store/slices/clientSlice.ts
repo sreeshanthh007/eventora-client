@@ -6,12 +6,7 @@ import  { AxiosError } from "axios";
 
 
 
-// interface Client {
-//     id:string,
-//     name:string,
-//     email:string,
-//     role:string
-// }
+
 
 
 interface IClientState {
