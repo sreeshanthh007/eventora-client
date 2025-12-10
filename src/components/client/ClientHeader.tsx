@@ -3,7 +3,7 @@
 import { Sheet, SheetTrigger, SheetContent, SheetHeader } from "../pages/ui/sheet"
 import type React from "react"
 import { useState } from "react"
-import { Users, Menu, Ticket, User, HelpCircle, LogOut, MessageCircle, Handshake } from "lucide-react"
+import { Users, Menu, Ticket, User, LogOut, MessageCircle, Handshake, MessageSquareWarning } from "lucide-react"
 import type { RootState } from "@/store/store"
 import { Link, useNavigate } from "react-router-dom"
 import { clientLogout } from "@/store/slices/clientSlice"
@@ -27,7 +27,7 @@ export const ClientHeader: React.FC = () => {
     { icon: Handshake, label: "My  Services", to: "/booked-services" },
     { icon: MessageCircle, label: "Chat", to: "/chat" },
     { icon: Users, label: "Become a Provider", to: "/vendor/register" },
-    // { icon: HelpCircle, label: "Help & Support", to: "/help" },
+    { icon: MessageSquareWarning, label: "Report an Issue", to: "/report-issue" },
   ]
 
   const [sidebarOpen, setSidebarOpen] = useState(false)
