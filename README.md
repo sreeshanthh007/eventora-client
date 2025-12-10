@@ -1,69 +1,95 @@
-# React + TypeScript + Vite
+# 🎨 Eventora Client – Event Booking & Vendor Service Platform (Frontend)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Eventora Client is the **frontend application** for the Eventora ecosystem, built using **React + TypeScript** with a clean, modular structure. It delivers a smooth experience for **Clients**, **Vendors**, and **Admins** to manage events, bookings, services, profiles, and real-time features.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## ✨ Features
 
-## Expanding the ESLint configuration
+## 🔹 Client Side (Users)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+* 🎉 Browse **events** and **vendor services**
+* 🎫 Book **event tickets**
+* 🕒 Book **services based on availability slots**
+* 🔐 Authentication (JWT login/signup)
+* 🔁 Forgot password + OTP verification
+* 👤 Manage profile & bookings
+* 🔔 Real-time updates (Socket.io)
+* 📷 View QR Ticket
+* 📥 Report an issue to admin/vendor
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+## 🔹 Vendor Side
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+* 🛠️ Manage **events** & **services**
+* 📅 Set availability and slot timings
+* 📄 View bookings for services & events
+* 📲 Scan & verify QR tickets
+* 📊 Vendor dashboard with booking insights
+* 👤 Manage profile
+
+---
+
+## 🔹 Admin Side
+
+* 👨‍💼 Manage **users, vendors, events, services**
+* ✔️ Approve or reject vendor applications (real-time)
+* 🏷️ Manage categories
+* 💰 Admin dashboard with system earnings
+* 🔍 View booked services and event analytics
+
+---
+
+# 🏗️ Tech Stack
+
+* **React** + **TypeScript**
+* **Redux Toolkit** 
+* **React Router**
+* **Tailwind CSS**
+* **Axios** 
+* **Socket.io Client** 
+* **React Hook & Formik + Yup** 
+
+---
+
+# 📁 Project Structure (Actual)
+
+```
+src/
+├─ api/           # axios instances, API endpoint definitions
+├─ assets/        # images, fonts, icons, static assets
+├─ components/    # reusable UI components (buttons, cards, modals)
+├─ contexts/      # React context providers (auth, theme, socket)
+├─ hooks/         # custom hooks (useAuth, useFetch, useSocket)
+├─ lib/           # small libraries/helpers shared across app
+├─ protected/     # protected route wrappers & auth-guard components
+├─ routes/        # route definitions and page-level route components
+├─ services/      # client-side services (api wrappers, storage, auth)
+├─ types/         # TypeScript types & interfaces
+├─ utils/         # utility functions and helpers
+└─ main.tsx       # app entrypoint
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+---
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+# 🔗 API Integration
+
+The frontend communicates with the Eventora backend via:
+
+* REST APIs (Axios)
+* Socket.io for live updates (bookings, check-ins, vendor approval)
+
+Auth flow uses **HTTP-only cookies**.
+
+---
+
+
+# 🖼️ UI & Styling
+
+* Fully responsive using **Tailwind CSS**
+* Reusable components and layouts
+* Dark mode support (if implemented)
+
+---
