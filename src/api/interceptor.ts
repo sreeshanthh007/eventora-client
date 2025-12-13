@@ -92,8 +92,7 @@ axiosInstance.interceptors.response.use(
         });
       });
     }
-
-    // Handle forbidden scenarios
+    
     if (
       error.response?.status === StatusCodes.FORBIDDEN &&
       (message.includes("Access denied") ||

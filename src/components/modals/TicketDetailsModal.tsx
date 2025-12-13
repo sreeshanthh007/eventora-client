@@ -1,11 +1,15 @@
+// Updated TicketDetailsModal.tsx (with Retry Payment button for failed payments)
+
 import { useState } from "react"
 import { Dialog, DialogContent } from "@/components/pages/ui/dialog"
 import { Button } from "@/components/pages/ui/button"
-import { X, Calendar, Clock, Ticket, Mail, IndianRupee, AlertCircle } from "lucide-react"
+import { X, Calendar, Clock, Ticket, Mail, IndianRupee, AlertCircle, CreditCard } from "lucide-react"
 import { formatDateForInput } from "@/utils/helpers/FormatDate"
 import { formatTime } from "@/utils/helpers/FormatTIme"
 import { TicketCancellationPolicyModal } from "../modals/TicketCancellationPolicyModal"
 import { useCancelTicketMutation } from "@/hooks/client/UseCancelTicket"
+// If you have a hook for retrying payment, import it here:
+// import { useRetryPaymentMutation } from "@/hooks/client/UseRetryPayment"
 
 interface EventSchedule {
   date: string
@@ -25,6 +29,8 @@ interface EventDetailsModalProps {
   ticketStatus: string
   paymentStatus: string
   onTicketCancelled?: () => void 
+  // Optional: callback after successful retry if needed
+  // onPaymentRetried?: () => void
 }
 
 export function TicketDetailsModal({
@@ -42,12 +48,16 @@ export function TicketDetailsModal({
 }: EventDetailsModalProps) {
   const [isCancellationOpen, setIsCancellationOpen] = useState(false)
   const [isCancelling, setIsCancelling] = useState(false)
+  const [isRetrying, setIsRetrying] = useState(false)
   const {mutate:cancelSelectedTicket}  = useCancelTicketMutation()
 
+  // Add your retry payment mutation here if available
+  // const { mutate: retryPayment } = useRetryPaymentMutation()
+
   const isCancellable = ticketStatus !== "refunded" && ticketStatus !== "used" && paymentStatus !== "failed"
+  const isRetryable = paymentStatus === "failed"
 
   const cancelTicket = async (ticketId: string, eventId: string) => {
-
     setIsCancelling(true)
     try {
         cancelSelectedTicket({ticketId:ticketId,eventId:eventId})
@@ -73,6 +83,22 @@ export function TicketDetailsModal({
 
   const handleCancellationClose = () => {
     setIsCancellationOpen(false)
+  }
+
+  // Placeholder for retry payment logic
+  const handleRetryPayment = async () => {
+    setIsRetrying(true)
+    try {
+      // Example: await retryPayment({ ticketId, eventId })
+      // Or redirect to payment gateway, etc.
+      console.log("Retrying payment for ticket:", ticketId)
+      // If successful, you might close modal or refresh data
+      // onClose()
+    } catch (error) {
+      // Handle error (e.g., show toast)
+    } finally {
+      setIsRetrying(false)
+    }
   }
 
   return (
@@ -137,19 +163,50 @@ export function TicketDetailsModal({
             </div>
           </div>
 
-          {!isCancellable && (
+          {/* Warning for non-cancellable tickets */}
+          {!isCancellable && !isRetryable && (
             <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
               <div className="flex items-start gap-2">
                 <AlertCircle className="h-4 w-4 text-yellow-600 mt-0.5 flex-shrink-0" />
                 <p className="text-sm text-yellow-800">
-                  This ticket cannot be cancelled as its
-                  {paymentStatus === "failed" && "  is  failed."}
+                  This ticket cannot be cancelled.
                 </p>
               </div>
             </div>
           )}
 
+          {/* Specific message for failed payment */}
+          {isRetryable && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-red-800">
+                  Payment for this ticket has failed. Please retry to secure your booking.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Action Buttons */}
           <div className="flex gap-3 pt-2">
+            {isRetryable && (
+              <Button 
+                onClick={handleRetryPayment}
+                variant="default"
+                className="flex-1 font-semibold h-9 bg-orange-600 hover:bg-orange-700"
+                disabled={isRetrying}
+              >
+                {isRetrying ? (
+                  <>Retrying...</>
+                ) : (
+                  <>
+                    <CreditCard className="h-4 w-4 mr-2" />
+                    Retry Payment
+                  </>
+                )}
+              </Button>
+            )}
+
             {isCancellable && (
               <Button 
                 onClick={handleCancelTicket} 
@@ -160,7 +217,11 @@ export function TicketDetailsModal({
                 {isCancelling ? 'Cancelling...' : 'Cancel Ticket'}
               </Button>
             )}
-            <Button onClick={onClose} className={`flex-1 font-semibold h-9 ${isCancellable ? 'bg-gray-900 hover:bg-black text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}>
+
+            <Button 
+              onClick={onClose} 
+              className="flex-1 font-semibold h-9 bg-gray-900 hover:bg-black text-white"
+            >
               Close
             </Button>
           </div>

@@ -17,6 +17,8 @@
 
   export const AddCategoryPage = () => {
     const { showToast } = useToast();
+    const CATEGORY_NAME = import.meta.env.VITE_CATEGORY_NAME
+
     const { mutate: categoryAdd } = UseAddCategoryMutation();
 
     const addCategory = async (data: ICategory) => {
@@ -26,7 +28,7 @@
       if (data.image instanceof File) {
         uploadImageUrl = await uploadImageToCloudinarySigned(
           data.image as File,
-          "category-images"
+          CATEGORY_NAME
         );
 
         if (!uploadImageUrl) {

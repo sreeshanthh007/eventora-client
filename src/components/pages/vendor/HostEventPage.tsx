@@ -9,7 +9,8 @@ export default function HostEventPage() {
 
   const {showToast} = useToast()
   const {mutate:addEvent} = useAddEventMutation()
-
+  const EVENT_IMAGE_NAME = import.meta.env.VITE_EVENT_IMAGES_NAME
+  
   const handleCreateEvent = async(data)=>{
     
     let uploadImageUrl : string [] = []
@@ -17,7 +18,7 @@ export default function HostEventPage() {
 
       if (data.Images?.length > 0) {
   for (let file of data.Images) {
-    const url = await uploadImageToCloudinarySigned(file, "event-images");
+    const url = await uploadImageToCloudinarySigned(file, EVENT_IMAGE_NAME);
     if (url) { 
       uploadImageUrl.push(url);
     } else {
