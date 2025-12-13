@@ -21,6 +21,9 @@ export const ProfileHeader: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const {showToast} = useToast()
   const {mutate : updateProfileImage} = useUpdateProfileImageMutation()
+
+  const CLIENT_PROFILE_IMAGES_NAME = import.meta.env.VITE_CLIENT_PROFILE_IMAGES_NAME
+
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleCameraClick = () => {
@@ -49,7 +52,7 @@ export const ProfileHeader: React.FC = () => {
      if(croppedFile){
       uploadImageUrl = await uploadImageToCloudinarySigned(
         croppedFile,
-        "client-profile-images"
+        CLIENT_PROFILE_IMAGES_NAME
       );
 
       if(!uploadImageUrl){

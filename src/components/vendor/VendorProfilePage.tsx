@@ -30,6 +30,8 @@ export default function VendorProfilePage() {
   const { showToast } = useToast()
   const { mutate: updateVendorProfileImage } = useUpdateVendorProfileImageMutation()
   const { mutate: updatePersonalInformation } = useUpdateVendorPersonalInformationMutation()
+  
+  const VENDOR_PROFILE_IMAGES_NAME = import.meta.env.VITE_VENDOR_PROFILE_IMAGES_NAME
 
   const vendor = useSelector((state: RootState) => state.vendor.vendor)
   const navigate = useNavigate()
@@ -57,7 +59,7 @@ export default function VendorProfilePage() {
 
       let uploadImageUrl: string | null = null
 
-      uploadImageUrl = await uploadImageToCloudinarySigned(croppedFile, "vendor-profile-images")
+      uploadImageUrl = await uploadImageToCloudinarySigned(croppedFile, VENDOR_PROFILE_IMAGES_NAME)
 
       if (!uploadImageUrl) {
         showToast("failed to upload", "error")

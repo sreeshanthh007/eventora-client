@@ -148,11 +148,11 @@ const events =
               </div>
             )}
 
-            {/* Real data */}
+    
             {!isLoading && !isError && events.length > 0 && (
               <>
                 <EventsByVendors events={events} />
-                {totalPages > 1 && (
+                {totalPages && (
                   <div className="mt-6 flex justify-center">
                     <Pagination
                       currentPage={page}
