@@ -12,6 +12,7 @@ import RequestedVendorsPage from "@/components/pages/admin/managementPages/Vendo
 import AdminWalletDetailsPage from "@/components/pages/admin/AdminWalletPage";
 import EventsByVendorsPage from "@/components/pages/admin/EventsByVendorsPage";
 import BookedservicesByVendorPage from "@/components/pages/admin/BookedServicesByVendorsPage";
+import ServicesByVendorsPage from "@/components/pages/admin/ServicesByVendorsPage";
 
 
 const AdminDashboard = lazy(() => import("@/components/pages/admin/AdminDashboard"));
@@ -79,6 +80,12 @@ export const AdminRoutes = () => {
     <Route path="/events-vendors" element={
       <Suspense fallback={<Spinner/>}>
       <EventsByVendorsPage/>
+      </Suspense>
+    }/>
+
+    <Route path="/services-by-vendors" element={
+      <Suspense fallback={<Spinner/>}>
+        <ServicesByVendorsPage/>
       </Suspense>
     }/>
 

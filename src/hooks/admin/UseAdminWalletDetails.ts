@@ -11,6 +11,7 @@ export const useAdminWalletDetails = ({page,limit,type}:GetAdminWalletDetailsPar
 
     return useQuery({
         queryKey: ['admin-wallet-details',page,limit,type],
-        queryFn:()=>getAdminWalletDetails({page,limit,type})
+        queryFn:()=>getAdminWalletDetails({page,limit,type}),
+        staleTime:1000*60
     });
 }

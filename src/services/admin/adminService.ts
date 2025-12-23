@@ -4,7 +4,7 @@ import { ADMIN_ROUTES } from "@/utils/constants/api.routes";
 
 export const getAllClients = async ({
   page = 1,
-  limit = 10,
+  limit = 6,
   search = "",
 }: {
   page: number;
@@ -23,7 +23,7 @@ export const getAllClients = async ({
 
 export const getAllVendors = async ({
   page = 1,
-  limit = 10,
+  limit = 6,
   search = "",
 }: {
   page: number;
@@ -43,7 +43,7 @@ export const getAllVendors = async ({
 
 export const getAllCategory = async ({
   page=1,
-  limit=10,
+  limit=6,
   search='',
 }:{
   page:number,
@@ -82,7 +82,7 @@ export const editCategory = async (
 
 export const getRequestedVendors = async({
   page=1,
-  limit=10,
+  limit=6,
   search="",
   
 }:{
@@ -180,7 +180,7 @@ export const rejectVendor = async ({ vendorId, rejectReason }:{vendorId:string,r
 export const getAdminWalletDetails = async({
   type="all",
   page=1,
-  limit=5
+  limit=6
 }:{
   type:string,
   page:number,
@@ -282,4 +282,50 @@ export const getBookedServicesofVendors = async({
     }
   );
   return response.data
+}
+
+
+export const toggleEventsByVendors = async({eventId,isActive}:{eventId:string,isActive:boolean})=>{
+
+  const response = await axiosInstance.patch(
+    ADMIN_ROUTES.TOGGLE_EVENTS_BY_VENDORS(eventId),
+    {isActive}
+  );
+  return response.data
+}
+
+
+export const getServicesByVendorForAdmin = async({
+  page=1,
+  limit=6,
+  search,
+  filterBy
+}:{
+  page:number,
+  limit:number,
+  search?:string,
+  filterBy?:string
+})=>{
+  const response = await axiosInstance.get(
+    ADMIN_ROUTES.GET_SERVICES_BY_VENDOR_ADMIN,
+    {
+      params:{
+        page,
+        limit,
+        search,
+        filterBy
+      }
+    }
+  );
+  return response.data
+}
+
+
+export const toggleServiceByAdmin = async({serviceId,status}:{serviceId:string,status:string})=>{
+
+  const resonse = await axiosInstance.patch(
+    ADMIN_ROUTES.TOGGLE_SERVICE(serviceId),
+    {status}
+  );
+  return resonse.data
 }
