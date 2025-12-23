@@ -50,12 +50,17 @@ const navData = {
       icon: Tag,
     },
     {
-      title: "Events",
+      title: "Events ",
       url: "/admin/events-vendors",
       icon: Calendar1,
     },
     {
-      title: "Services",
+      title: "Services by Vendors",
+      url: "/admin/services-by-vendors",
+      icon: Settings,
+    },
+    {
+      title: "Services Booked by Clients",
       url: "/admin/services-vendors",
       icon: Settings,
     },

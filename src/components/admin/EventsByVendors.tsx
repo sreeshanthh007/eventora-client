@@ -1,6 +1,7 @@
 import { Card } from '@/components/pages/ui/card';
 import { Badge } from '@/components/pages/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/pages/ui/avatar';
+import { Button } from '@/components/pages/ui/button';
 
 interface Event {
   id: string;
@@ -11,6 +12,7 @@ interface Event {
   totalTickets: number;
   eventLocation: string;
   status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
+  isActive: boolean;
   eventSchedule: string;
   eventProviderName: string;
   profilePicture: string;
@@ -18,6 +20,8 @@ interface Event {
 
 interface EventsByVendorsProps {
   events: Event[];
+  onToggleClick: (id: string, newIsActive: boolean, eventName: string) => void;
+  updatingEvents: Set<string>;
 }
 
 const statusConfig = {
@@ -27,7 +31,9 @@ const statusConfig = {
   cancelled: { label: 'Cancelled', className: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' },
 };
 
-export function EventsByVendors({ events }: EventsByVendorsProps) {
+export function EventsByVendors({ events, onToggleClick, updatingEvents }: EventsByVendorsProps) {
+  console.log("events by vendors", events);
+
   return (
     <div className="w-full overflow-x-auto">
       <div className="inline-block min-w-full align-middle">
@@ -44,6 +50,7 @@ export function EventsByVendors({ events }: EventsByVendorsProps) {
                   <th className="px-6 py-4 text-right text-sm font-semibold text-foreground">Price</th>
                   <th className="px-6 py-4 text-right text-sm font-semibold text-foreground">Total Tickets</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Status</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -90,6 +97,16 @@ export function EventsByVendors({ events }: EventsByVendorsProps) {
                       <Badge className={statusConfig[event.status].className}>
                         {statusConfig[event.status].label}
                       </Badge>
+                    </td>
+                    <td className="px-6 py-4">
+                      <Button 
+                        variant={event.isActive ? "destructive" : "default"}
+                        size="sm"
+                        onClick={() => onToggleClick(event.id, !event.isActive, event.eventName)}
+                        disabled={updatingEvents.has(event.id)}
+                      >
+                        {event.isActive ? "Block" : "Unblock"}
+                      </Button>
                     </td>
                   </tr>
                 ))}
@@ -148,6 +165,20 @@ export function EventsByVendors({ events }: EventsByVendorsProps) {
                     <Badge className={`${statusConfig[event.status].className} text-xs mt-1`}>
                       {statusConfig[event.status].label}
                     </Badge>
+                  </div>
+
+                  {/* Fixed Block Button - Full width on mobile */}
+                  <div className="col-span-2">
+                    <p className="text-muted-foreground text-xs font-medium mb-2">Action</p>
+                    <Button 
+                      variant={event.isActive ? "destructive" : "default"}
+                      size="sm" 
+                      className="w-full"
+                     onClick={() => onToggleClick(event.id, !event.isActive, event.eventName)}
+                      disabled={updatingEvents.has(event.id)}
+                    >
+                      {event.isActive ? "Block" : "Unblock"}
+                    </Button>
                   </div>
                 </div>
               </div>

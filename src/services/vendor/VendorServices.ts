@@ -144,7 +144,7 @@ export const getCategoryForService = async()=>{
 
 export const getservices = async ({
   page = 1,
-  limit = 3,
+  limit = 6,
   search = "",
 }: {
   page: number
