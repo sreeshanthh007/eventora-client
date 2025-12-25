@@ -3,7 +3,7 @@
 import { Sheet, SheetTrigger, SheetContent, SheetHeader } from "../pages/ui/sheet"
 import type React from "react"
 import { useState } from "react"
-import { Users, Menu, Ticket, User, LogOut, MessageCircle, Handshake, MessageSquareWarning } from "lucide-react"
+import { Users, Menu, Ticket, User, LogOut, MessageCircle, Handshake, MessageSquareWarning, Home, Calendar, Wrench } from "lucide-react" // Added icons
 import type { RootState } from "@/store/store"
 import { Link, useNavigate } from "react-router-dom"
 import { clientLogout } from "@/store/slices/clientSlice"
@@ -20,20 +20,24 @@ import { NotificationPopover } from "../common/card/NotificationPopOver"
 export const ClientHeader: React.FC = () => {
   const client = useSelector((state: RootState) => state.client.client)
   const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const { mutate: logoutReq } = UseLogout(logOutClient)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  const mainNavItems = [
+    { icon: Home, label: "Home", to: "/" },
+    { icon: Calendar, label: "Events", to: "/events" },
+    { icon: Wrench, label: "Services", to: "/services" }, 
+  ]
 
   const sidebarMenuItems = [
     { icon: User, label: "My Profile", to: "/profile" },
     { icon: Ticket, label: "My Events", to: "/booked-events" },
-    { icon: Handshake, label: "My  Services", to: "/booked-services" },
+    { icon: Handshake, label: "My Services", to: "/booked-services" },
     { icon: MessageCircle, label: "Chat", to: "/chat" },
     { icon: Users, label: "Become a Provider", to: "/vendor/register" },
     { icon: MessageSquareWarning, label: "Report an Issue", to: "/report-issue" },
   ]
-
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-
-  const dispatch = useDispatch()
-  const { mutate: logoutReq } = UseLogout(logOutClient)
 
   const handleLogout = () => {
     logoutReq(undefined, {
@@ -62,20 +66,17 @@ export const ClientHeader: React.FC = () => {
             EVENTORA
           </Link>
 
-          {/* Navigation Menu - Desktop */}
+          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">
-              Home
-            </Link>
-            <Link to="/events" className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">
-              Events
-            </Link>
-            <Link
-              to="/services"
-              className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200"
-            >
-              Services
-            </Link>
+            {mainNavItems.map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200"
+              >
+                {item.label}
+              </Link>
+            ))}
           </nav>
 
           <div className="flex items-center space-x-3">
@@ -98,7 +99,7 @@ export const ClientHeader: React.FC = () => {
                   </SheetTrigger>
                   <SheetContent side="right" className="w-80 bg-white border-l border-gray-200">
                     <SheetHeader className="border-b border-gray-200 pb-4">
-                      {/* <SheetTitle className="text-gray-900 text-left font-semibold text-lg">Menu</SheetTitle> */}
+                      {/* Optional title */}
                     </SheetHeader>
 
                     {/* User Profile */}
@@ -119,15 +120,18 @@ export const ClientHeader: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Navigation Menu */}
+                    {/* Main Navigation (now visible on mobile) */}
                     <nav className="py-4">
+                      <h4 className="px-3 text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                        Navigation
+                      </h4>
                       <ul className="space-y-1">
-                        {sidebarMenuItems.map((item, index) => (
-                          <li key={index}>
+                        {mainNavItems.map((item) => (
+                          <li key={item.to}>
                             <Link
                               to={item.to}
-                              className="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 group block"
                               onClick={() => handleNavigation(item.to)}
+                              className="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 group"
                             >
                               <item.icon className="w-5 h-5 text-gray-600 group-hover:text-gray-900 flex-shrink-0" />
                               <span className="font-medium text-gray-700 group-hover:text-gray-900">{item.label}</span>
@@ -139,10 +143,34 @@ export const ClientHeader: React.FC = () => {
 
                     <Separator className="bg-gray-200" />
 
+                    {/* User Menu Items */}
+                    <nav className="py-4">
+                      <h4 className="px-3 text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                        Account
+                      </h4>
+                      <ul className="space-y-1">
+                        {sidebarMenuItems.map((item, index) => (
+                          <li key={index}>
+                            <Link
+                              to={item.to}
+                              onClick={() => handleNavigation(item.to)}
+                              className="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 group"
+                            >
+                              <item.icon className="w-5 h-5 text-gray-600 group-hover:text-gray-900 flex-shrink-0" />
+                              <span className="font-medium text-gray-700 group-hover:text-gray-900">{item.label}</span>
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </nav>
+
+                    <Separator className="bg-gray-200" />
+
+                    {/* Logout */}
                     <div className="py-4">
                       <button
-                        className="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-red-50 transition-colors duration-200 w-full text-left text-red-600 group"
                         onClick={handleLogout}
+                        className="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-red-50 transition-colors duration-200 w-full text-left text-red-600 group"
                       >
                         <LogOut className="w-5 h-5 group-hover:text-red-700 flex-shrink-0" />
                         <span className="font-medium group-hover:text-red-700">Sign Out</span>
