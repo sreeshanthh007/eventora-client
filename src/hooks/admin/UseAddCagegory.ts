@@ -20,5 +20,4 @@ export const UseAddCategoryMutation = ()=>{
             showToast(err.message,"error")
         }
     })
-    
 }
