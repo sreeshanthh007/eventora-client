@@ -1,4 +1,4 @@
-import type { IVendor } from "@/types/User"
+
 import { useEffect } from "react"
 import { socket } from "./socket"
 import { refreshVendorSessionThunk } from "@/store/slices/vendorSlice"

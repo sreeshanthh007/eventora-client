@@ -20,7 +20,7 @@ export const ClientPublicRoute = () => {
 if(vendor){
   return <Navigate to='/' replace/>
 }
-  return client ? <Navigate to="/" /> : <Outlet />;
+  return client ? <Navigate to="/" /> : <Outlet />; 
 };
 
 export const AdminPublicRoute = () => {
